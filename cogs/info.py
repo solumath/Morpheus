@@ -10,7 +10,7 @@ class Info(Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@command(name="info", aliases=["memberinfo", "ui", "mi", "userinfo"])
+	@command(name="info", aliases=["memberinfo", "me", "userinfo"])
 	async def user_info(self, ctx, target: discord.Member = None):
 		"""prints out info about user"""
 		target = target or ctx.author
@@ -34,7 +34,7 @@ class Info(Cog):
 
 		await ctx.send(embed=embed)
 
-	@command(name="server", aliases=["serverinfo", "guildinfo", "si", "gi"])
+	@command(name="server", aliases=["serverinfo", "guildinfo"])
 	async def server_info(self, ctx):
 		"""prints out info about server"""
 		embed = Embed(title="Server information",

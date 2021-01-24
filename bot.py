@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions
+from discord.ext.commands import has_permissions, MissingPermissions
 import os
 import json
 import init
@@ -51,7 +51,6 @@ async def unload(ctx, extension):
         await ctx.send("Cog not found")
     except commands.ExtensionFailed:
         await ctx.send("Cog failed to unload")
-    
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -75,7 +74,7 @@ for filename in os.listdir('./cogs'):
 @unload.error
 @reload.error
 @clear.error
-async def clear_error(error, ctx):
+async def command_error(ctx, error):
     if isinstance(error, MissingPermissions):
        await ctx.send("You don't have permission to do that...")
 

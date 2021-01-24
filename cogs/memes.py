@@ -33,5 +33,4 @@ class Memes(commands.Cog):
             await message.channel.send("je čerstvá")
 
 def setup(bot):
-    bot.add_cog(memes(bot))
-    
+    bot.add_cog(Memes(bot))
