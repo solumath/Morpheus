@@ -1,9 +1,7 @@
 import discord
 from discord.ext import commands
-bot = commands.Bot(command_prefix='?')
 
-class memes(commands.Cog):
-
+class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -29,6 +27,10 @@ class memes(commands.Cog):
             await message.channel.send("henlo <:peepolove:747845162071490742>")
         elif "jn" in message.content:
             await message.channel.send("jn :slight_smile:")
+        elif "je čerstvá" in message.content:
+            await message.channel.send("není čerstvá")
+        elif "není čerstvá" in message.content:
+            await message.channel.send("je čerstvá")
 
 def setup(bot):
     bot.add_cog(memes(bot))

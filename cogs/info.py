@@ -12,6 +12,7 @@ class Info(Cog):
 
 	@command(name="info", aliases=["memberinfo", "ui", "mi", "userinfo"])
 	async def user_info(self, ctx, target: discord.Member = None):
+		"""prints out info about user"""
 		target = target or ctx.author
 
 		embed = Embed(title="User information",
@@ -35,6 +36,7 @@ class Info(Cog):
 
 	@command(name="server", aliases=["serverinfo", "guildinfo", "si", "gi"])
 	async def server_info(self, ctx):
+		"""prints out info about server"""
 		embed = Embed(title="Server information",
 					  colour=ctx.guild.owner.colour,
 					  timestamp=datetime.utcnow())
@@ -54,7 +56,7 @@ class Info(Cog):
 				  ("Humans", len(list(filter(lambda m: not m.bot, ctx.guild.members))), True),
 				  ("Bots", len(list(filter(lambda m: m.bot, ctx.guild.members))), True),
 				  ("Banned members", len(await ctx.guild.bans()), True),
-				  ("Statuses", f"🟢 {statuses[0]} 🟠 {statuses[1]} 🔴 {statuses[2]} ⚪ {statuses[3]}", True),
+				  ("Statuses", f"🟩 {statuses[0]} 🟧 {statuses[1]} 🟥 {statuses[2]} ⬛ {statuses[3]}", True),
 				  ("Text channels", len(ctx.guild.text_channels), True),
 				  ("Voice channels", len(ctx.guild.voice_channels), True),
 				  ("Categories", len(ctx.guild.categories), True),
