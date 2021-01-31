@@ -21,6 +21,7 @@ class Memes(commands.Cog):
     async def on_message(self, message):
         with open("src/replies.json", 'r') as fp:
             replies = json.load(fp)
+        mention = f'<@!{self.bot.user.id}>'
 
         if message.author.bot:
             if message.author.id == self.bot.user.id and \
@@ -31,6 +32,8 @@ class Memes(commands.Cog):
 
         elif "uh oh" in message.content:
             await message.channel.send("uh oh")
+        elif mention in message.content:
+            await message.channel.send("Whaat? You pinging me?! Use ?help <:Reee:747845163279319180>")
         elif message.content in replies.keys():
             await message.channel.send(replies[message.content])
 
