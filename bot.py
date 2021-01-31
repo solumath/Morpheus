@@ -51,6 +51,7 @@ async def unload(ctx, extension):
         await ctx.send("Cog not found")
     except commands.ExtensionFailed:
         await ctx.send("Cog failed to unload")
+    
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -64,7 +65,7 @@ async def reload(ctx, extension):
     
     print('Reloading cog {} successful'.format(extension))
     await ctx.send('Reloading {} successful'.format(extension))
-    
+
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
@@ -74,7 +75,7 @@ for filename in os.listdir('./cogs'):
 @unload.error
 @reload.error
 @clear.error
-async def command_error(ctx, error):
+async def clear_error(error, ctx):
     if isinstance(error, MissingPermissions):
        await ctx.send("You don't have permission to do that...")
 

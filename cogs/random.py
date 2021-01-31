@@ -18,10 +18,25 @@ class Random(commands.Cog):
             x, y = y, x
         await ctx.send(str(random.randint(x, y)))
 
+    @commands.command(usage = "?pick x y ...")
+    async def pick(self, ctx, *args):
+        """pick a random argument"""
+        for i, arg in enumerate(args):
+            if "?" in arg:
+                args = args[i + 1:]
+                break
+        if not len(args):
+            await ctx.send(f"nejsem fcking vědma, abych vařil z vody <:Reee:747845163279319180> {ctx.author.mention}") 
+
+        choice = discord.utils.escape_mentions(random.choice(args))
+        if choice:
+            await ctx.send(f"{choice} {ctx.author.mention}")
+
+    @pick.error
     @roll.error
     async def command_error(self, ctx, error):
         if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
-            await ctx.send(ctx.command.usage)
+            await ctx.send(f"{ctx.command.usage} {ctx.author.mention}")
 
 def setup(bot):
     bot.add_cog(Random(bot))
