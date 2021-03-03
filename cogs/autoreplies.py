@@ -37,6 +37,7 @@ class Autoreplies(commands.Cog):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
             add = json.load(f)
             f.seek(0, 0)
+            f.truncate(0)
             if key in add.keys():
                 await ctx.send(f"hláška {key} již existuje")
             else:
