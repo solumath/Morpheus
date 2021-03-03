@@ -1,16 +1,29 @@
 import discord
+from discord.ext import commands
 from datetime import datetime
 from typing import Optional
-
 from discord import Embed, Member
-from discord.ext.commands import Cog
-from discord.ext.commands import command
 
-class Info(Cog):
+class Info(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@command(name="info", aliases=["memberinfo", "me", "userinfo"])
+	@commands.command()
+	async def kredity(self, ctx):
+		"""prints out credits for BIT"""
+		await ctx.send("""
+        ```cs
+if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
+    return 65
+if ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
+    return 70
+if ("Mám průměr pod 1.5")
+    return 80
+if ("Mám průměr pod 2.0")
+    return 75```""")
+
+
+	@commands.command(name="info", aliases=["memberinfo", "me", "userinfo"])
 	async def user_info(self, ctx, target: discord.Member = None):
 		"""prints out info about user"""
 		target = target or ctx.author
@@ -24,7 +37,7 @@ class Info(Cog):
 		fields = [("Name", str(target), True),
 				  ("ID", target.id, True),
 				  ("Status", str(target.status), True),
-				  ("Role", ["{}".format(tg.name) for tg in target.roles[1:]], False),
+				  ("Role", ' '.join([role.mention for role in target.roles[1:][::-1]]), False),
 				  ("Created account", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
 				  ("Joined server", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), True),
 				  ("Boosted", bool(target.premium_since), True)]
@@ -34,7 +47,7 @@ class Info(Cog):
 
 		await ctx.send(embed=embed)
 
-	@command(name="server", aliases=["serverinfo", "guildinfo"])
+	@commands.command(name="server", aliases=["serverinfo", "guildinfo"])
 	async def server_info(self, ctx):
 		"""prints out info about server"""
 		embed = Embed(title="Server information",
@@ -68,6 +81,6 @@ class Info(Cog):
 			embed.add_field(name=name, value=value, inline=inline)
 
 		await ctx.send(embed=embed)
-
+	
 def setup(bot):
 	bot.add_cog(Info(bot))

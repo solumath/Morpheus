@@ -11,7 +11,7 @@ class Random(commands.Cog):
         """Flip a coin"""
         await ctx.send(random.randint(0, 1))
 
-    @commands.command(aliases=["rng", "random"], usage = "roll x (y) numbers must be integers")
+    @commands.command(aliases=["rng", "random"], usage = "roll x (y) musí být celá čísla")
     async def roll(self, ctx, x : int, y : int = 0):
         """Roll a dice for range ?roll x (y)"""
         if x > y:
@@ -31,7 +31,7 @@ class Random(commands.Cog):
         choice = discord.utils.escape_mentions(random.choice(args))
         if choice:
             await ctx.send(f"{choice} {ctx.author.mention}")
-
+    
     @pick.error
     @roll.error
     async def command_error(self, ctx, error):

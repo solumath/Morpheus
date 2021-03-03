@@ -1,9 +1,8 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions, MissingPermissions
 import os
 import json
-import init
+import token
 
 intents = discord.Intents.all()
 
@@ -22,12 +21,12 @@ async def clear(ctx, numberOfMessages : int):
 @commands.has_permissions(administrator=True)
 async def load(ctx, extension):
     """Loads cog file"""
-    print('Loading cog {}'.format(extension))
-    await ctx.send('Loading {}'.format(extension))
+    print(f'Loading cog {extension}')
+    await ctx.send(f'Loading {extension}')
     try:
         bot.load_extension(f'cogs.{extension}')
-        print('Loading cog {} successful'.format(extension))
-        await ctx.send('Loading {} successful'.format(extension))
+        print(f'Loading cog {extension} successful')
+        await ctx.send(f'Loading {extension} successful')
     except commands.ExtensionAlreadyLoaded:
         await ctx.send("Cog is already loaded")
     except commands.ExtensionNotFound:
@@ -39,44 +38,59 @@ async def load(ctx, extension):
 @commands.has_permissions(administrator=True)
 async def unload(ctx, extension):
     """Unloads cog file"""
-    print('Unloading cog {}'.format(extension))
-    await ctx.send('Unloading {}'.format(extension))
+    print(f'Unloading cog {extension}')
+    await ctx.send(f'Unloading {extension}')
     try:
         bot.unload_extension(f'cogs.{extension}')
-        print('Unloading cog {} successful'.format(extension))
-        await ctx.send('Unloading {} successful'.format(extension))
+        print(f'Unloading cog {extension} successful')
+        await ctx.send(f'Unloading {extension} successful')
     except commands.ExtensionNotLoaded:
         await ctx.send("Cog is not loaded")
     except commands.ExtensionNotFound:
         await ctx.send("Cog not found")
     except commands.ExtensionFailed:
         await ctx.send("Cog failed to unload")
-    
 
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def reload(ctx, extension):
     """Unload + load cog file"""
-    print('Reloading cog {}'.format(extension))
-    await ctx.send('Reloading {}'.format(extension))
+    print(f'Reloading cog {extension}')
+    await ctx.send(f'Reloading {extension}')
     
     bot.unload_extension(f'cogs.{extension}')  
     bot.load_extension(f'cogs.{extension}') 
-    
-    print('Reloading cog {} successful'.format(extension))
-    await ctx.send('Reloading {} successful'.format(extension))
+
+    print(f'Reloading cog {extension} successful')
+    await ctx.send(f'Reloading {extension} successful')
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def reloadall(ctx):
+    """Reloads all cogs"""
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            bot.load_extension(f'cogs.{filename[:-3]}')
+            print(f'Loaded cog {filename[:-3]}')
+            await ctx.send(f'Loaded cog {filename[:-3]}')
+        else:
+            print(f'Unable to load {filename[:-3]}')
+            await ctx.send(f'Unable to load cog {filename[:-3]}')
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
+        if filename.endswith('.py'):
+            bot.load_extension(f'cogs.{filename[:-3]}')
 
 #-------------------------Errors----------------------------
-@load.error
-@unload.error
-@reload.error
-@clear.error
-async def clear_error(error, ctx):
-    if isinstance(error, MissingPermissions):
-       await ctx.send("You don't have permission to do that...")
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("Takový příkaz neumím")
 
-bot.run(init.TOKEN)
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Na tento příkaz nemáš práva")
+
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("Chybí ti argument")
+
+bot.run(token.TOKEN)
