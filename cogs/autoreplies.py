@@ -4,7 +4,16 @@ import os
 import json
 import datetime
 import git
-import bot
+import logging
+
+today = datetime.date.today()
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(filename=f"servers/logs/{today}.log",encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
+logger.addHandler(handler)
+logging.addLevelName(21, "MSG")
 
 class Autoreplies(commands.Cog):
     def __init__(self, bot):
@@ -65,7 +74,7 @@ class Autoreplies(commands.Cog):
             await message.channel.send(replies[message.content])
 
         #------------------Logger--------------------------------------
-        logger.log(21, "%s: %s", message.author.name, message.content.encode("utf-8"))
+        logger.log(21, "%s: %s", message.author.name, message.content)
 
         # with open(f"servers/{message.guild.name}/logs/{today}","a+") as f:
         #     f.write(f"{message.guild.name}; {today}, {current_time}: {message.author.name}: {message.content}\n")
@@ -79,7 +88,6 @@ class Autoreplies(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         logger.info("in %s, %s reacted with %s on message: %s",
                     payload.guild.name, payload.member.name, payload.emoji.name, payload.message_id)
-
 
 def setup(bot):
     bot.add_cog(Autoreplies(bot))

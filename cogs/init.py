@@ -19,7 +19,7 @@ class Init(commands.Cog):
         #----------------------Create replies-------------------------
         if not (os.path.isfile(f"servers/{ctx.guild.name}/replies.json")):
             with open(f"servers/{ctx.guild.name}/replies.json", "w") as f:
-                json.dump({"hello": "hello"}, f, ensure_ascii=False, indent=4)
+                json.dump({"PR": "https://github.com/solumath/KanekiBot"}, f, ensure_ascii=False, indent=4)
 
         #----------------------Create logs----------------------------
         if not (os.path.isdir(f"servers/{ctx.guild.name}/logs")):
