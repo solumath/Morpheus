@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import json
-import token
+import env
 
 intents = discord.Intents.all()
 
@@ -93,4 +93,4 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Chybí ti argument")
 
-bot.run(token.TOKEN)
+bot.run(env.TOKEN)
