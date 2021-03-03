@@ -52,7 +52,7 @@ class Autoreplies(commands.Cog):
     #uh oh reply
     @commands.Cog.listener()                                          #actually @bot.event
     async def on_message(self, message):
-        with open(f"servers/{message.guild.name_message.guild.id}/replies.json", 'r') as f:
+        with open(f"servers/{message.guild.name}/replies.json", 'r') as f:
             replies = json.load(f)
 
         if message.author.bot:
