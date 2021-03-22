@@ -5,15 +5,11 @@ import io
 import urllib
 from PIL import Image
 
-from config import messages
-
-messages = messages.Messages
-
 PNG_HEADER = b'\x89PNG\r\n\x1a\n'
 
 class Latex(commands.Cog):
     @commands.cooldown(rate=2, per=20.0, type=commands.BucketType.user)
-    @commands.command(brief=messages.latex_desc, description=messages.latex_help)
+    @commands.command(brief="Vykreslí LaTeX výraz", description=f"Příklad:\n`{prefix}latex x^n + y^n = z^n`")
     async def latex(self, ctx, *, equation):
         channel = ctx.channel
         async with ctx.typing():
