@@ -1,4 +1,14 @@
+#bot
 discord
 gitpython
 ffmpeg
-git
+GitPython
+pydrive
+
+#stream script
+av
+click
+lxml
+requests
+tqdm
+setuptools

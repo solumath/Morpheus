@@ -1,3 +1,3 @@
 # Kanekibot
 
-Our own discord but for managing reactions on messages and custom phrases.
+Our own discord but for managing discord servers and helpful for school things.
