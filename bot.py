@@ -87,10 +87,14 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         await ctx.send("Takový příkaz neumím")
 
-    if isinstance(error, commands.MissingPermissions):
+    elif isinstance(error, commands.MissingPermissions):
         await ctx.send("Na tento příkaz nemáš práva")
 
-    if isinstance(error, commands.MissingRequiredArgument):
+    elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Chybí ti argument")
+
+    else:
+        raise error
+
 
 bot.run(env.TOKEN)
