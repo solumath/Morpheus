@@ -62,6 +62,9 @@ class Autoreplies(commands.Cog):
     #uh oh reply
     @commands.Cog.listener()                                          #actually @bot.event
     async def on_message(self, message):
+        if message.guild is None:
+            return
+
         with open(f"servers/{message.guild.name}/replies.json", 'r') as f:
             replies = json.load(f)
 

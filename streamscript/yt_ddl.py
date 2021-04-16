@@ -91,7 +91,8 @@ def process_mpd(mpd_data):
     )
     # Float stupidity for now cause Python doesnt know how to parse this
     # TODO: Make segments actually work without these workarounds
-    seg_len = int(float(root.attrib["minimumUpdatePeriod"][2:-1]))
+    seg_len = 2
+    # seg_len = int(float(root.attrib["minimumUpdatePeriod"][2:-1]))
     attribute_sets = tree.findall(".//def:Period/def:AdaptationSet", nsmap)
     v_streams = []
     a_streams = []
@@ -192,16 +193,16 @@ def mux_to_file(output, aud, vid):
     video.close()
 
 
-def check_if_exists(output):
-    if os.path.exists(output):
-        yn = input(f"File '{output}' already exists. Overwrite? [y/N] ").lower()
-        if yn and yn[0] == "y":
-            os.remove(output)
-            return True
-        else:
-            return False
-    else:
-        return True
+# def check_if_exists(output):
+#     if os.path.exists(output):
+#         yn = input(f"File '{output}' already exists. Overwrite? [y/N] ").lower()
+#         if yn and yn[0] == "y":
+#             os.remove(output)
+#             return True
+#         else:
+#             return False
+#     else:
+#         return True
 
 
 def parse_datetime(inp, utc=True):
@@ -274,7 +275,7 @@ def main(**kwargs):
     mpd_data = get_mpd_data(kwargs["url"])
     if mpd_data is None:
         print("Error: Couldn't get MPD data!")
-        return 0
+        return 1
     a, v, m, s, l = process_mpd(mpd_data)
 
     if kwargs["list_formats"]:
@@ -283,11 +284,11 @@ def main(**kwargs):
 
     if kwargs["output"] is None:
         print("Error: Missing option '-o' / '--output'!")
-        return 0
+        return 1
 
     if not kwargs["output"].endswith((".mp4", ".mkv")):
         print("Error: Unsupported output file format!")
-        return 0
+        return 1
 
     start_time = (
         s - timedelta(seconds=m * l)
@@ -297,7 +298,7 @@ def main(**kwargs):
 
     if start_time == -1:
         print("Error: Couldn't parse start date!")
-        return 0
+        return 1
 
     if kwargs["duration"] is None and kwargs["end"] is None:
         duration = m * l
@@ -311,7 +312,7 @@ def main(**kwargs):
 
     if duration == -1:
         print("Error: Couldn't parse duration or end date!")
-        return 0
+        return 1
 
     start_segment = m - round((s - start_time).total_seconds() / l)
     if start_segment < 0:
@@ -320,7 +321,7 @@ def main(**kwargs):
     end_segment = start_segment + round(duration / l)
     if end_segment > m:
         print("Error: You are requesting segments that dont exist yet!")
-        return 0
+        return 1
 
     download_threads = cpu_count() if kwargs['download_threads'] is None else kwargs['download_threads']
     if download_threads > 4:
@@ -328,13 +329,13 @@ def main(**kwargs):
         download_threads = 4
 
     
-    if check_if_exists(kwargs["output"]):
-        print("Downloading segments...")
-        v_data = download(v[kwargs["vf"]], range(start_segment, end_segment), download_threads)
-        a_data = download(a[kwargs["af"]], range(start_segment, end_segment), download_threads)
-        print("Muxing into file...")
-        mux_to_file(kwargs["output"], a_data, v_data)
+    # if check_if_exists(kwargs["output"]):
+    print("Downloading segments...")
+    v_data = download(v[kwargs["vf"]], range(start_segment, end_segment), download_threads)
+    a_data = download(a[kwargs["af"]], range(start_segment, end_segment), download_threads)
+    print("Muxing into file...")
+    mux_to_file(kwargs["output"], a_data, v_data)
 
 
 if __name__ == "__main__":
-    main()
+    exit(main())
