@@ -7,7 +7,7 @@ import env
 intents = discord.Intents.all()
 
 description = '''Kaneki Tryhardbot'''
-bot = commands.Bot(command_prefix='?', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 @bot.command(name="clear", aliases=["purge"])
 @commands.has_permissions(manage_messages=True)
@@ -94,7 +94,7 @@ async def on_command_error(ctx, error):
         await ctx.send("Chybí ti argument")
 
     else:
+        await ctx.send(error)
         raise error
-
 
 bot.run(env.TOKEN)

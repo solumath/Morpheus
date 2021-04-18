@@ -270,25 +270,25 @@ def check_for_update():
 @click.option("-d", "--duration", help="Duration of the download.")
 @click.option("-o", "--output", help="Output file path.")
 def main(**kwargs):
-    check_for_update()
+    #check_for_update()
 
     mpd_data = get_mpd_data(kwargs["url"])
     if mpd_data is None:
         print("Error: Couldn't get MPD data!")
-        return 1
+        sys.exit(1)
     a, v, m, s, l = process_mpd(mpd_data)
 
     if kwargs["list_formats"]:
         info(a, v, m, s)
-        return 0
+        sys.exit(0)
 
     if kwargs["output"] is None:
         print("Error: Missing option '-o' / '--output'!")
-        return 1
+        sys.exit(1)
 
     if not kwargs["output"].endswith((".mp4", ".mkv")):
         print("Error: Unsupported output file format!")
-        return 1
+        sys.exit(1)
 
     start_time = (
         s - timedelta(seconds=m * l)
@@ -298,7 +298,7 @@ def main(**kwargs):
 
     if start_time == -1:
         print("Error: Couldn't parse start date!")
-        return 1
+        sys.exit(1)
 
     if kwargs["duration"] is None and kwargs["end"] is None:
         duration = m * l
@@ -312,7 +312,7 @@ def main(**kwargs):
 
     if duration == -1:
         print("Error: Couldn't parse duration or end date!")
-        return 1
+        sys.exit(1)
 
     start_segment = m - round((s - start_time).total_seconds() / l)
     if start_segment < 0:
@@ -321,7 +321,7 @@ def main(**kwargs):
     end_segment = start_segment + round(duration / l)
     if end_segment > m:
         print("Error: You are requesting segments that dont exist yet!")
-        return 1
+        sys.exit(1)
 
     download_threads = cpu_count() if kwargs['download_threads'] is None else kwargs['download_threads']
     if download_threads > 4:
@@ -335,6 +335,7 @@ def main(**kwargs):
     a_data = download(a[kwargs["af"]], range(start_segment, end_segment), download_threads)
     print("Muxing into file...")
     mux_to_file(kwargs["output"], a_data, v_data)
+
 
 
 if __name__ == "__main__":
