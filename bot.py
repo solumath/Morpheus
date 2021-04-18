@@ -7,7 +7,7 @@ import env
 intents = discord.Intents.all()
 
 description = '''Kaneki Tryhardbot'''
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='?', intents=intents)
 
 @bot.command(name="clear", aliases=["purge"])
 @commands.has_permissions(manage_messages=True)

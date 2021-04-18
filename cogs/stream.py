@@ -30,10 +30,10 @@ class Stream(commands.Cog):
         else:
             await msg.edit(content=f"Failed to download `{output}`\n\n```{(out+err).decode()}```")
 
-        # TODO semaphor or synchronization so multiple downloads can run in background
-        # TODO if name of file is same update file instead of uploading another one
+        # TODO semaphor or synchronization so multiple downloads can run in the background
+        # TODO if name of file is same, update file instead of uploading another one
+        
         # check for folder with name subject
-
         folders = drive.ListFile({'q': f"title='{subject}' and mimeType='application/vnd.google-apps.folder' and trashed=false"}).GetList()
 
         try:
@@ -59,7 +59,7 @@ class Stream(commands.Cog):
     @commands.command(aliases=["dw","download","s"], usage="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
     async def stream(self, ctx, subject, link, start, duration):
         """Download part of stream"""
-        subject = subject.lower()
+        subject = (subject.lower()).replace(" ", "_")
         filename = f"{time}_{subject}.mp4"
 
         # strip <> just because someone can use it
