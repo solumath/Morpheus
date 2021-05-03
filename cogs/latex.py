@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import io
 import urllib
-from PIL import Image
+import image
 
 PNG_HEADER = b'\x89PNG\r\n\x1a\n'
 

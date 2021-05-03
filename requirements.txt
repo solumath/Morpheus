@@ -4,10 +4,10 @@ gitpython
 ffmpeg
 GitPython
 pydrive
+image
 
 #stream script
 av
-click
 lxml
 requests
 tqdm
