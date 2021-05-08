@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord_slash import cog_ext, SlashContext
 from datetime import datetime
 from typing import Optional
 from discord import Embed, Member
@@ -8,9 +9,8 @@ class Info(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.command()
+	@cog_ext.cog_slash(name="kredity", description="Prints out credits for BIT")
 	async def kredity(self, ctx):
-		"""prints out credits for BIT"""
 		await ctx.send("""
         ```cs
 if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
@@ -23,9 +23,8 @@ if ("Mám průměr pod 2.0")
     return 75```""")
 
 
-	@commands.command(name="info", aliases=["memberinfo", "me", "userinfo"])
+	@cog_ext.cog_slash(name="userinfo", description="Prints out info about user")
 	async def user_info(self, ctx, target: discord.Member = None):
-		"""prints out info about user"""
 		target = target or ctx.author
 
 		embed = Embed(title="User information",
@@ -47,9 +46,8 @@ if ("Mám průměr pod 2.0")
 
 		await ctx.send(embed=embed)
 
-	@commands.command(name="server", aliases=["serverinfo", "guildinfo"])
+	@cog_ext.cog_slash(name="serverinfo", description="Prints out info about server")
 	async def server_info(self, ctx):
-		"""prints out info about server"""
 		embed = Embed(title="Server information",
 					  colour=ctx.guild.owner.colour,
 					  timestamp=datetime.utcnow())

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord_slash import cog_ext
 import os
 import json
 
@@ -7,7 +8,7 @@ class Init(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @cog_ext.cog_slash(name="setupdir",description="setup folders for server")
     async def setupDir(self, ctx):
         """setup folder for new server"""
         #----------------------Create dir-----------------------------

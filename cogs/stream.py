@@ -1,6 +1,7 @@
 import discord
 import random
 from discord.ext import commands
+from discord_slash import cog_ext
 import os
 import subprocess
 import datetime
@@ -57,7 +58,7 @@ class Stream(commands.Cog):
         # except Exception:
         #     await ctx.send(Exception)
         
-    @commands.command(aliases=["dw","download","s"], usage="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
+    @cog_ext.cog_slash(name="stream", description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
     async def stream(self, ctx, subject, link, start, duration):
         """Download part of stream"""
         subject = (subject.lower()).replace(" ", "_")
@@ -70,12 +71,6 @@ class Stream(commands.Cog):
         msg = await ctx.send(f"Downloading `{duration}` of `{link}` from {time} saving to `{filename}`...")
 
         asyncio.create_task(self.download(msg, filename, link, start, duration, subject, ctx))
-
-
-    @stream.error
-    async def command_error(self, ctx, error):
-        if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
-            await ctx.send(f"{ctx.command.usage} {ctx.author.mention}")
 
 def setup(bot):
     bot.add_cog(Stream(bot))

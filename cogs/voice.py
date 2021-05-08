@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
+from discord_slash import cog_ext
 
 class Voice(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command(pass_context=True,aliases=["j"])
+    @cog_ext.cog_slash(name="join")
     async def join(self, ctx):
         if not ctx.author.voice.channel:
             await ctx.send("Musíš být v hovoru")
@@ -14,7 +15,7 @@ class Voice(commands.Cog):
             channel = ctx.author.voice.channel
         await channel.connect()
     
-    @commands.command(pass_context=True,aliases=["l"])
+    @cog_ext.cog_slash(name="leave")
     async def leave(self, ctx):
         await ctx.voice_client.disconnect()
 

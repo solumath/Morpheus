@@ -1,42 +1,32 @@
 import discord
 import random
 from discord.ext import commands
+from discord_slash import cog_ext
 
 class Random(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["coinflip", "coin"])
+    @cog_ext.cog_slash(name="flip", description="flip a coin")
     async def flip(self, ctx):
-        """Flip a coin"""
         await ctx.send(random.randint(0, 1))
 
-    @commands.command(aliases=["rng", "random"], usage = "roll x (y) musí být celá čísla")
+    @cog_ext.cog_slash(name="roll", description="Roll a dice for range")
     async def roll(self, ctx, x : int, y : int = 0):
-        """Roll a dice for range ?roll x (y)"""
         if x > y:
             x, y = y, x
         await ctx.send(str(random.randint(x, y)))
 
-    @commands.command(usage = "?pick x y ...")
-    async def pick(self, ctx, *args):
-        """pick a random argument"""
-        for i, arg in enumerate(args):
-            if "?" in arg:
-                args = args[i + 1:]
-                break
-        if not len(args):
-            await ctx.send(f"nejsem fcking vědma, abych vařil z vody <:Reee:747845163279319180> {ctx.author.mention}") 
-
-        choice = discord.utils.escape_mentions(random.choice(args))
-        if choice:
-            await ctx.send(f"{choice} {ctx.author.mention}")
+    @cog_ext.cog_slash(name="pick", description="Pick a random thing")
+    async def pick(self, ctx, arg1 : str, arg2 : str, arg3 : str = None, arg4 : str = None,
+                    arg5 : str = None, arg6 : str = None, arg7 : str = None,
+                    arg8 : str = None, arg9 : str = None, arg10 : str = None):
+        
+        # for now works
+        args = [arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10]
+        choices = [i for i in args if i]
+        rng = random.choice(choices)
+        await ctx.send(rng)
     
-    @pick.error
-    @roll.error
-    async def command_error(self, ctx, error):
-        if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
-            await ctx.send(f"{ctx.command.usage} {ctx.author.mention}")
-
 def setup(bot):
     bot.add_cog(Random(bot))

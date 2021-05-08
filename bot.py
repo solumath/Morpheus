@@ -3,24 +3,22 @@ from discord.ext import commands
 import os
 import json
 import env
+from discord_slash import SlashCommand, SlashContext
 
-intents = discord.Intents.all()
+bot = commands.Bot(command_prefix='?', intents=discord.Intents.all())
+slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload = True)
 
-description = '''Kaneki Tryhardbot'''
-bot = commands.Bot(command_prefix='?', intents=intents)
-
-@bot.command(name="clear", aliases=["purge"])
+@slash.slash(name="purge", description="delete number of messages")
 @commands.has_permissions(manage_messages=True)
-async def clear(ctx, numberOfMessages : int):
-    """delete X messages"""
-    await ctx.message.channel.purge(limit=numberOfMessages)
+async def purge(ctx, number_of_messages : int):
+    await ctx.channel.purge(limit=number_of_messages)
+    await ctx.send("What is real? How do you define real?", delete_after=5)
+
 
 #-------------------------Cogs----------------------------
-
-@bot.command()
+@slash.slash(name="load", description="Loads cog file")
 @commands.has_permissions(administrator=True)
 async def load(ctx, extension):
-    """Loads cog file"""
     print(f'Loading cog {extension}')
     await ctx.send(f'Loading {extension}')
     try:
@@ -34,10 +32,9 @@ async def load(ctx, extension):
     except commands.ExtensionFailed:
         await ctx.send("Cog failed to load")
 
-@bot.command()
+@slash.slash(name="unload", description="Unloads cog file")
 @commands.has_permissions(administrator=True)
 async def unload(ctx, extension):
-    """Unloads cog file"""
     print(f'Unloading cog {extension}')
     await ctx.send(f'Unloading {extension}')
     try:
@@ -51,10 +48,9 @@ async def unload(ctx, extension):
     except commands.ExtensionFailed:
         await ctx.send("Cog failed to unload")
 
-@bot.command()
+@slash.slash(name="reload", description="Reloads cog file")
 @commands.has_permissions(administrator=True)
-async def reload(ctx, extension):
-    """Unload + load cog file"""
+async def rel(ctx, extension):
     print(f'Reloading cog {extension}')
     await ctx.send(f'Reloading {extension}')
     
@@ -64,7 +60,7 @@ async def reload(ctx, extension):
     print(f'Reloading cog {extension} successful')
     await ctx.send(f'Reloading {extension} successful')
 
-@bot.command()
+@slash.slash(name="reloadall", description="Reloads all cog files")
 @commands.has_permissions(administrator=True)
 async def reloadall(ctx):
     """Reloads all cogs"""
@@ -81,20 +77,21 @@ for filename in os.listdir('./cogs'):
         if filename.endswith('.py'):
             bot.load_extension(f'cogs.{filename[:-3]}')
 
+
 #-------------------------Errors----------------------------
 @bot.event
-async def on_command_error(ctx, error):
+async def on_slash_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send("Takový příkaz neumím")
+        await ctx.send("I do not posses that command")
 
     elif isinstance(error, commands.MissingPermissions):
-        await ctx.send("Na tento příkaz nemáš práva")
+        await ctx.send("You cannot beat me!")
 
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("Chybí ti argument")
+        await ctx.send("Your argument is invalid")
 
     else:
-        await ctx.send(error)
         raise error
+        await ctx.send(error)
 
 bot.run(env.TOKEN)
