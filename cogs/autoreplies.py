@@ -32,7 +32,7 @@ class Autoreplies(commands.Cog):
         #set status for bot
         repo = git.Repo(search_parent_directories=True)
         sha = repo.head.object.hexsha
-        await self.bot.change_presence(activity=discord.Game(f"?help | On commit {sha[:7]}"))
+        await self.bot.change_presence(activity=discord.Game(f"/userinfo | On commit {sha[:7]}"))
 
     @cog_ext.cog_slash(name="addreply", description="Add autoreply")
     async def addreply(self, ctx, key, reply):

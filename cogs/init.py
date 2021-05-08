@@ -8,7 +8,7 @@ class Init(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name="setupdir",description="setup folders for server")
+    @cog_ext.cog_slash(name="setupdir", description="setup folders for server")
     async def setupDir(self, ctx):
         """setup folder for new server"""
         #----------------------Create dir-----------------------------

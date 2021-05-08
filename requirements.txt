@@ -2,7 +2,6 @@
 discord
 gitpython
 ffmpeg
-GitPython
 pydrive
 image
 discord-py-slash-command
