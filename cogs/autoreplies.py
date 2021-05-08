@@ -6,6 +6,7 @@ import json
 import datetime
 import git
 import logging
+import env
 
 today = datetime.date.today()
 
@@ -73,7 +74,7 @@ class Autoreplies(commands.Cog):
             return
         elif "uh oh" in message.content:
             await message.channel.send("uh oh")
-        elif (f'<@!{self.bot.user.id}>') or (f'<@{self.bot.user.id}>') in message.content:
+        elif f"<@!{self.bot.user.id}>" in message.content or f"<@{self.bot.user.id}>" in message.content:
             await message.channel.send("Remember...All I'm Offering Is The Truth. Nothing More.")
         elif message.content in replies.keys():
             await message.channel.send(replies[message.content])
