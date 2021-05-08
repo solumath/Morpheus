@@ -1,6 +1,7 @@
 import discord
 import random
 from discord.ext import commands
+from discord_slash import cog_ext
 import os
 import subprocess
 import datetime
@@ -32,31 +33,32 @@ class Stream(commands.Cog):
 
         # TODO semaphor or synchronization so multiple downloads can run in the background
         # TODO if name of file is same, update file instead of uploading another one
+        # TODO rewrite upload (cant upload file bigger than 100MB with pydrive)
         
         # check for folder with name subject
-        folders = drive.ListFile({'q': f"title='{subject}' and mimeType='application/vnd.google-apps.folder' and trashed=false"}).GetList()
+        # folders = drive.ListFile({'q': f"title='{subject}' and mimeType='application/vnd.google-apps.folder' and trashed=false"}).GetList()
 
-        try:
-            # check if folder was found if not create folder and upload to it
-            if folders != []:
-                for folder in folders:
-                    if folder.get("title") == subject:
-                        gfile = drive.CreateFile({'title': output,'parents': [{'id': folder['id']}]})
-                        gfile.Upload()
-                        os.remove(output)
-                        await ctx.send("File successfully uploaded")
+        # try:
+        #     # check if folder was found if not create folder and upload to it
+        #     if folders != []:
+        #         for folder in folders:
+        #             if folder.get("title") == subject:
+        #                 gfile = drive.CreateFile({'title': output,'parents': [{'id': folder['id']}]})
+        #                 gfile.Upload()
+        #                 os.remove(output)
+        #                 await ctx.send("File successfully uploaded")
 
-            else:
-                new_folder = drive.CreateFile({'title': subject,"parents":[{'id': env.DRIVE_ID}],'mimeType':"application/vnd.google-apps.folder"})
-                new_folder.Upload()
-                gfile = drive.CreateFile({'title': output,'parents': [{'id': new_folder['id']}]})
-                gfile.Upload()
-                await ctx.send("File successfully uploaded")
-                os.remove(output)
-        except Exception:
-            await ctx.send(Exception)
+        #     else:
+        #         new_folder = drive.CreateFile({'title': subject,"parents":[{'id': env.DRIVE_ID}],'mimeType':"application/vnd.google-apps.folder"})
+        #         new_folder.Upload()
+        #         gfile = drive.CreateFile({'title': output,'parents': [{'id': new_folder['id']}]})
+        #         gfile.Upload()
+        #         await ctx.send("File successfully uploaded")
+        #         os.remove(output)
+        # except Exception:
+        #     await ctx.send(Exception)
         
-    @commands.command(aliases=["dw","download","s"], usage="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
+    @cog_ext.cog_slash(name="stream", description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
     async def stream(self, ctx, subject, link, start, duration):
         """Download part of stream"""
         subject = (subject.lower()).replace(" ", "_")
@@ -69,12 +71,6 @@ class Stream(commands.Cog):
         msg = await ctx.send(f"Downloading `{duration}` of `{link}` from {time} saving to `{filename}`...")
 
         asyncio.create_task(self.download(msg, filename, link, start, duration, subject, ctx))
-
-
-    @stream.error
-    async def command_error(self, ctx, error):
-        if isinstance(error, (commands.MissingRequiredArgument, commands.BadArgument)):
-            await ctx.send(f"{ctx.command.usage} {ctx.author.mention}")
 
 def setup(bot):
     bot.add_cog(Stream(bot))

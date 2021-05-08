@@ -1,25 +1,22 @@
-import json
-import os
-import re
-import sys
-import time
-from datetime import datetime, timedelta
-from distutils.version import LooseVersion
-from io import BytesIO
-from multiprocessing import cpu_count
+from requests.packages.urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+import requests
+import lxml.html
+from lxml.etree import QName, SubElement
+from lxml import etree
+from tqdm import tqdm
+import av
+
 from multiprocessing.pool import ThreadPool
+from multiprocessing import cpu_count
+from io import BytesIO
+from datetime import datetime, timedelta
+import time
+import re
 
-import av                                               # av
-import click                                            # click
-import pkg_resources                                    # setuptools
-from lxml import etree                                  # lxml
-from lxml.etree import QName, SubElement                # lxml
-import lxml.html                                        # lxml
-import requests                                         # requests
-from requests.adapters import HTTPAdapter               # requests
-from requests.packages.urllib3.util.retry import Retry  # requests
-from tqdm import tqdm                                   # tqdm
+from argparse import ArgumentParser
 
+# init session
 s = requests.Session()
 retry = Retry(connect=5, backoff_factor=0.5)
 adapter = HTTPAdapter(max_retries=retry)
@@ -28,6 +25,26 @@ s.mount('https://', adapter)
 get = s.get
 
 av.logging.set_level(av.logging.PANIC)
+
+
+# define exceptions
+class UnparseableDatetime(BaseException):
+    def __init__(self, string):
+        self.string = string
+        super().__init__(f"Couldn't parse datetime \"{string}\"")
+
+class UnparseableDuration(BaseException):
+    def __init__(self, string):
+        self.string = string
+        super().__init__(f"Couldn't parse duration \"{string}\"")
+
+class ConsentCheckFailed(BaseException):
+    def __init__(self):
+        super().__init__("Didn't manage to pass consent check")
+
+class FutureSegmentsException(BaseException):
+    def __init__(self):
+        super().__init__("You are requesting segments that don't exist yet!")
 
 
 class Stream:
@@ -60,21 +77,21 @@ def local_to_utc(dt):
 def get_mpd_data(video_url):
     req = get(video_url)
     if 'dashManifestUrl\\":\\"' in req.text:
-        mpd_link = req.text.split('dashManifestUrl\\":\\"')[-1].split('\\"')[0].replace("\/", "/")
+        mpd_link = req.text.split('dashManifestUrl\\":\\"')[-1].split('\\"')[0].replace(r"\/", "/")
     elif 'dashManifestUrl":"' in req.text:
-        mpd_link = req.text.split('dashManifestUrl":"')[-1].split('"')[0].replace("\/", "/")
+        mpd_link = req.text.split('dashManifestUrl":"')[-1].split('"')[0].replace(r"\/", "/")
     else:
         doc = lxml.html.fromstring(req.content)
         form = doc.xpath('//form[@action="https://consent.youtube.com/s"]')
-        if len(form) > 0:
-            print("Consent check detected. Will try to pass...")
-            params = form[0].xpath('.//input[@type="hidden"]')
-            pars = {}
-            for par in params:
-                pars[par.attrib['name']] = par.attrib['value']
-            s.post("https://consent.youtube.com/s", data=pars)
-            return get_mpd_data(video_url)
-        return None
+        if len(form) == 0:
+            raise ConsentCheckFailed()
+
+        print("Consent check detected. Will try to pass...")
+        params = form[0].xpath('.//input[@type="hidden"]')
+        pars = {par.attrib['name']: par.attrib['value'] for par in params}
+        s.post("https://consent.youtube.com/s", data=pars)
+        return get_mpd_data(video_url)
+
     return get(mpd_link).text
 
 
@@ -91,29 +108,35 @@ def process_mpd(mpd_data):
     )
     # Float stupidity for now cause Python doesnt know how to parse this
     # TODO: Make segments actually work without these workarounds
-    seg_len = 2
-    # seg_len = int(float(root.attrib["minimumUpdatePeriod"][2:-1]))
+
+    # sometimes, doesn't work. if not guessed correctly, will make your video longer/shorter
+    # seg_len = 2
+    seg_len = int(float(root.attrib["minimumUpdatePeriod"][2:-1]))
     attribute_sets = tree.findall(".//def:Period/def:AdaptationSet", nsmap)
     v_streams = []
     a_streams = []
+
     for a in attribute_sets:
         stream_type = a.attrib["mimeType"][0]
+
         for r in a.findall(".//def:Representation", nsmap):
             bitrate = int(r.attrib["bandwidth"])
             codec = r.attrib["codecs"]
             base_url = r.find(".//def:BaseURL", nsmap).text + "sq/"
+
             if stream_type == "a":
                 quality = r.attrib["audioSamplingRate"]
                 a_streams.append(Stream(stream_type, bitrate, codec, quality, base_url))
             elif stream_type == "v":
                 quality = f"{r.attrib['width']}x{r.attrib['height']}"
                 v_streams.append(Stream(stream_type, bitrate, codec, quality, base_url))
+
     a_streams.sort(key=lambda x: x.bitrate, reverse=True)
     v_streams.sort(key=lambda x: x.bitrate, reverse=True)
     return a_streams, v_streams, total_seg, d_time, seg_len
 
 
-def info(a, v, m, s):
+def print_info(a, v, m):
     print(f"You can go back {int(m*2/3600)} hours and {int(m*2%3600/60)} minutes...")
     print(f"Download avaliable from {datetime.today() - timedelta(seconds=m*2)}")
     print("\nAudio stream ids")
@@ -125,21 +148,19 @@ def info(a, v, m, s):
         print(f"{i}:  {str(v[i])}")
 
 
-def download_func(seg):
-    while True:
-        req = get(seg.url)
-        if req.status_code == 200:
-            break
-        time.sleep(1)
-    return req.content
-
-
 def download(stream, seg_range, threads=1):
-    segments = []
-    for seg in seg_range:
-        segments.append(Segment(stream, seg))
+    # get(seg.url).content until it's http 200
+    def download_func(seg):
+        while True:
+            req = get(seg.url)
+            if req.status_code == 200:
+                break
+            time.sleep(1)
+        return req.content
 
+    segments = [Segment(stream, seg) for seg in seg_range]
     results = ThreadPool(threads).imap(download_func, segments)
+
     combined_file = BytesIO()
     segs_downloaded = 0
     for res in tqdm(results, total=len(segments), unit="seg"):
@@ -193,18 +214,6 @@ def mux_to_file(output, aud, vid):
     video.close()
 
 
-# def check_if_exists(output):
-#     if os.path.exists(output):
-#         yn = input(f"File '{output}' already exists. Overwrite? [y/N] ").lower()
-#         if yn and yn[0] == "y":
-#             os.remove(output)
-#             return True
-#         else:
-#             return False
-#     else:
-#         return True
-
-
 def parse_datetime(inp, utc=True):
     formats = ["%Y-%m-%dT%H:%M", "%d.%m.%Y %H:%M", "%d.%m %H:%M", "%H:%M"]
     for fmt in formats:
@@ -220,123 +229,98 @@ def parse_datetime(inp, utc=True):
             return local_to_utc(d_time)
         except ValueError:
             pass
-    return -1
+    raise UnparseableDatetime(inp)
 
 
 def parse_duration(inp):
-    x = re.findall("([0-9]+[hmsHMS])", inp)
-    if not x:
-        try:
-            number = int(inp)
-        except:
-            return -1
-        return number
+    if (x := re.findall("([0-9]+[hmsHMS])", inp)):
+        return sum(int(chunk[:-1]) * {'h':3600,'m':60}.get(chunk[-1], 1) for chunk in x)
     else:
-        total_seconds = 0
-        for chunk in x:
-            if chunk[-1] == "h":
-                total_seconds += int(chunk[:-1]) * 3600
-            elif chunk[-1] == "m":
-                total_seconds += int(chunk[:-1]) * 60
-            elif chunk[-1] == "s":
-                total_seconds += int(chunk[:-1])
-        return total_seconds
+        try:
+            return int(inp)
+        except ValueError:
+            raise UnparseableDuration(inp)
 
-def check_for_update():
-    # Ugly code... if you have a better idea please help
-    try:
-        local_version = LooseVersion(pkg_resources.get_distribution("youtube_dash_dl").version)
-    except:
-        return
-    try:
-        req = get("https://pypi.org/pypi/youtube-dash-dl/json")
-        online_version = LooseVersion(json.loads(req.text)['info']['version'])
-    except:
-        return
+def main(parsed):
 
-    if online_version > local_version:
-        print(f"Update avaliable!\nYou should probably update with 'pip install --upgrade youtube_dash_dl'\nLocal version: {local_version} | Online version: {online_version}\n")
+    # check -o extension
+    if parsed.output and not parsed.output.endswith((".mp4", ".mkv")):
+        print("Error: Unsupported output file format!")
+        return 1
 
+    start_time = None
+    duration = None
+    end_time = None
 
-@click.command()
-@click.argument("url")
-@click.option("-l", "--list-formats", is_flag=True, help="List info about stream ids")
-@click.option("-af", default=0, help="Select audio stream id.")
-@click.option("-vf", default=0, help="Select video stream id.")
-@click.option("--utc", is_flag=True, help="Use UTC time instead of local.")
-@click.option("-s", "--start", help="Start time of the download.")
-@click.option("-e", "--end", help="End time of the download.")
-@click.option("--download-threads", type=int, help="Set amount of download threads.")
-@click.option("-d", "--duration", help="Duration of the download.")
-@click.option("-o", "--output", help="Output file path.")
-def main(**kwargs):
-    #check_for_update()
+    # parse user-entered start, end or duration
+    if parsed.start:
+        start_time = parse_datetime(parsed.start, parsed.utc)
+    if parsed.duration:
+        duration =  parse_duration(parsed.duration)
+    elif parsed.end:
+        end_time = parse_datetime(parsed.end, parsed.utc)
 
-    mpd_data = get_mpd_data(kwargs["url"])
-    if mpd_data is None:
-        print("Error: Couldn't get MPD data!")
-        sys.exit(1)
+    print(start_time, duration, end_time)
+
+    # retrieve mpd data from youtube servers
+    mpd_data = get_mpd_data(parsed.url)
     a, v, m, s, l = process_mpd(mpd_data)
 
-    if kwargs["list_formats"]:
-        info(a, v, m, s)
-        sys.exit(0)
-
-    if kwargs["output"] is None:
-        print("Error: Missing option '-o' / '--output'!")
-        sys.exit(1)
-
-    if not kwargs["output"].endswith((".mp4", ".mkv")):
-        print("Error: Unsupported output file format!")
-        sys.exit(1)
-
-    start_time = (
-        s - timedelta(seconds=m * l)
-        if kwargs["start"] is None
-        else parse_datetime(kwargs["start"], kwargs["utc"])
-    )
-
-    if start_time == -1:
-        print("Error: Couldn't parse start date!")
-        sys.exit(1)
-
-    if kwargs["duration"] is None and kwargs["end"] is None:
-        duration = m * l
-    else:
-        if kwargs["duration"] is None:
-            e_dtime = parse_datetime(kwargs["end"], kwargs["utc"])
-            s_dtime = s if kwargs["start"] is None else parse_datetime(kwargs["start"], kwargs["utc"])
-            duration = (e_dtime - s_dtime).total_seconds()
+    # if not -s, retrieve start time from mpd data
+    if not start_time:
+        start_time = s - timedelta(seconds=m * l)
+        print(start_time)
+    if not duration:
+        if end_time:
+            duration = (end_time - (start_time or s)).total_seconds()
         else:
-            duration =  parse_duration(kwargs["duration"])
+            duration = m * l
 
-    if duration == -1:
-        print("Error: Couldn't parse duration or end date!")
-        sys.exit(1)
-
+    # calculate start and end segments
     start_segment = m - round((s - start_time).total_seconds() / l)
-    if start_segment < 0:
-        start_segment = 0
-
+    start_segment = max(start_segment, 0)
     end_segment = start_segment + round(duration / l)
     if end_segment > m:
-        print("Error: You are requesting segments that dont exist yet!")
-        sys.exit(1)
+        raise FutureSegmentsException()
 
-    download_threads = cpu_count() if kwargs['download_threads'] is None else kwargs['download_threads']
-    if download_threads > 4:
-        # This is here until we figure out how to use youtube cookies as to not get blocked
-        download_threads = 4
+    print(start_time, duration, end_time)
 
-    
-    # if check_if_exists(kwargs["output"]):
+    # just list formats if -l
+    if parsed.list_formats:
+        print_info(a, v, m)
+        return
+
+    # This is here until we figure out how to use youtube cookies as to not get blocked
+    download_threads = min(4, parsed.download_threads or cpu_count())
+
     print("Downloading segments...")
-    v_data = download(v[kwargs["vf"]], range(start_segment, end_segment), download_threads)
-    a_data = download(a[kwargs["af"]], range(start_segment, end_segment), download_threads)
+    v_data = download(v[parsed.vf], range(start_segment, end_segment), download_threads)
+    a_data = download(a[parsed.af], range(start_segment, end_segment), download_threads)
+
     print("Muxing into file...")
-    mux_to_file(kwargs["output"], a_data, v_data)
+    mux_to_file(parsed.output, a_data, v_data)
 
 
 
 if __name__ == "__main__":
-    exit(main())
+
+    parser = ArgumentParser()
+    parser.add_argument("url")
+    parser.add_argument("-s", "--start", help="Start time of the download")
+    parser.add_argument("-e", "--end", help="End time of the download")
+    parser.add_argument("-d", "--duration", help="Duration of the download")
+    parser.add_argument("--utc", action='store_true', help="Use UTC time instead of local")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-o", "--output", help="Output file path.")
+    group.add_argument("-l", "--list-formats", action='store_true', help="List info about stream ids")
+    parser.add_argument("-dt", "--download-threads", type=int, help="Set amount of download threads")
+    parser.add_argument("-af", default=0, help="Select audio stream id")
+    parser.add_argument("-vf", default=0, help="Select video stream id")
+
+    parsed = parser.parse_args()
+
+    try:
+        main(parsed)
+    except (UnparseableDatetime, UnparseableDuration, ConsentCheckFailed, FutureSegmentsException) as e:
+        print(f'Error: {e}')
+        exit(1)

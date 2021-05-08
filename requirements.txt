@@ -4,10 +4,11 @@ gitpython
 ffmpeg
 GitPython
 pydrive
+image
+discord-py-slash-command
 
 #stream script
 av
-click
 lxml
 requests
 tqdm
