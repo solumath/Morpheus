@@ -13,15 +13,14 @@ class Info(commands.Cog):
 	async def kredity(self, ctx):
 		await ctx.send("""
         ```cs
-if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
-    return 65
-if ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
-    return 70
-if ("Mám průměr pod 1.5")
-    return 80
-if ("Mám průměr pod 2.0")
-    return 75```""")
-
+		if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
+    		return 65
+		if ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
+    		return 70
+		if ("Mám průměr pod 1.5")
+    		return 80
+		if ("Mám průměr pod 2.0")
+    		return 75```""")
 
 	@cog_ext.cog_slash(name="userinfo", description="Prints out info about user")
 	async def user_info(self, ctx, target: discord.Member = None):

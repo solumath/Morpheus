@@ -9,6 +9,7 @@ class Init(commands.Cog):
         self.bot = bot
 
     @cog_ext.cog_slash(name="setupdir", description="setup folders for server")
+    @commands.has_permissions(administrator=True)
     async def setupDir(self, ctx):
         """setup folder for new server"""
         #----------------------Create dir-----------------------------
