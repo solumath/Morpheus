@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
+
 import os
 import json
 import datetime
-import git
 import logging
 import traceback
+
+import env
 
 today = datetime.date.today()
 
@@ -21,21 +23,9 @@ logging.addLevelName(23, "EDIT")
 logging.addLevelName(24, "DEL")
 logging.addLevelName(25, "COMM")
 
-class Autoreplies(commands.Cog):
+class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    # Events
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print('Ready!')
-        print('Logged in as', self.bot.user)
-        print('ID:', self.bot.user.id)
-
-        #set status for bot
-        repo = git.Repo(search_parent_directories=True)
-        sha = repo.head.object.hexsha
-        await self.bot.change_presence(activity=discord.Game(f"/userinfo | On commit {sha[:7]}"))
 
     @cog_ext.cog_slash(name="addreply", description="Add autoreply")
     async def addreply(self, ctx, key, reply):
@@ -64,8 +54,8 @@ class Autoreplies(commands.Cog):
                 await ctx.send(f"takovou hlášku jsem nenašel")
 
     #uh oh reply
-    @commands.Cog.listener()
-    async def on_message(self, message):
+    @commands.Cog.listener("on_message")
+    async def reply(self, message):
         if not "Traceback" in message.content:
             image = ""
             if message.attachments:
@@ -91,27 +81,24 @@ class Autoreplies(commands.Cog):
     #-------------------------Logs----------------------------
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        guild = await self.bot.fetch_guild(payload.guild_id)
-        member = await self.bot.fetch_user(payload.user_id)
-        channel = await self.bot.fetch_channel(payload.channel_id)
-        logger.log(22, f"Guild: {guild} || Channel: {channel} || Message: {payload.message_id} ||"
-                       f" Author: {member} || EmojiRem: {payload.emoji}")
+        channel = self.bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        logger.log(22, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||"
+                       f" Author: {message.author} || EmojiRem: {payload.emoji}")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        guild = await self.bot.fetch_guild(payload.guild_id)
-        member = await self.bot.fetch_user(payload.user_id)
-        channel = await self.bot.fetch_channel(payload.channel_id)
-        logger.log(22, f"Guild: {guild} || Channel: {channel} || Message: {payload.message_id} ||" 
-                       f" Author: {member} || EmojiAdd: {payload.emoji}")
+        channel = self.bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        logger.log(22, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
+                       f" Author: {message.author} || EmojiAdd: {payload.emoji}")
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
-        guild = await self.bot.fetch_guild(payload.guild_id)
-        channel = await self.bot.fetch_channel(payload.channel_id)
-        logger.log(23, f"Guild: {guild} || Channel: {channel} || Message: {payload.message_id} ||" 
-                       f" Author: {payload.data['author']['username']}#{payload.data['author']['discriminator']}:"
-                       f" {payload.data['content']}")
+        channel = self.bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        logger.log(23, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
+                       f" Author: {message.author}: {message.content}")
     
     @commands.Cog.listener()
     async def on_message_delete(self, ctx):
@@ -129,27 +116,30 @@ class Autoreplies(commands.Cog):
     #-------------------------Errors----------------------------
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error):
-        if isinstance(error, commands.CommandNotFound):
-            await ctx.send("I do not posses that command")
-
-        elif isinstance(error, commands.MissingPermissions):
+        if isinstance(error, commands.MissingPermissions):
             await ctx.send("You cannot beat me!")
-
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Your argument is invalid")
 
         #send traceback to server
         else:
-            channel = self.bot.get_channel(768796879042773022)
-            etype = type(error)
-            trace = error.__traceback__
-            lines = traceback.format_exception(etype, error, trace)
-            traceback_text = ''.join(lines)
+            await ctx.defer()
+            channel = self.bot.get_channel(env.development)
+            lines = traceback.format_exception(type(error), error, error.__traceback__)
+            ex = ''.join(lines)
+            
+            logger.exception(ex)
 
-            logger.exception(traceback_text)
-            await ctx.send(f"```{traceback_text}```")
-            await channel.send(f"```{traceback_text}```")
+            message = await ctx.send(f"```Errors happen Mr. Anderson```")
+            
+            embed = discord.Embed(title=f"Ignoring exception on {ctx.command}", colour=0xFF0000)
+            embed.add_field(name="Zpráva", value=ctx.args, inline=True)
+            embed.add_field(name="Autor", value=ctx.author, inline=True)
+            embed.add_field(name="Link", value=message.jump_url, inline=False)
+            embed.add_field(name="Traceback", value=f"```{ex}```", inline=False)
+
+            await channel.send(embed=embed)
+            print(ex)
+
             raise error
     
 def setup(bot):
-    bot.add_cog(Autoreplies(bot))
+    bot.add_cog(Logging(bot))

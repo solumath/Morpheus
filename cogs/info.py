@@ -1,32 +1,30 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
+
 from datetime import datetime
-from typing import Optional
-from discord import Embed, Member
 
 class Info(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@cog_ext.cog_slash(name="kredity", description="Prints out credits for BIT")
+	@cog_ext.cog_slash(name="kredity", description="Prints out credits for BIT", )
 	async def kredity(self, ctx):
-		await ctx.send("""
-        ```cs
-		if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
-    		return 65
-		if ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
-    		return 70
-		if ("Mám průměr pod 1.5")
-    		return 80
-		if ("Mám průměr pod 2.0")
-    		return 75```""")
+		await ctx.send("""```cs
+if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
+	return 65
+if ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
+	return 70
+if ("Mám průměr pod 1.5")
+	return 80
+if ("Mám průměr pod 2.0")
+	return 75```""")
 
-	@cog_ext.cog_slash(name="userinfo", description="Prints out info about user")
+	@cog_ext.cog_slash(name="user", description="Prints out info about user")
 	async def user_info(self, ctx, target: discord.Member = None):
 		target = target or ctx.author
 
-		embed = Embed(title="User information",
+		embed = discord.Embed(title="User information",
 					  color=target.color,
 					  timestamp=datetime.utcnow())
 
@@ -45,9 +43,9 @@ class Info(commands.Cog):
 
 		await ctx.send(embed=embed)
 
-	@cog_ext.cog_slash(name="serverinfo", description="Prints out info about server")
+	@cog_ext.cog_slash(name="server", description="Prints out info about server")
 	async def server_info(self, ctx):
-		embed = Embed(title="Server information",
+		embed = discord.Embed(title="Server information",
 					  colour=ctx.guild.owner.colour,
 					  timestamp=datetime.utcnow())
 

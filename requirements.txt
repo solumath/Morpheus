@@ -5,6 +5,8 @@ ffmpeg
 pydrive
 image
 discord-py-slash-command
+pillow
+youtube-dl
 
 #stream script
 av
