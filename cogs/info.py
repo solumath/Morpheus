@@ -8,7 +8,7 @@ class Info(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@cog_ext.cog_slash(name="kredity", description="Prints out credits for BIT", )
+	@cog_ext.cog_slash(name="kredity", description="Prints out credits for BIT")
 	async def kredity(self, ctx):
 		await ctx.send("""```cs
 if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")

@@ -83,15 +83,17 @@ class Logging(commands.Cog):
     async def on_raw_reaction_remove(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
+        guild = self.bot.get_guild(payload.guild_id)
+        member = guild.get_member(payload.user_id)
         logger.log(22, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||"
-                       f" Author: {message.author} || EmojiRem: {payload.emoji}")
+                       f" Author: {member} || EmojiRem: {payload.emoji}")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         logger.log(22, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
-                       f" Author: {message.author} || EmojiAdd: {payload.emoji}")
+                       f" Author: {payload.member} || EmojiAdd: {payload.emoji}")
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
@@ -117,29 +119,30 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_slash_command_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
-            await ctx.send("You cannot beat me!")
+            await ctx.send("You do not posses enough strenght to beat me!")
 
         #send traceback to server
         else:
             await ctx.defer()
             channel = self.bot.get_channel(env.development)
+
             lines = traceback.format_exception(type(error), error, error.__traceback__)
             ex = ''.join(lines)
             
             logger.exception(ex)
-
+            
             message = await ctx.send(f"```Errors happen Mr. Anderson```")
             
             embed = discord.Embed(title=f"Ignoring exception on {ctx.command}", colour=0xFF0000)
-            embed.add_field(name="Zpráva", value=ctx.args, inline=True)
+            embed.add_field(name="Zpráva", value=ctx.kwargs, inline=True)
             embed.add_field(name="Autor", value=ctx.author, inline=True)
             embed.add_field(name="Link", value=message.jump_url, inline=False)
             embed.add_field(name="Traceback", value=f"```{ex}```", inline=False)
 
-            await channel.send(embed=embed)
             print(ex)
+            await channel.send(embed=embed)
 
             raise error
-    
+
 def setup(bot):
     bot.add_cog(Logging(bot))

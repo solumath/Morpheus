@@ -9,7 +9,7 @@ class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @cog_ext.cog_slash(name="drzpicu", description="Drz picu soti")
+    @cog_ext.cog_slash(name="drzpicu", description="Drz picu 'user'")
     async def drzpicu(self, ctx, user = "<@153480398054227978>"):
         await ctx.send(f"drz picu {user}")
 
