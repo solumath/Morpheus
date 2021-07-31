@@ -28,6 +28,8 @@ class Roles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_component(self, ctx):
+        await ctx.defer(edit_origin=True)
+        
         roles_options = []
         for num in ctx.component["options"]:
             roles_options.append(num["value"])
@@ -48,7 +50,7 @@ class Roles(commands.Cog):
                 role = get(ctx.guild.roles, id=role_id)
                 await user.remove_roles(role)
         
-        await ctx.defer(edit_origin=True)
+        
 
 def setup(bot):
     bot.add_cog(Roles(bot))
