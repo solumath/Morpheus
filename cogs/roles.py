@@ -10,6 +10,7 @@ class Roles(commands.Cog):
 
     @commands.command()
     @commands.has_role("BotPR")
+    @commands.is_owner()
     async def role(self, ctx, max, phrase, *roles: discord.Role):
         opt = []
 
@@ -27,23 +28,27 @@ class Roles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_component(self, ctx):
+        roles_options = []
+        for num in ctx.component["options"]:
+            roles_options.append(num["value"])
+        roles_options = list(map(int, roles_options))           # all options from menu
+
         user: discord.Member = ctx.author
-        user_has_roles = user.roles[1:]                         # all roles except @everyone
+        user_has_roles = user.roles[1:]                         # all roles except @everyone user has
         selected = list(map(int, ctx.selected_options))
 
-        user_role_ids = [role.id for role in user_has_roles]    # get id from object Role
-        union = set(user_role_ids).intersection(selected)       # check for matches of id
+        difference = set(roles_options) - set(selected)
 
         for role_id in selected:
             role = get(ctx.guild.roles, id=role_id)
             await user.add_roles(role)
         
-        if union:
-            for role_id in union:
+        if difference:
+            for role_id in difference:
                 role = get(ctx.guild.roles, id=role_id)
                 await user.remove_roles(role)
         
-        await ctx.send(f"You chose death", hidden=True)
+        await ctx.defer(edit_origin=True)
 
 def setup(bot):
     bot.add_cog(Roles(bot))

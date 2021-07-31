@@ -13,5 +13,9 @@ class Memes(commands.Cog):
     async def drzpicu(self, ctx, user = "<@153480398054227978>"):
         await ctx.send(f"drz picu {user}")
 
+    @cog_ext.cog_slash(name="nebudsalty", description="Nebud salty 'user'")
+    async def nebudsalty(self, ctx, user = "<@624604891603795968>"):
+        await ctx.send(f":salt: nebud salty {user}")
+
 def setup(bot):
     bot.add_cog(Memes(bot))
