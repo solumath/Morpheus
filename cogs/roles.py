@@ -23,34 +23,35 @@ class Roles(commands.Cog):
             min_values=1,
             max_values=max,
         )
-
         await ctx.send(phrase, components=[create_actionrow(select)])
 
     @commands.Cog.listener()
     async def on_component(self, ctx):
         await ctx.defer(edit_origin=True)
-        
-        roles_options = []
-        for num in ctx.component["options"]:
-            roles_options.append(num["value"])
-        roles_options = list(map(int, roles_options))           # all options from menu
 
-        user: discord.Member = ctx.author
-        user_has_roles = user.roles[1:]                         # all roles except @everyone user has
-        selected = list(map(int, ctx.selected_options))
+        # All options from menu
+        roles_options = set(map(lambda num : int(num["value"]), ctx.component["options"]))
 
-        difference = set(roles_options) - set(selected)
+        # User roles
+        user = ctx.author
+        user_has_roles = set(map(lambda role : role.id, user.roles))
 
-        for role_id in selected:
-            role = get(ctx.guild.roles, id=role_id)
-            await user.add_roles(role)
-        
-        if difference:
-            for role_id in difference:
+        selected = set(map(int, ctx.selected_options))
+
+        not_selected = roles_options - selected
+
+        to_remove = set.intersection(not_selected, user_has_roles)
+        to_add = selected - user_has_roles
+
+        if to_add:
+            for role_id in to_add:
+                role = get(ctx.guild.roles, id=role_id)
+                await user.add_roles(role)
+
+        if to_remove:
+            for role_id in to_remove:
                 role = get(ctx.guild.roles, id=role_id)
                 await user.remove_roles(role)
-        
-        
 
 def setup(bot):
     bot.add_cog(Roles(bot))
