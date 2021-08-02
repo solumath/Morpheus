@@ -23,7 +23,7 @@ class Memes(commands.Cog):
     @commands.command()
     async def tagrage(self, ctx, user: discord.Member, *text):
         await ctx.message.delete()
-        for x in range(4):
+        for x in range(5):
             await ctx.send(f"{user.mention} {' '.join(text)}")
             await asyncio.sleep(15)
     
