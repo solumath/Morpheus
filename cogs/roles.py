@@ -11,8 +11,9 @@ class Roles(commands.Cog):
     @commands.command()
     @commands.has_role("BotPR")
     @commands.is_owner()
-    async def role(self, ctx, max, phrase, *roles: discord.Role):
+    async def role(self, ctx, phrase, room, max, *roles: discord.Role):
         opt = []
+        channel = self.bot.get_channel(int(room[2:-1]))
 
         for role in roles:
             opt.append(create_select_option(f"{role.name}", value=role.id))
@@ -23,7 +24,7 @@ class Roles(commands.Cog):
             min_values=1,
             max_values=max,
         )
-        await ctx.send(phrase, components=[create_actionrow(select)])
+        await channel.send(phrase, components=[create_actionrow(select)])
 
     @commands.Cog.listener()
     async def on_component(self, ctx):
