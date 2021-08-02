@@ -30,6 +30,7 @@ class Memes(commands.Cog):
     @tagrage.error
     async def mine_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
+            await ctx.message.delete()
             msg = 'Dostal jsi cooldown {:.2f}s'.format(error.retry_after)
             await ctx.send(msg)
         else:
