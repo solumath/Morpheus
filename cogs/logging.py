@@ -1,22 +1,22 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext, SlashContext
+from logging.handlers import TimedRotatingFileHandler
 
 import os
 import json
-import datetime
 import logging
 import traceback
 
 import env
 
-today = datetime.date.today()
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-handler = logging.FileHandler(filename=f"servers/logs/{today}.log",encoding='utf-8', mode='w')
+handler = TimedRotatingFileHandler(filename=f"servers/logs/'%d%m%Y'.log", when="midnight", interval=1, encoding='utf-8', backupCount=31)
 handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
+handler.suffix = "%d%m%Y"
 logger.addHandler(handler)
+
 logging.addLevelName(21, "MSG")
 logging.addLevelName(22, "REACT")
 logging.addLevelName(23, "EDIT")
@@ -27,28 +27,27 @@ class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name="addreply", description="Add autoreply")
+    @cog_ext.cog_slash(name="addreply", description="Add autoreply", guild_ids=env.guild_ids)
     async def addreply(self, ctx, key, reply):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
-            add = json.load(f)
-            f.seek(0, 0)
-            f.truncate(0)
-            if key in add.keys():
+            dict = json.load(f)
+            if key in dict.keys():
                 await ctx.send(f"hláška {key} již existuje")
             else:
-                add[key] = reply
-                json.dump(add, f, ensure_ascii=False, indent=4)
+                add = {f"{key}":reply}
+                dict.update(add)
+                with open(f"servers/{ctx.guild.name}/replies.json",'w', encoding='utf-8') as f:
+                    json.dump(dict, f, ensure_ascii=False, indent=4)
                 await ctx.send(f"reply {key} byla přidána")
 
-    @cog_ext.cog_slash(name="remreply", description="Remove autoreply")
+    @cog_ext.cog_slash(name="remreply", description="Remove autoreply", guild_ids=env.guild_ids)
     async def remreply(self, ctx, key):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
-            rem = json.load(f)
-            f.seek(0, 0)
-            f.truncate(0)
-            if key in rem.keys():
-                del rem[key]
-                json.dump(rem, f, ensure_ascii=False, indent=4)
+            dict = json.load(f)
+            if key in dict.keys():
+                dict.pop(key)
+                with open(f"servers/{ctx.guild.name}/replies.json", 'w', encoding='utf-8') as f:
+                    json.dump(dict, f, ensure_ascii=False, indent=4)
                 await ctx.send(f"hláška {key} byla odstraněna")
             else:
                 await ctx.send(f"takovou hlášku jsem nenašel")
