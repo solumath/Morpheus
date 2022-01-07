@@ -12,9 +12,9 @@ import env
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-handler = TimedRotatingFileHandler(filename=f"servers/logs/'%d%m%Y'.log", when="midnight", interval=1, encoding='utf-8', backupCount=31)
+handler = TimedRotatingFileHandler(filename=f"servers/logs/L", when="midnight", interval=1, encoding='utf-8', backupCount=31)
 handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
-handler.suffix = "%d%m%Y"
+handler.suffix = "%d.%m.%Y.log"
 logger.addHandler(handler)
 
 logging.addLevelName(21, "MSG")
@@ -27,7 +27,7 @@ class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name="addreply", description="Add autoreply", guild_ids=env.guild_ids)
+    @cog_ext.cog_slash(name="addreply", description="Add autoreply")
     async def addreply(self, ctx, key, reply):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
             dict = json.load(f)
@@ -40,7 +40,7 @@ class Logging(commands.Cog):
                     json.dump(dict, f, ensure_ascii=False, indent=4)
                 await ctx.send(f"reply {key} byla přidána")
 
-    @cog_ext.cog_slash(name="remreply", description="Remove autoreply", guild_ids=env.guild_ids)
+    @cog_ext.cog_slash(name="remreply", description="Remove autoreply")
     async def remreply(self, ctx, key):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
             dict = json.load(f)
