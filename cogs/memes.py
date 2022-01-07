@@ -27,6 +27,50 @@ class Memes(commands.Cog):
             await ctx.send(f"{user.mention} {' '.join(text)}")
             await asyncio.sleep(15)
     
+    @cog_ext.cog_slash(name="dadjoke", description="Get a dadjoke", guild_ids=env.guild_ids)
+    async def dadjoke(self, ctx, *, keyword = None):
+        """Get random dad joke
+        Arguments
+        ---------
+        keyword: search for a certain keyword in a joke
+        """
+        if keyword is not None and ("&" in keyword or "?" in keyword):
+            await ctx.send("I didn't find a joke like that.")
+
+        params: Dict[str, str] = {"limit": "30"}
+        url: str = "https://icanhazdadjoke.com"
+        if keyword is not None:
+            params["term"] = keyword
+            url += "/search"
+        headers: Dict[str, str] = {"Accept": "application/json"}
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers, params=params) as response:
+                fetched = await response.json()
+
+        if keyword is not None:
+            res = fetched["results"]
+            if len(res) == 0:
+                await ctx.send("I didn't find a joke like that.")
+            result = random.choice(res)
+            result["joke"] = re.sub(
+                f"(\\b\\w*{keyword}\\w*\\b)",
+                r"**\1**",
+                result["joke"],
+                flags=re.IGNORECASE,
+            )
+        else:
+            result = fetched
+
+        embed = discord.Embed(
+            author=ctx.author,
+            description=result["joke"],
+            footer="icanhazdadjoke.com",
+            url="https://icanhazdadjoke.com/j/" + result["id"],
+        )
+
+        await ctx.send(embed=embed)
+    
     @tagrage.error
     async def mine_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
