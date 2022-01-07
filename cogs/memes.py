@@ -1,7 +1,9 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+from typing import Dict
 
+import re
 import aiohttp
 import random
 import asyncio
@@ -70,6 +72,15 @@ class Memes(commands.Cog):
         )
 
         await ctx.send(embed=embed)
+
+    @cog_ext.cog_slash(name="nickname", description="Change nickname", guild_ids=env.guild_ids)
+    async def nick(self, ctx, nickname, target: discord.Member):
+        try:
+            await target.edit(nick=nickname)
+        except discord.errors.Forbidden:
+            await ctx.send("Cant change this ones name")
+        else:
+            await ctx.send("Nickname has been changed.")
     
     @tagrage.error
     async def mine_error(self, ctx, error):
