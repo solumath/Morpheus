@@ -1,6 +1,5 @@
 import disnake
 from disnake.ext import commands
-
 from typing import Dict
 
 import re
@@ -27,7 +26,7 @@ class Memes(commands.Cog):
         await ctx.message.delete()
         for x in range(5):
             await ctx.send(f"{user.mention} {' '.join(text)}")
-            await asyncio.sleep(15)
+            await asyncio.sleep(5)
     
     @commands.slash_command(name="dadjoke", description="Get a dadjoke")
     async def dadjoke(self, ctx, *, keyword = None):
