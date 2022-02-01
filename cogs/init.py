@@ -1,6 +1,6 @@
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext
+import disnake
+from disnake.ext import commands
+
 
 import os
 import json
@@ -9,9 +9,10 @@ class Init(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name="setupdir", description="setup folders for server")
+    @commands.slash_command(name="setupdir", description="setup folders for server")
     @commands.has_permissions(administrator=True)
     async def setupDir(self, ctx):
+        await ctx.defer()
         """setup folder for new server"""
         #----------------------Create dir-----------------------------
         if not (os.path.isdir(f"servers")):
@@ -27,6 +28,7 @@ class Init(commands.Cog):
         #----------------------Create logs----------------------------
         if not (os.path.isdir(f"servers/{ctx.guild.name}/logs")):
             os.mkdir(f"servers/{ctx.guild.name}/logs")
+        await ctx.send("Setup done")
 
 def setup(bot):
     bot.add_cog(Init(bot))

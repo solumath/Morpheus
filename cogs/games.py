@@ -1,6 +1,6 @@
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext
+import disnake
+from disnake.ext import commands
+
 import env
 
 from datetime import datetime
@@ -30,15 +30,15 @@ class Games(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 	
-	@cog_ext.cog_slash(name="games", description="Prints out list of games", guild_ids=env.guild_ids)
+	@commands.slash_command(name="games", description="Prints out list of games", guild_ids=env.guild_ids)
 	async def games(self, ctx):
-		embed = discord.Embed(colour=0x30fc03)
-		embed.set_author(name="List of games in summer steam sale", icon_url="https://cdn.discordapp.com/avatars/722567836010151938/bda3258e4cdd76a2f71f9beda73c2e5b.webp?size=128")
+		embed = disnake.Embed(colour=0x30fc03)
+		embed.set_author(name="List of games in summer steam sale", icon_url="https://cdn.disnakeapp.com/avatars/722567836010151938/bda3258e4cdd76a2f71f9beda73c2e5b.webp?size=128")
 		embed.add_field(name="Must have", value = "\n".join(buy), inline=False)
 		embed.add_field(name="Optional", value = "\n".join(optional), inline=False)
 		await ctx.send(embed=embed)
 	
-	@cog_ext.cog_slash(name="addgame", description="add game to a list", guild_ids=env.guild_ids)
+	@commands.slash_command(name="addgame", description="add game to a list", guild_ids=env.guild_ids)
 	async def add_game(self, ctx, category, name, link, price):
 		field = {
 					"optional": optional,

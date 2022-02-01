@@ -1,16 +1,13 @@
-import discord
-from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
-
+import disnake
+from disnake.ext import commands
 import os
-import json
 import traceback
 import git
 
 import env
+ 
+bot = commands.Bot(command_prefix="?", intents=disnake.Intents.all(), help_command=None, test_guilds=env.guild_ids)
 
-bot = commands.Bot(command_prefix="?", intents=discord.Intents.all(), help_command=None)
-slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload = True)
 
 @bot.event
 async def on_ready():
@@ -21,16 +18,16 @@ async def on_ready():
     #set status for bot
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
-    await bot.change_presence(activity=discord.Game(f"/help | On commit {sha[:7]}"))
+    await bot.change_presence(activity=disnake.Game(f"/help | On commit {sha[:7]}"))
 
-@slash.slash(name="purge", description="delete number of messages")
+@bot.slash_command(name="purge", description="delete number of messages")
 @commands.has_permissions(manage_messages=True)
 async def purge(ctx, number_of_messages : int):
     await ctx.channel.purge(limit=number_of_messages)
     await ctx.send("What is real? How do you define real?", delete_after=5)
 
 #-------------------------Cogs----------------------------
-@slash.slash(name="load", description="Loads cog(s) file")
+@bot.slash_command(name="load", description="Loads cog(s) file")
 @commands.has_permissions(administrator=True)
 async def load(ctx, extension):
     msg = []
@@ -48,7 +45,7 @@ async def load(ctx, extension):
     print(*msg, sep = "\n")
     await ctx.send("\n".join(msg))
 
-@slash.slash(name="unload", description="Unloads cog(s) file")
+@bot.slash_command(name="unload", description="Unloads cog(s) file")
 @commands.has_permissions(administrator=True)
 async def unload(ctx, extension):
     msg = []
@@ -64,7 +61,7 @@ async def unload(ctx, extension):
     print(*msg, sep = "\n")
     await ctx.send("\n".join(msg))
 
-@slash.slash(name="reload", description="Reloads cog(s) file")
+@bot.slash_command(name="reload", description="Reloads cog(s) file")
 @commands.has_permissions(administrator=True)
 async def rel(ctx, extension):
     msg = []
@@ -82,7 +79,7 @@ async def rel(ctx, extension):
     print(*msg, sep = "\n")
     await ctx.send("\n".join(msg))
 
-@slash.slash(name="reloadall", description="Reloads all cog files")
+@bot.slash_command(name="reloadall", description="Reloads all cog files")
 @commands.has_permissions(administrator=True)
 async def reloadall(ctx):
     cogs = []
@@ -100,7 +97,7 @@ async def reloadall(ctx):
     print(*cogs, sep = "\n")
     await ctx.send("\n".join(cogs))
 
-@slash.slash(name="cogs", description="List of loaded cogs")
+@bot.slash_command(name="cogs", description="List of loaded cogs")
 @commands.has_permissions(administrator=True)
 async def cogs(ctx):
     cogs = bot.cogs
@@ -123,7 +120,7 @@ async def on_error(event, *args, **kwargs):
         channel = bot.get_channel(env.development)
         ex = traceback.format_exc()
 
-        embed = discord.Embed(title="Ignoring exception", colour=0xFF0000)
+        embed = disnake.Embed(title="Ignoring exception", colour=0xFF0000)
         embed.add_field(name="Traceback", value=f"```{ex}```")
 
         print(ex)

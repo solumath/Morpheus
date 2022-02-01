@@ -1,6 +1,6 @@
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext
+import disnake
+from disnake.ext import commands
+
 
 import os
 import random
@@ -60,7 +60,7 @@ class Stream(commands.Cog):
         # except Exception:
         #     await ctx.send(Exception)
         
-    @cog_ext.cog_slash(name="stream", description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
+    @commands.slash_command(name="stream", description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
     async def stream(self, ctx, subject, link, start, duration):
         """Download part of stream"""
         subject = (subject.lower()).replace(" ", "_")

@@ -1,6 +1,6 @@
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+import disnake
+from disnake.ext import commands
+
 
 import aiohttp
 import asyncio
@@ -28,7 +28,7 @@ class Latex(commands.Cog):
                             return await ctx.send("Could not get image.")
 
                         datastream = io.BytesIO(data)
-                        await ctx.send(file=discord.File(datastream, "latex.png"))
+                        await ctx.send(file=disnake.File(datastream, "latex.png"))
                 except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                     await ctx.send("Website unreachable")
     

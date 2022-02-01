@@ -1,10 +1,9 @@
 #bot
-discord
+disnake
 gitpython
 ffmpeg
 pydrive
 image
-discord-py-slash-command
 pillow
 youtube-dl
 

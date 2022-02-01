@@ -1,7 +1,7 @@
-import discord
-from discord.utils import get
-from discord.ext import commands
-from discord_slash import cog_ext
+import disnake
+from disnake.utils import get
+from disnake.ext import commands
+
 from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow
 
 class Roles(commands.Cog):
@@ -11,7 +11,7 @@ class Roles(commands.Cog):
     @commands.command()
     @commands.has_role("BotPR")
     @commands.is_owner()
-    async def role(self, ctx, phrase, room, max, *roles: discord.Role):
+    async def role(self, ctx, phrase, room, max, *roles: disnake.Role):
         opt = []
         channel = self.bot.get_channel(int(room[2:-1]))
 

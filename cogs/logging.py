@@ -1,14 +1,17 @@
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+import disnake
+from disnake.ext import commands
 from logging.handlers import TimedRotatingFileHandler
 
 import os
 import json
 import logging
 import traceback
+import random
 
 import env
+from config import messages
+
+messages = messages.Messages
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -27,7 +30,7 @@ class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @cog_ext.cog_slash(name="addreply", description="Add autoreply")
+    @commands.slash_command(name="addreply", description="Add autoreply")
     async def addreply(self, ctx, key, reply):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
             dict = json.load(f)
@@ -40,7 +43,7 @@ class Logging(commands.Cog):
                     json.dump(dict, f, ensure_ascii=False, indent=4)
                 await ctx.send(f"reply {key} byla přidána")
 
-    @cog_ext.cog_slash(name="remreply", description="Remove autoreply")
+    @commands.slash_command(name="remreply", description="Remove autoreply")
     async def remreply(self, ctx, key):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
             dict = json.load(f)
@@ -73,7 +76,7 @@ class Logging(commands.Cog):
         elif "uh oh" in message.content:
             await message.channel.send("uh oh")
         elif f"<@!{self.bot.user.id}>" in message.content or f"<@{self.bot.user.id}>" in message.content:
-            await message.channel.send("Remember...All I'm Offering Is The Truth. Nothing More.")
+            await message.channel.send(random.choice(messages.Morpheus))
         elif message.content in replies.keys():
             await message.channel.send(replies[message.content])
 
@@ -132,7 +135,7 @@ class Logging(commands.Cog):
             
             message = await ctx.send(f"```Errors happen Mr. Anderson```")
             
-            embed = discord.Embed(title=f"Ignoring exception on {ctx.command}", colour=0xFF0000)
+            embed = disnake.Embed(title=f"Ignoring exception on {ctx.command}", colour=0xFF0000)
             embed.add_field(name="Zpráva", value=ctx.kwargs, inline=True)
             embed.add_field(name="Autor", value=ctx.author, inline=True)
             embed.add_field(name="Link", value=message.jump_url, inline=False)

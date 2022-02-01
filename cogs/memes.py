@@ -1,6 +1,6 @@
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext
+import disnake
+from disnake.ext import commands
+
 from typing import Dict
 
 import re
@@ -13,23 +13,23 @@ class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    @cog_ext.cog_slash(name="drzpicu", description="Drz picu 'user'")
+    @commands.slash_command(name="drzpicu", description="Drz picu 'user'")
     async def drzpicu(self, ctx, user = "<@153480398054227978>"):
         await ctx.send(f"drz picu {user}")
 
-    @cog_ext.cog_slash(name="nebudsalty", description="Nebud salty 'user'")
+    @commands.slash_command(name="nebudsalty", description="Nebud salty 'user'")
     async def nebudsalty(self, ctx, user = "<@624604891603795968>"):
         await ctx.send(f":salt: nebud salty {user}")
     
     @commands.cooldown(rate=1, per=100.0, type=commands.BucketType.user)
     @commands.command()
-    async def tagrage(self, ctx, user: discord.Member, *text):
+    async def tagrage(self, ctx, user: disnake.Member, *text):
         await ctx.message.delete()
         for x in range(5):
             await ctx.send(f"{user.mention} {' '.join(text)}")
             await asyncio.sleep(15)
     
-    @cog_ext.cog_slash(name="dadjoke", description="Get a dadjoke", guild_ids=env.guild_ids)
+    @commands.slash_command(name="dadjoke", description="Get a dadjoke", guild_ids=env.guild_ids)
     async def dadjoke(self, ctx, *, keyword = None):
         """Get random dad joke
         Arguments
@@ -64,7 +64,7 @@ class Memes(commands.Cog):
         else:
             result = fetched
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             author=ctx.author,
             description=result["joke"],
             footer="icanhazdadjoke.com",
@@ -73,18 +73,14 @@ class Memes(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @cog_ext.cog_slash(name="nickname", description="Change nickname", guild_ids=env.guild_ids)
-    async def nick(self, ctx, nickname, target: discord.Member):
-        accept = len(nickname)
-        if accept > 32:
-            await ctx.send("Nickname must be 32 characters or less")
+    @commands.slash_command(name="nickname", description="Change nickname", guild_ids=env.guild_ids)
+    async def nick(self, ctx, nickname, target: disnake.Member):
+        try:
+            await target.edit(nick=nickname)
+        except disnake.errors.Forbidden:
+            await ctx.send("Cant change this ones name")
         else:
-            try:
-                await target.edit(nick=nickname)
-            except discord.errors.Forbidden:
-                await ctx.send("Cant change this ones name")
-            else:
-                await ctx.send("Nickname has been changed.")
+            await ctx.send("Nickname has been changed.")
     
     @tagrage.error
     async def mine_error(self, ctx, error):

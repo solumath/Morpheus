@@ -1,14 +1,20 @@
-import discord
-from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
+import disnake
+from disnake.ext import commands
+
 
 from datetime import datetime
+import env
 
 class Info(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@cog_ext.cog_slash(name="kredity", description="Prints out credits for BIT")
+	@commands.Cog.listener()
+	async def on_member_join(self, member):
+		channel = self.bot.get_channel(env.general)
+		await channel.send(f"Hej debílci, došel {member} tak ho pozdravte.")
+
+	@commands.slash_command(name="kredity", description="Prints out credits for BIT")
 	async def kredity(self, ctx):
 		await ctx.send("""```cs
 if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
@@ -20,11 +26,12 @@ if ("Mám průměr pod 1.5")
 if ("Mám průměr pod 2.0")
 	return 75```""")
 
-	@cog_ext.cog_slash(name="user", description="Prints out info about user")
-	async def user_info(self, ctx, target: discord.Member = None):
+	@commands.slash_command(name="user", description="Prints out info about user")
+	async def user_info(self, ctx, target: disnake.Member = None):
 		target = target or ctx.author
+		print(target.status, ctx.author)
 
-		embed = discord.Embed(title="User information",
+		embed = disnake.Embed(title="User information",
 					  color=target.color,
 					  timestamp=datetime.utcnow())
 
@@ -32,7 +39,7 @@ if ("Mám průměr pod 2.0")
 
 		fields = [("Name", str(target), True),
 				  ("ID", target.id, True),
-				  ("Status", str(target.status), True),
+				  ("Status", str(target.status).title(), True),
 				  ("Role", ' '.join([role.mention for role in target.roles[1:][::-1]]), False),
 				  ("Created account", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
 				  ("Joined server", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), True),
@@ -43,9 +50,9 @@ if ("Mám průměr pod 2.0")
 
 		await ctx.send(embed=embed)
 
-	@cog_ext.cog_slash(name="server", description="Prints out info about server")
+	@commands.slash_command(name="server", description="Prints out info about server")
 	async def server_info(self, ctx):
-		embed = discord.Embed(title="Server information",
+		embed = disnake.Embed(title="Server information",
 					  colour=ctx.guild.owner.colour,
 					  timestamp=datetime.utcnow())
 
