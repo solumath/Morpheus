@@ -29,7 +29,7 @@ class Memes(commands.Cog):
             await ctx.send(f"{user.mention} {' '.join(text)}")
             await asyncio.sleep(15)
     
-    @commands.slash_command(name="dadjoke", description="Get a dadjoke", guild_ids=env.guild_ids)
+    @commands.slash_command(name="dadjoke", description="Get a dadjoke")
     async def dadjoke(self, ctx, *, keyword = None):
         """Get random dad joke
         Arguments
@@ -73,14 +73,18 @@ class Memes(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.slash_command(name="nickname", description="Change nickname", guild_ids=env.guild_ids)
+    @commands.slash_command(name="nickname", description="Change nickname")
     async def nick(self, ctx, nickname, target: disnake.Member):
-        try:
-            await target.edit(nick=nickname)
-        except disnake.errors.Forbidden:
-            await ctx.send("Cant change this ones name")
+        accept = len(nickname)
+        if accept > 32:
+            await ctx.send("Nickname must be 32 characters or less")
         else:
-            await ctx.send("Nickname has been changed.")
+            try:
+                await target.edit(nick=nickname)
+            except disnake.errors.Forbidden:
+                await ctx.send("Cant change this ones name")
+            else:
+                await ctx.send("Nickname has been changed.")
     
     @tagrage.error
     async def mine_error(self, ctx, error):

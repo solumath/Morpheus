@@ -30,7 +30,7 @@ class Games(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 	
-	@commands.slash_command(name="games", description="Prints out list of games", guild_ids=env.guild_ids)
+	@commands.slash_command(name="games", description="Prints out list of games")
 	async def games(self, ctx):
 		embed = disnake.Embed(colour=0x30fc03)
 		embed.set_author(name="List of games in summer steam sale", icon_url="https://cdn.disnakeapp.com/avatars/722567836010151938/bda3258e4cdd76a2f71f9beda73c2e5b.webp?size=128")
@@ -38,7 +38,7 @@ class Games(commands.Cog):
 		embed.add_field(name="Optional", value = "\n".join(optional), inline=False)
 		await ctx.send(embed=embed)
 	
-	@commands.slash_command(name="addgame", description="add game to a list", guild_ids=env.guild_ids)
+	@commands.slash_command(name="addgame", description="add game to a list")
 	async def add_game(self, ctx, category, name, link, price):
 		field = {
 					"optional": optional,
