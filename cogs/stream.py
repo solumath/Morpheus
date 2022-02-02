@@ -12,8 +12,6 @@ from multiprocessing import Pool
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
-import env
-
 time = datetime.date.today()
 gauth = GoogleAuth()           
 drive = GoogleDrive(gauth) 

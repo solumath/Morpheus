@@ -7,8 +7,6 @@ import json
 import logging
 import traceback
 import random
-import pprint
-
 
 import env
 from config import messages
@@ -71,7 +69,7 @@ class Logging(commands.Cog):
             if message.attachments:
                 for x in message.attachments:
                     image.append(x.url)
-                    
+
             logger.log(21, f"Guild: {message.guild} || Channel: {message.channel} || Message: {message.id} ||"
                            f" Author: {message.author}: {content} {image}")
 

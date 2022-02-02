@@ -6,7 +6,6 @@ import re
 import aiohttp
 import random
 import asyncio
-import env
 
 class Memes(commands.Cog):
     def __init__(self, bot):
