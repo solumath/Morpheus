@@ -7,6 +7,8 @@ import json
 import logging
 import traceback
 import random
+import pprint
+
 
 import env
 from config import messages
@@ -58,12 +60,20 @@ class Logging(commands.Cog):
     #uh oh reply
     @commands.Cog.listener("on_message")
     async def reply(self, message):
+        if message.embeds:
+            for embed in message.embeds:
+                content = embed.to_dict()
+        else:
+            content = message.content
+
         if not "Traceback" in message.content:
-            image = ""
+            image = []
             if message.attachments:
-                image = message.attachments[0].url
+                for x in message.attachments:
+                    image.append(x.url)
+                    
             logger.log(21, f"Guild: {message.guild} || Channel: {message.channel} || Message: {message.id} ||"
-                           f" Author: {message.author}: {message.content} {image}")
+                           f" Author: {message.author}: {content} {image}")
 
         if message.guild is None:
             return
@@ -111,11 +121,13 @@ class Logging(commands.Cog):
     
     @commands.Cog.listener()
     async def on_slash_command(self, ctx):
+        guild = self.bot.get_guild(ctx.guild_id)
+        print(dir(ctx.data))
         args = ""
-        if ctx.kwargs is not None:
-            args = list(ctx.kwargs.values())
-        logger.log(25, f"Guild: {ctx.guild} || Channel: {ctx.channel} || Message: {ctx.interaction_id} ||"
-                       f" Author: {ctx.author} || Command: {ctx.command} || Passed: {args}")
+        if ctx.filled_options is not None:
+            args = list(ctx.filled_options)
+        logger.log(25, f"Guild: {guild} || Channel: {ctx.channel} || Message: {ctx.application_id} ||"
+                       f" Author: {ctx.author} || Command: {ctx.data.name} || Passed: {ctx.filled_options}")
 
     #-------------------------Errors----------------------------
     @commands.Cog.listener()

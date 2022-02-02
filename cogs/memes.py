@@ -44,7 +44,7 @@ class Memes(commands.Cog):
             params["term"] = keyword
             url += "/search"
         headers: Dict[str, str] = {"Accept": "application/json"}
-
+        
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, params=params) as response:
                 fetched = await response.json()
@@ -63,12 +63,7 @@ class Memes(commands.Cog):
         else:
             result = fetched
 
-        embed = disnake.Embed(
-            author=ctx.author,
-            description=result["joke"],
-            footer="icanhazdadjoke.com",
-            url="https://icanhazdadjoke.com/j/" + result["id"],
-        )
+        embed = disnake.Embed(description=result["joke"])
 
         await ctx.send(embed=embed)
 

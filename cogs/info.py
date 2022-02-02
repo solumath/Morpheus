@@ -29,13 +29,12 @@ if ("Mám průměr pod 2.0")
 	@commands.slash_command(name="user", description="Prints out info about user")
 	async def user_info(self, ctx, target: disnake.Member = None):
 		target = target or ctx.author
-		print(target.status, ctx.author)
 
 		embed = disnake.Embed(title="User information",
 					  color=target.color,
 					  timestamp=datetime.utcnow())
 
-		embed.set_thumbnail(url=target.avatar_url)
+		embed.set_thumbnail(url=target.avatar)
 
 		fields = [("Name", str(target), True),
 				  ("ID", target.id, True),
@@ -56,16 +55,16 @@ if ("Mám průměr pod 2.0")
 					  colour=ctx.guild.owner.colour,
 					  timestamp=datetime.utcnow())
 
-		embed.set_thumbnail(url=ctx.guild.icon_url)
-
+		if ctx.guild.icon is not None:
+			embed.set_thumbnail(url=ctx.guild.icon)
+		
 		statuses = [len(list(filter(lambda m: str(m.status) == "online", ctx.guild.members))),
 					len(list(filter(lambda m: str(m.status) == "idle", ctx.guild.members))),
 					len(list(filter(lambda m: str(m.status) == "dnd", ctx.guild.members))),
 					len(list(filter(lambda m: str(m.status) == "offline", ctx.guild.members)))]
 
 		fields = [("ID", ctx.guild.id, True),
-				  ("Owner", ctx.guild.owner, True),
-				  ("Region", ctx.guild.region, True),
+				  ("Owner", ctx.guild.owner.mention, True),
 				  ("Created at", ctx.guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
 				  ("Members", len(ctx.guild.members), True),
 				  ("Humans", len(list(filter(lambda m: not m.bot, ctx.guild.members))), True),
