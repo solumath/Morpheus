@@ -120,7 +120,6 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_slash_command(self, ctx):
         guild = self.bot.get_guild(ctx.guild_id)
-        print(dir(ctx.data))
         args = ""
         if ctx.filled_options is not None:
             args = list(ctx.filled_options)
