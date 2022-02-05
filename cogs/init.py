@@ -11,7 +11,6 @@ class Init(commands.Cog):
     @commands.slash_command(name="setupdir", description="setup folders for server")
     @commands.has_permissions(administrator=True)
     async def setupDir(self, ctx):
-        await ctx.defer()
         """setup folder for new server"""
         #----------------------Create dir-----------------------------
         if not (os.path.isdir(f"servers")):

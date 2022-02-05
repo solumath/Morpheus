@@ -1,7 +1,6 @@
 import disnake
 from disnake.ext import commands
 
-
 from datetime import datetime
 import env
 
@@ -12,7 +11,7 @@ class Info(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		channel = self.bot.get_channel(env.general)
-		await channel.send(f"Hej debílci, došel {member} tak ho pozdravte.")
+		await channel.send(f"Hej debílci, došel {member.mention} tak ho pozdravte. <:feelsWowMan:747845161563979857>")
 
 	@commands.slash_command(name="kredity", description="Prints out credits for BIT")
 	async def kredity(self, ctx):
@@ -34,11 +33,12 @@ if ("Mám průměr pod 2.0")
 					  color=target.color,
 					  timestamp=datetime.utcnow())
 
-		embed.set_thumbnail(url=target.avatar)
+		if target.avatar is not None:
+			embed.set_thumbnail(url=target.avatar)
 
 		fields = [("Name", str(target), True),
 				  ("ID", target.id, True),
-				  ("Status", str(target.status).title(), True),
+				  ("Status", str(target.status).title(), False),
 				  ("Role", ' '.join([role.mention for role in target.roles[1:][::-1]]), False),
 				  ("Created account", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
 				  ("Joined server", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), True),
