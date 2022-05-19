@@ -21,7 +21,7 @@ async def on_ready():
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
     await bot.change_presence(activity=disnake.Game(f"/help | On commit {sha[:7]}"))
-    bot_room: TextChannel = bot.get_channel(channels.bot_room)
+    bot_room: TextChannel = bot.get_channel(channels.development)
     if bot_room is not None:
         await bot_room.send(messages.on_ready_bot.format(bot.user.mention, bot.user.id))
 
