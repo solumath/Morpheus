@@ -1,52 +1,57 @@
 import disnake
 from disnake.utils import get
 from disnake.ext import commands
+from config import channels
 
-from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow
+channels = channels.Channels
 
-class Roles(commands.Cog):
+class Buttons(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    @commands.has_role("BotPR")
-    @commands.is_owner()
-    async def role(self, ctx, phrase, room, max, *roles: disnake.Role):
+    @commands.slash_command(name="select", description="Create select menu")
+    async def select(self, ctx, room : disnake.TextChannel, text : str, 
+                    min_roles : int, max_roles : int, roles: str):
+        """extract roles from string and create select menu"""
+        roles = roles.split()
         opt = []
-        channel = self.bot.get_channel(int(room[2:-1]))
-
         for role in roles:
-            opt.append(create_select_option(f"{role.name}", value=role.id))
+            role = role[3:-1]
+            opt.append(int(role))
 
-        select = create_select(
-            options=opt,
-            placeholder=phrase,
-            min_values=1,
-            max_values=max,
-        )
-        await channel.send(phrase, components=[create_actionrow(select)])
+        roles = []
+        for id in opt:
+            role = ctx.guild.get_role(id)
+            roles.append(disnake.SelectOption(label=role.name, value=role.id))
+        
+        await ctx.send("select menu sent")
+        await room.send(components=disnake.ui.Select(placeholder=text, min_values=min_roles, 
+                                                     max_values=max_roles, options=roles, custom_id="role_select"))
 
-    @commands.Cog.listener()
-    async def on_component(self, ctx):
-        await ctx.defer(edit_origin=True)
+    @commands.Cog.listener("on_dropdown")
+    async def cool_select_listener(self, ctx: disnake.MessageInteraction):
+        if ctx.component.custom_id != "role_select":
+            return
 
-        # All options from menu
-        roles_options = set(map(lambda num : int(num["value"]), ctx.component["options"]))
+        #All options from menu
+        roles_options = set([int(o.value) for o in ctx.component.options])
 
-        # User roles
+        #User roles
         user = ctx.author
         user_has_roles = set(map(lambda role : role.id, user.roles))
 
-        selected = set(map(int, ctx.selected_options))
+        selected = set(map(int, ctx.values))
 
         not_selected = roles_options - selected
 
         to_remove = set.intersection(not_selected, user_has_roles)
         to_add = selected - user_has_roles
 
+        selected = []
         if to_add:
             for role_id in to_add:
                 role = get(ctx.guild.roles, id=role_id)
+                selected.append(role)
                 await user.add_roles(role)
 
         if to_remove:
@@ -54,5 +59,8 @@ class Roles(commands.Cog):
                 role = get(ctx.guild.roles, id=role_id)
                 await user.remove_roles(role)
 
+        selected = [role.mention for role in selected]
+        await ctx.response.send_message(f"You selected {' '.join(selected)}.", ephemeral=True)
+
 def setup(bot):
-    bot.add_cog(Roles(bot))
+    bot.add_cog(Buttons(bot))

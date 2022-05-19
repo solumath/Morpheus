@@ -1,7 +1,6 @@
 import disnake
 from disnake.ext import commands
 
-
 import aiohttp
 import asyncio
 import io

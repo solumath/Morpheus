@@ -1,8 +1,14 @@
 import disnake
 from disnake.ext import commands
-
 from datetime import datetime
+import json
+import requests
+from config import channels, messages
+
 import env
+
+channels = channels.Channels
+messages = messages.Messages
 
 class Info(commands.Cog):
 	def __init__(self, bot):
@@ -10,24 +16,23 @@ class Info(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		channel = self.bot.get_channel(env.general)
+		channel_id = disnake.utils.get(member.guild.channels, name="general")
+		channel = self.bot.get_channel(channel_id.id)
 		await channel.send(f"Hej debílci, došel {member.mention} tak ho pozdravte. <:feelsWowMan:747845161563979857>")
 
 	@commands.slash_command(name="kredity", description="Prints out credits for BIT")
 	async def kredity(self, ctx):
-		await ctx.send("""```cs
-if ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
-	return 65
-if ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
-	return 70
-if ("Mám průměr pod 1.5")
-	return 80
-if ("Mám průměr pod 2.0")
-	return 75```""")
+		await ctx.send(messages.kredity)
 
 	@commands.slash_command(name="user", description="Prints out info about user")
 	async def user_info(self, ctx, target: disnake.Member = None):
 		target = target or ctx.author
+		
+		headers = {
+                    'authorization': env.authorization
+                    }
+		r = requests.get(f'https://discord.com/api/v9/guilds/{ctx.guild.id}/messages/search?author_id={target.id}&include_nsfw=true', headers=headers)
+		data = json.loads(r.text)
 
 		embed = disnake.Embed(title="User information",
 					  color=target.color,
@@ -35,6 +40,7 @@ if ("Mám průměr pod 2.0")
 
 		if target.avatar is not None:
 			embed.set_thumbnail(url=target.avatar)
+		print(target.roles)
 
 		fields = [("Name", str(target), True),
 				  ("ID", target.id, True),
@@ -42,7 +48,8 @@ if ("Mám průměr pod 2.0")
 				  ("Role", ' '.join([role.mention for role in target.roles[1:][::-1]]), False),
 				  ("Created account", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
 				  ("Joined server", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), True),
-				  ("Boosted", bool(target.premium_since), True)]
+				  ("Total messages", data['total_results'], False),
+				  ("Boosted", bool(target.premium_since), False)]
 
 		for name, value, inline in fields:
 			embed.add_field(name=name, value=value, inline=inline)
@@ -69,7 +76,7 @@ if ("Mám průměr pod 2.0")
 				  ("Members", len(ctx.guild.members), True),
 				  ("Humans", len(list(filter(lambda m: not m.bot, ctx.guild.members))), True),
 				  ("Bots", len(list(filter(lambda m: m.bot, ctx.guild.members))), True),
-				  ("Banned members", len(await ctx.guild.bans()), True),
+				  ("Banned members", len(await ctx.guild.bans().flatten()), True),
 				  ("Statuses", f"🟩 {statuses[0]} 🟧 {statuses[1]} 🟥 {statuses[2]} ⬛ {statuses[3]}", True),
 				  ("Text channels", len(ctx.guild.text_channels), True),
 				  ("Voice channels", len(ctx.guild.voice_channels), True),

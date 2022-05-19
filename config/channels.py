@@ -1,0 +1,8 @@
+class Channels:
+    my_guild = 747842674232524870
+    guild_ids = [845678676530954271]
+    development = 863730103195664384
+    bot_room = 863730103195664384
+    general = 747842674232524873
+    plans = [851761770770202654]
+    plans_with_reaction = [880104339107110983]

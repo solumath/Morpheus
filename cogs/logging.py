@@ -2,16 +2,15 @@ import disnake
 from disnake.ext import commands
 from logging.handlers import TimedRotatingFileHandler
 
-import os
 import json
 import logging
 import traceback
 import random
-
-import env
-from config import messages
+import utility
+from config import messages, channels
 
 messages = messages.Messages
+channels = channels.Channels
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -120,10 +119,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_slash_command(self, ctx):
         guild = self.bot.get_guild(ctx.guild_id)
-        args = ""
-        if ctx.filled_options is not None:
-            args = list(ctx.filled_options)
-        logger.log(25, f"Guild: {guild} || Channel: {ctx.channel} || Message: {ctx.application_id} ||"
+        logger.log(25, f"Guild: {guild} || Channel: {ctx.channel} || Message: {ctx.id} ||"
                        f" Author: {ctx.author} || Command: {ctx.data.name} || Passed: {ctx.filled_options}")
 
     #-------------------------Errors----------------------------
@@ -131,29 +127,65 @@ class Logging(commands.Cog):
     async def on_slash_command_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send("You do not posses enough strenght to beat me!")
-
-        #send traceback to server
+            return
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds.")
+            return
         else:
-            await ctx.defer()
-            channel = self.bot.get_channel(env.development)
+            channel = self.bot.get_channel(channels.development)
+            await ctx.send(f"```Errors happen Mr. Anderson```")
+            url = f"https://discord.com/channels/{ctx.guild_id}/{ctx.channel_id}/{ctx.id}"
 
-            lines = traceback.format_exception(type(error), error, error.__traceback__)
-            ex = ''.join(lines)
+            output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            embed = disnake.Embed(title=f"Ignoring exception on command {ctx.data.name}", color=0xFF0000)
+            embed.add_field(name="Autor", value=str(ctx.author))
+            if ctx.guild and ctx.guild.id != channels.my_guild:
+                embed.add_field(name="Guild", value=ctx.guild.name)
+            embed.add_field(name="Zpráva", value=ctx.filled_options, inline=False)
+            embed.add_field(name="Link", value=url, inline=False)
+
+            print(output)
+            await channel.send(embed=embed)
             
-            logger.exception(ex)
-            
+            output = utility.cut_string(output, 1900)
+            if channel is not None:
+                for message in output:
+                    await channel.send(f"```\n{message}\n```")
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("You do not posses enough strenght to beat me!")
+            return
+        elif isinstance(error, commands.CommandNotFound):
+            await ctx.send(error)
+            return
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds.")
+            return
+        elif isinstance(error, commands.UserInputError):
+            await ctx.send(error)
+            return
+        else:
+            channel = self.bot.get_channel(channels.development)
+
             message = await ctx.send(f"```Errors happen Mr. Anderson```")
             
-            embed = disnake.Embed(title=f"Ignoring exception on {ctx.command}", colour=0xFF0000)
-            embed.add_field(name="Zpráva", value=ctx.kwargs, inline=True)
-            embed.add_field(name="Autor", value=ctx.author, inline=True)
-            embed.add_field(name="Link", value=message.jump_url, inline=False)
-            embed.add_field(name="Traceback", value=f"```{ex}```", inline=False)
+            output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            embed = disnake.Embed(title=f"Ignoring exception on command {ctx.command}", color=0xFF0000)
+            embed.add_field(name="Autor", value=str(ctx.author))
+            if ctx.guild and ctx.guild.id != channels.my_guild:
+                embed.add_field(name="Guild", value=ctx.guild.name)
+            embed.add_field(name="Zpráva", value=ctx.message.content[:1000], inline=False)
+            embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
 
-            print(ex)
+            print(output)
             await channel.send(embed=embed)
-
-            raise error
-
+            
+            output = utility.cut_string(output, 1900)
+            if channel is not None:
+                for message in output:
+                    await channel.send(f"```\n{message}\n```")
+        
 def setup(bot):
     bot.add_cog(Logging(bot))

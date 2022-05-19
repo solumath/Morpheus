@@ -10,7 +10,7 @@ import asyncio
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.slash_command(name="drzpicu", description="Drz picu 'user'")
     async def drzpicu(self, ctx, user = "<@153480398054227978>"):
         await ctx.send(f"drz picu {user}")
@@ -78,15 +78,6 @@ class Memes(commands.Cog):
                 await ctx.send("Cant change this ones name")
             else:
                 await ctx.send("Nickname has been changed.")
-    
-    @tagrage.error
-    async def mine_error(self, ctx, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            await ctx.message.delete()
-            msg = 'Dostal jsi cooldown {:.2f}s'.format(error.retry_after)
-            await ctx.send(msg)
-        else:
-            raise error
 
 def setup(bot):
     bot.add_cog(Memes(bot))
