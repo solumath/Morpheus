@@ -16,9 +16,8 @@ class Info(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		with open(f"servers/{member.guild.name}/config.json", 'r') as f:
-			info_channel = json.load(f)
-		channel = self.bot.get_channel(int(info_channel["joined"]))
+		channel_id = disnake.utils.get(member.guild.channels, name="general")
+		channel = self.bot.get_channel(channel_id.id)
 		await channel.send(f"Hej debílci, došel {member.mention} tak ho pozdravte. <:feelsWowMan:747845161563979857>")
 
 	@commands.slash_command(name="kredity", description="Prints out credits for BIT")
