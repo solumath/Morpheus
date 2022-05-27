@@ -9,6 +9,10 @@ import youtube_dl
 from async_timeout import timeout
 from disnake.ext import commands
 
+
+# TODO importing playlists from youtube
+# TODO spotify links and playlists
+
 # Silence useless bug reports messages
 youtube_dl.utils.bug_reports_message = lambda: ''
 
@@ -45,7 +49,7 @@ class YTDLSource(disnake.PCMVolumeTransformer):
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
 
-    def __init__(self, ctx: commands.Context, source: disnake.FFmpegPCMAudio, *, data: dict):
+    def __init__(self, ctx: commands.Context, source: disnake.FFmpegPCMAudio, *, data: dict, volume = 0.5):
         super().__init__(source)
 
         self.requester = ctx.author
@@ -210,7 +214,7 @@ class VoiceState:
 
         if self.voice:
             self.voice.source.volume = value
-            
+
     @property
     def is_playing(self):
         return self.voice and self.current
