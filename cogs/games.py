@@ -1,8 +1,6 @@
 import disnake
 from disnake.ext import commands
 
-from datetime import datetime
-
 buy = [
 	"[Rounds](https://store.steampowered.com/app/1557740/ROUNDS/) - 3,49€",
 	"[Garry's Mod](https://store.steampowered.com/app/4000/Garrys_Mod/) - 4,99€",
