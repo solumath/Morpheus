@@ -32,6 +32,11 @@ class Init(commands.Cog):
             #----------------------Create dir-----------------------------
             if not (os.path.isdir(f"servers/{ctx.name}")):
                 os.mkdir(f"servers/{ctx.name}")
+            
+            #----------------------Create config-----------------------------
+            if not (os.path.isdir(f"servers/{ctx.name}")):
+                with open(f"servers/{ctx.name}/config.json", "w") as f:
+                    json.dump({"joined": ""}, f, ensure_ascii=False, indent=4)
 
             #----------------------Create replies-------------------------
             if not (os.path.isfile(f"servers/{ctx.name}/replies.json")):
