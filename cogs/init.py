@@ -12,6 +12,17 @@ class Init(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.has_permissions(administrator=True)
+    @commands.slash_command(name="edit_config", description="Edits config file")
+    async def edit_config(self, ctx, info_channel):
+        print(info_channel[2:-1])
+        with open(f"servers/{ctx.guild.name}/config.json", 'r+', encoding='utf-8') as f:
+            dict = json.load(f)
+            dict['joined'] = info_channel[2:-1]
+            with open(f"servers/{ctx.guild.name}/config.json",'w', encoding='utf-8') as f:
+                json.dump(dict, f, ensure_ascii=False, indent=4)
+            await ctx.send(f"Info channel byl změněn na kanál {info_channel}")
+
     @commands.Cog.listener()
     async def on_guild_join(self, ctx):
         """setup folder for new server"""
