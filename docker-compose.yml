@@ -3,3 +3,5 @@ version: '3.8'
 services:
     bot:
         build: .
+        volumes:
+            - ./servers:/morpheus/servers

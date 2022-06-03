@@ -7,6 +7,7 @@ import logging
 import traceback
 import random
 import utility
+import re
 from config.messages import Messages
 from config.channels import Channels
 
@@ -31,10 +32,10 @@ class Logging(commands.Cog):
     async def addreply(self, ctx, key, reply):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
             dict = json.load(f)
-            if key in dict.keys():
+            if key.lower() in dict.keys():
                 await ctx.send(f"hláška {key} již existuje")
             else:
-                add = {f"{key}":reply}
+                add = {f"{key.lower()}":reply}
                 dict.update(add)
                 with open(f"servers/{ctx.guild.name}/replies.json",'w', encoding='utf-8') as f:
                     json.dump(dict, f, ensure_ascii=False, indent=4)
@@ -44,8 +45,8 @@ class Logging(commands.Cog):
     async def remreply(self, ctx, key):
         with open(f"servers/{ctx.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
             dict = json.load(f)
-            if key in dict.keys():
-                dict.pop(key)
+            if key.lower() in dict.keys():
+                dict.pop(key.lower())
                 with open(f"servers/{ctx.guild.name}/replies.json", 'w', encoding='utf-8') as f:
                     json.dump(dict, f, ensure_ascii=False, indent=4)
                 await ctx.send(f"hláška {key} byla odstraněna")
@@ -82,8 +83,10 @@ class Logging(commands.Cog):
             await message.channel.send("uh oh")
         elif f"<@!{self.bot.user.id}>" in message.content or f"<@{self.bot.user.id}>" in message.content:
             await message.channel.send(random.choice(Messages.Morpheus))
-        elif message.content in replies.keys():
-            await message.channel.send(replies[message.content])
+        else: 
+            for key, value in replies.items():
+                if re.search(fr"\b{key.lower()}\b", message.content.lower()):
+                    await message.channel.send(value)
 
     #-------------------------Logs----------------------------
     @commands.Cog.listener()
