@@ -33,3 +33,4 @@ class Messages:
                 	return 70\nif ("Mám průměr pod 1.5")
                 	return 80\nif ("Mám průměr pod 2.0")
                 	return 75```"""
+    filename_error = "Error: {} - {}."

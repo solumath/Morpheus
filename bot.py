@@ -1,29 +1,27 @@
 import disnake
 from disnake.ext import commands
 from disnake import TextChannel, Embed
-from config import messages, channels
+from config.messages import Messages
+from config.channels import Channels
 import utility
 import os
 import traceback
 import git
 import keys
 
-messages = messages.Messages
-channels = channels.Channels
-
-bot = commands.Bot(command_prefix="?", intents=disnake.Intents.all(), test_guilds=channels.guild_ids)
+bot = commands.Bot(command_prefix="?", intents=disnake.Intents.all(), test_guilds=Channels.guild_ids)
 
 @bot.event
 async def on_ready():
-    print(messages.on_ready_bot.format(bot.user, bot.user.id))
+    print(Messages.on_ready_bot.format(bot.user, bot.user.id))
 
     #set status for bot
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
     await bot.change_presence(activity=disnake.Game(f"/help | On commit {sha[:7]}"))
-    bot_room: TextChannel = bot.get_channel(channels.development)
+    bot_room: TextChannel = bot.get_channel(Channels.development)
     if bot_room is not None:
-        await bot_room.send(messages.on_ready_bot.format(bot.user.mention, bot.user.id))
+        await bot_room.send(Messages.on_ready_bot.format(bot.user.mention, bot.user.id))
 
 @bot.slash_command(name="purge", description="delete number of messages")
 @commands.has_permissions(manage_messages=True)
@@ -59,33 +57,33 @@ async def cogs_not_loaded(inter: disnake.CommandInteraction, user_input: str):
 async def loading(msg, extension):
     try:
         bot.load_extension(f"cogs.{extension}")
-        msg.append(messages.succes_load.format(extension))
+        msg.append(Messages.succes_load.format(extension))
     except commands.ExtensionFailed:
-        msg.append(messages.fail_load.format(extension))
+        msg.append(Messages.fail_load.format(extension))
     except commands.ExtensionNotFound:
-        msg.append(messages.not_found.format(extension))
+        msg.append(Messages.not_found.format(extension))
     except commands.ExtensionAlreadyLoaded:
-        msg.append(messages.already_loaded.format(extension))
+        msg.append(Messages.already_loaded.format(extension))
 
 async def unloading(msg, extension):
     try:
         bot.unload_extension(f"cogs.{extension}")
-        msg.append(messages.succes_unload.format(extension))
+        msg.append(Messages.succes_unload.format(extension))
     except commands.ExtensionNotFound:
-        msg.append(messages.not_found.format(extension))
+        msg.append(Messages.not_found.format(extension))
     except commands.ExtensionNotLoaded:
-        msg.append(messages.not_loaded.format(extension))
+        msg.append(Messages.not_loaded.format(extension))
 
 async def reloading(msg, extension):
     try:
         bot.reload_extension(f"cogs.{extension}")  
-        msg.append(messages.succes_reload.format(extension))
+        msg.append(Messages.succes_reload.format(extension))
     except commands.ExtensionFailed:
-        msg.append(messages.fail_reload.format(extension))
+        msg.append(Messages.fail_reload.format(extension))
     except commands.ExtensionNotFound:
-        msg.append(messages.not_found.format(extension))
+        msg.append(Messages.not_found.format(extension))
     except commands.ExtensionNotLoaded:
-        msg.append(messages.not_loaded.format(extension))
+        msg.append(Messages.not_loaded.format(extension))
 
 # slash commands for manipulating with extensions
 @bot.slash_command(name="load", description="Loads cog(s) file")
@@ -146,7 +144,7 @@ for filename in os.listdir("./cogs"):
 
 @bot.event
 async def on_error(event, *args, **kwargs):
-    channel_out = bot.get_channel(channels.development)
+    channel_out = bot.get_channel(Channels.development)
     output = traceback.format_exc()
     print(output)
 
@@ -185,7 +183,7 @@ async def on_error(event, *args, **kwargs):
             user = str(user)
         embed = Embed(title=f"Ignoring exception on event '{event}'", color=0xFF0000)
         embed.add_field(name="Zpráva", value=message, inline=False)
-        if arg.guild_id != channels.my_guild:
+        if arg.guild_id != Channels.my_guild:
             embed.add_field(name="Guild", value=event_guild)
 
     if channel_out is not None:

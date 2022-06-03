@@ -1,5 +1,5 @@
 LICENSE
 README.md
-keys.py
 **/__pycache__/
-**/servers/
+**/docker-compose*
+**/Dockerfile*

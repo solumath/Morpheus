@@ -7,10 +7,8 @@ import logging
 import traceback
 import random
 import utility
-from config import messages, channels
-
-messages = messages.Messages
-channels = channels.Channels
+from config.messages import Messages
+from config.channels import Channels
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -83,7 +81,7 @@ class Logging(commands.Cog):
         elif "uh oh" in message.content:
             await message.channel.send("uh oh")
         elif f"<@!{self.bot.user.id}>" in message.content or f"<@{self.bot.user.id}>" in message.content:
-            await message.channel.send(random.choice(messages.Morpheus))
+            await message.channel.send(random.choice(Messages.Morpheus))
         elif message.content in replies.keys():
             await message.channel.send(replies[message.content])
 
@@ -132,14 +130,14 @@ class Logging(commands.Cog):
             await ctx.send(f"This command is on cooldown. Please try again after {round(error.retry_after, 1)} seconds.")
             return
         else:
-            channel = self.bot.get_channel(channels.development)
+            channel = self.bot.get_channel(Channels.development)
             await ctx.send(f"```Errors happen Mr. Anderson```")
             url = f"https://discord.com/channels/{ctx.guild_id}/{ctx.channel_id}/{ctx.id}"
 
             output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
             embed = disnake.Embed(title=f"Ignoring exception on command {ctx.data.name}", color=0xFF0000)
             embed.add_field(name="Autor", value=str(ctx.author))
-            if ctx.guild and ctx.guild.id != channels.my_guild:
+            if ctx.guild and ctx.guild.id != Channels.my_guild:
                 embed.add_field(name="Guild", value=ctx.guild.name)
             embed.add_field(name="Zpráva", value=ctx.filled_options, inline=False)
             embed.add_field(name="Link", value=url, inline=False)
@@ -167,14 +165,14 @@ class Logging(commands.Cog):
             await ctx.send(error)
             return
         else:
-            channel = self.bot.get_channel(channels.development)
+            channel = self.bot.get_channel(Channels.development)
 
             message = await ctx.send(f"```Errors happen Mr. Anderson```")
             
             output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
             embed = disnake.Embed(title=f"Ignoring exception on command {ctx.command}", color=0xFF0000)
             embed.add_field(name="Autor", value=str(ctx.author))
-            if ctx.guild and ctx.guild.id != channels.my_guild:
+            if ctx.guild and ctx.guild.id != Channels.my_guild:
                 embed.add_field(name="Guild", value=ctx.guild.name)
             embed.add_field(name="Zpráva", value=ctx.message.content[:1000], inline=False)
             embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
@@ -186,6 +184,7 @@ class Logging(commands.Cog):
             if channel is not None:
                 for message in output:
                     await channel.send(f"```\n{message}\n```")
-        
+
+  
 def setup(bot):
     bot.add_cog(Logging(bot))

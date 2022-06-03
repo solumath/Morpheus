@@ -29,5 +29,6 @@ class Messages(commands.Cog):
         with open(f"servers/{ctx.guild.name}/messages.json",'w', encoding='utf-8') as f:
                     json.dump(messages_count, f, ensure_ascii=False, indent=4)
 
+
 def setup(bot):
     bot.add_cog(Messages(bot))

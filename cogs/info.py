@@ -3,12 +3,9 @@ from disnake.ext import commands
 from datetime import datetime
 import json
 import requests
-from config import channels, messages
+from config.messages import Messages
 
 import keys
-
-channels = channels.Channels
-messages = messages.Messages
 
 class Info(commands.Cog):
 	def __init__(self, bot):
@@ -23,7 +20,7 @@ class Info(commands.Cog):
 
 	@commands.slash_command(name="kredity", description="Prints out credits for BIT")
 	async def kredity(self, ctx):
-		await ctx.send(messages.kredity)
+		await ctx.send(Messages.kredity)
 
 	@commands.slash_command(name="user", description="Prints out info about user")
 	async def user_info(self, ctx, target: disnake.Member = None):
@@ -90,6 +87,7 @@ class Info(commands.Cog):
 			embed.add_field(name=name, value=value, inline=inline)
 
 		await ctx.send(embed=embed)
-	
+
+
 def setup(bot):
 	bot.add_cog(Info(bot))

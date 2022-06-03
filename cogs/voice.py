@@ -498,5 +498,6 @@ class Voice(commands.Cog):
             if ctx.voice_client.channel != ctx.author.voice.channel:
                 raise commands.CommandError('Bot is already in a voice channel.')
 
+
 def setup(bot):
     bot.add_cog(Voice(bot))

@@ -46,5 +46,6 @@ class Games(commands.Cog):
 			field.get(category).append(f"[{name}]({link}) - {price}")
 			await ctx.send("List updated")
 
+
 def setup(bot):
 	bot.add_cog(Games(bot))

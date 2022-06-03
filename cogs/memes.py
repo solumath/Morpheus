@@ -12,30 +12,30 @@ class Memes(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(name="drzpicu", description="Drz picu 'user'")
-    async def drzpicu(self, ctx, user = "<@153480398054227978>"):
-        await ctx.send(f"drz picu {user}")
+    async def drzpicu(self, inter: disnake.ApplicationCommandInteraction, user = "<@153480398054227978>"):
+        await inter.send(f"drz picu {user}")
 
     @commands.slash_command(name="nebudsalty", description="Nebud salty 'user'")
-    async def nebudsalty(self, ctx, user = "<@624604891603795968>"):
-        await ctx.send(f":salt: nebud salty {user}")
+    async def nebudsalty(self, inter: disnake.ApplicationCommandInteraction, user = "<@624604891603795968>"):
+        await inter.send(f":salt: nebud salty {user}")
     
     @commands.cooldown(rate=1, per=100.0, type=commands.BucketType.user)
     @commands.command()
-    async def tagrage(self, ctx, user: disnake.Member, *text):
-        await ctx.message.delete()
+    async def tagrage(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, *text):
+        await inter.message.delete()
         for x in range(5):
-            await ctx.send(f"{user.mention} {' '.join(text)}")
+            await inter.send(f"{user.mention} {' '.join(text)}")
             await asyncio.sleep(5)
     
     @commands.slash_command(name="dadjoke", description="Get a dadjoke")
-    async def dadjoke(self, ctx, *, keyword = None):
+    async def dadjoke(self, inter: disnake.ApplicationCommandInteraction, *, keyword = None):
         """Get random dad joke
         Arguments
         ---------
         keyword: search for a certain keyword in a joke
         """
         if keyword is not None and ("&" in keyword or "?" in keyword):
-            await ctx.send("I didn't find a joke like that.")
+            await inter.send("I didn't find a joke like that.")
 
         params: Dict[str, str] = {"limit": "30"}
         url: str = "https://icanhazdadjoke.com"
@@ -51,7 +51,7 @@ class Memes(commands.Cog):
         if keyword is not None:
             res = fetched["results"]
             if len(res) == 0:
-                await ctx.send("I didn't find a joke like that.")
+                await inter.send("I didn't find a joke like that.")
             result = random.choice(res)
             result["joke"] = re.sub(
                 f"(\\b\\w*{keyword}\\w*\\b)",
@@ -64,20 +64,21 @@ class Memes(commands.Cog):
 
         embed = disnake.Embed(description=result["joke"])
 
-        await ctx.send(embed=embed)
+        await inter.send(embed=embed)
 
     @commands.slash_command(name="nickname", description="Change nickname")
-    async def nick(self, ctx, nickname, target: disnake.Member):
+    async def nick(self, inter: disnake.ApplicationCommandInteraction, nickname, target: disnake.Member):
         accept = len(nickname)
         if accept > 32:
-            await ctx.send("Nickname must be 32 characters or less")
+            await inter.send("Nickname must be 32 characters or less")
         else:
             try:
                 await target.edit(nick=nickname)
             except disnake.errors.Forbidden:
-                await ctx.send("Cant change this ones name")
+                await inter.send("Cant change this ones name")
             else:
-                await ctx.send("Nickname has been changed.")
+                await inter.send("Nickname has been changed.")
+
 
 def setup(bot):
     bot.add_cog(Memes(bot))

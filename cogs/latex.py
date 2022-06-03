@@ -29,6 +29,7 @@ class Latex(commands.Cog):
                         await ctx.send(file=disnake.File(datastream, "latex.png"))
                 except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
                     await ctx.send("Website unreachable")
-    
+
+
 def setup(bot):
     bot.add_cog(Latex(bot))
