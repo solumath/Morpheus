@@ -6,7 +6,7 @@ import utility
 import os
 import traceback
 import git
-import env
+import keys
 
 messages = messages.Messages
 channels = channels.Channels
@@ -195,4 +195,4 @@ async def on_error(event, *args, **kwargs):
         for message in output:
             await channel_out.send(f"```\n{message}```")
 
-bot.run(env.TOKEN)
+bot.run(keys.TOKEN)

@@ -2,7 +2,7 @@ from disnake.ext import commands
 import json
 import requests
 import time
-import env
+import keys
 
 class Messages(commands.Cog):
     def __init__(self, bot):
@@ -14,7 +14,7 @@ class Messages(commands.Cog):
         member_ids = [member.id for member in ctx.guild.members]
         messages_count = {}
         headers = {
-                    'authorization': env.authorization
+                    'authorization': keys.authorization
                     }
         for ids in member_ids:
             r = requests.get(f'https://discord.com/api/v9/guilds/{ctx.guild.id}/messages/search?author_id={ids}&include_nsfw=true', headers=headers)

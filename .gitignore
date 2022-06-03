@@ -1,9 +1,4 @@
-env.py
+keys.py
 __pycache__
-logs
-replies.json
 servers
 *.mp4
-client_secrets.json
-credentials.json
-settings.yaml

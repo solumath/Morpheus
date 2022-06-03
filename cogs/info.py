@@ -5,7 +5,7 @@ import json
 import requests
 from config import channels, messages
 
-import env
+import keys
 
 channels = channels.Channels
 messages = messages.Messages
@@ -30,7 +30,7 @@ class Info(commands.Cog):
 		target = target or ctx.author
 		
 		headers = {
-                    'authorization': env.authorization
+                    'authorization': keys.authorization
                     }
 		r = requests.get(f'https://discord.com/api/v9/guilds/{ctx.guild.id}/messages/search?author_id={target.id}&include_nsfw=true', headers=headers)
 		data = json.loads(r.text)
