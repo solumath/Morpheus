@@ -85,7 +85,7 @@ class Logging(commands.Cog):
             await message.channel.send(random.choice(Messages.Morpheus))
         else: 
             for key, value in replies.items():
-                if re.search(fr"\b{key.lower()}\b", message.content.lower()):
+                if re.search(fr"^\b{key.lower()}\b", message.content.lower()):
                     await message.channel.send(value)
 
     #-------------------------Logs----------------------------
