@@ -15,7 +15,7 @@ class Random(commands.Cog):
     async def roll(self, inter: disnake.ApplicationCommandInteraction, x : int, y : int = 0):
         if x > y:
             x, y = y, x
-        await inter.response.send_message((str(random.randint(x, y))))
+        await inter.response.send_message(str(random.randint(x, y)))
 
     @commands.slash_command(name="pick", description="Pick a random thing")
     async def pick(self, inter: disnake.ApplicationCommandInteraction, 

@@ -34,3 +34,8 @@ class Messages:
                 	return 80\nif ("Mám průměr pod 2.0")
                 	return 75```"""
     filename_error = "Error: {} - {}."
+
+    name_day_cz = "Dnes má svátek {name}."
+    name_day_cz_brief = "Vypíše, kdo má dnes svátek."
+    name_day_sk = "Dnes má meniny {name}."
+    name_day_sk_brief = "Vypíše, kto má dnes meniny."
