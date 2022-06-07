@@ -25,7 +25,7 @@ class Info(commands.Cog):
 	@commands.slash_command(name="user", description="Prints out info about user")
 	async def user_info(self, ctx, target: disnake.Member = None):
 		target = target or ctx.author
-		
+
 		headers = {
                     'authorization': keys.authorization
                     }
@@ -38,7 +38,6 @@ class Info(commands.Cog):
 
 		if target.avatar is not None:
 			embed.set_thumbnail(url=target.avatar)
-		print(target.roles)
 
 		fields = [("Name", str(target), True),
 				  ("ID", target.id, True),
@@ -62,7 +61,7 @@ class Info(commands.Cog):
 
 		if ctx.guild.icon is not None:
 			embed.set_thumbnail(url=ctx.guild.icon)
-		
+
 		statuses = [len(list(filter(lambda m: str(m.status) == "online", ctx.guild.members))),
 					len(list(filter(lambda m: str(m.status) == "idle", ctx.guild.members))),
 					len(list(filter(lambda m: str(m.status) == "dnd", ctx.guild.members))),
