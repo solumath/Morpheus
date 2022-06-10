@@ -9,7 +9,7 @@ import traceback
 import git
 import keys
 
-bot = commands.Bot(command_prefix="?", intents=disnake.Intents.all(), test_guilds=Channels.guild_ids)
+bot = commands.Bot(command_prefix="?", intents=disnake.Intents.all())
 
 @bot.event
 async def on_ready():
@@ -29,113 +29,6 @@ async def purge(ctx, number_of_messages : int):
     await ctx.channel.purge(limit=number_of_messages)
     await ctx.send("What is real? How do you define real?", delete_after=5)
 
-#-------------------------Cogs----------------------------
-async def all_loaded_cogs():
-    cogs = bot.cogs
-    cog_names = []
-    for cog in cogs:
-        cog_names.append(f"{cog.lower()}")
-    return cog_names
-
-async def cogs_loaded(inter: disnake.CommandInteraction, user_input: str):
-    cogs = await all_loaded_cogs()
-    return [cog for cog in cogs if user_input.lower() in cog]
-
-async def cogs_not_loaded(inter: disnake.CommandInteraction, user_input: str):
-    all_cogs = []
-    for filename in os.listdir("./cogs"):
-            if filename.endswith(".py"):
-                all_cogs.append(filename[:-3])
-
-    loaded = await all_loaded_cogs()
-    cogs = list(set(loaded)^set(all_cogs))
-    if cogs:
-        return [cog for cog in cogs if user_input.lower() in cog]
-    else:
-        return ["All cogs loaded."]
-
-async def loading(msg, extension):
-    try:
-        bot.load_extension(f"cogs.{extension}")
-        msg.append(Messages.succes_load.format(extension))
-    except commands.ExtensionFailed:
-        msg.append(Messages.fail_load.format(extension))
-    except commands.ExtensionNotFound:
-        msg.append(Messages.not_found.format(extension))
-    except commands.ExtensionAlreadyLoaded:
-        msg.append(Messages.already_loaded.format(extension))
-
-async def unloading(msg, extension):
-    try:
-        bot.unload_extension(f"cogs.{extension}")
-        msg.append(Messages.succes_unload.format(extension))
-    except commands.ExtensionNotFound:
-        msg.append(Messages.not_found.format(extension))
-    except commands.ExtensionNotLoaded:
-        msg.append(Messages.not_loaded.format(extension))
-
-async def reloading(msg, extension):
-    try:
-        bot.reload_extension(f"cogs.{extension}")  
-        msg.append(Messages.succes_reload.format(extension))
-    except commands.ExtensionFailed:
-        msg.append(Messages.fail_reload.format(extension))
-    except commands.ExtensionNotFound:
-        msg.append(Messages.not_found.format(extension))
-    except commands.ExtensionNotLoaded:
-        msg.append(Messages.not_loaded.format(extension))
-
-# slash commands for manipulating with extensions
-@bot.slash_command(name="load", description="Loads cog(s) file")
-@commands.has_permissions(administrator=True)
-async def load(ctx, all: bool = False, extension: str = commands.Param(autocomplete=cogs_not_loaded)):
-    msg = []
-    if all:
-        for filename in os.listdir("./cogs"):
-            if filename.endswith(".py"):
-                await loading(msg, filename[:-3])
-    else:
-        await loading(msg, extension)
-
-    print(*msg, sep = "\n")
-    await ctx.send("\n".join(msg))
-
-@bot.slash_command(name="unload", description="Unloads cog(s) file")
-@commands.has_permissions(administrator=True)
-async def unload(ctx, all: bool = False, extension: str = commands.Param(autocomplete=cogs_loaded)):
-    msg = []
-    if all:
-        for filename in os.listdir("./cogs"):
-            if filename.endswith(".py"):
-                await unloading(msg, filename[:-3])
-    else:
-        await unloading(msg, extension)
-
-    print(*msg, sep = "\n")
-    await ctx.send("\n".join(msg))
-
-@bot.slash_command(name="reload", description="Reloads cog(s) file")
-@commands.has_permissions(administrator=True)
-async def rel(ctx, all: bool = False, extension: str = commands.Param(autocomplete=cogs_loaded)):
-    msg = []
-    if all:
-        for filename in os.listdir("./cogs"):
-            if filename.endswith(".py"):
-                await reloading(msg, filename[:-3])
-    else:
-        await reloading(msg, extension)
-
-    print(*msg, sep = "\n")
-    await ctx.send("\n".join(msg))
-
-@bot.slash_command(name="cogs", description="List of loaded cogs")
-@commands.has_permissions(administrator=True)
-async def cogs(ctx):
-    cogs = bot.cogs
-    cog_names = []
-    for cog in cogs:
-        cog_names.append(str(cog))
-    await ctx.send("\n".join(cog_names))
 
 #load all cogs and remove extension from name
 for filename in os.listdir("./cogs"):
@@ -192,5 +85,6 @@ async def on_error(event, *args, **kwargs):
             await channel_out.send(embed=embed)
         for message in output:
             await channel_out.send(f"```\n{message}```")
+
 
 bot.run(keys.TOKEN)

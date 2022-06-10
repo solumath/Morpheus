@@ -28,14 +28,23 @@ class Messages:
     already_loaded = "Already loaded **{}**"
     fail_load = "Failed to load **{}**"
     succes_load = "Loaded successfully **{}**"
+
     kredity = """```cs\nif ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
                 	return 65\nif ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
                 	return 70\nif ("Mám průměr pod 1.5")
                 	return 80\nif ("Mám průměr pod 2.0")
                 	return 75```"""
+
     filename_error = "Error: {} - {}."
+    command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
+    command_cooldowns = "This command is on cooldown. Please try again after {time} seconds."
+    not_enough_perms = "You do not posses enough strenght to beat me!"
+    member_not_found = "{user} Nikoho takového jsem nenašel."
 
     name_day_cz = "Dnes má svátek {name}."
     name_day_cz_brief = "Vypíše, kdo má dnes svátek."
     name_day_sk = "Dnes má meniny {name}."
     name_day_sk_brief = "Vypíše, kto má dnes meniny."
+
+    pet_brief = "Vytvoří gif z uživatele."
+    pet_unsupported_avatar = "Defaultní avatar aktuálne není podporovaný."
