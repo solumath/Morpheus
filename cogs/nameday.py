@@ -11,8 +11,6 @@ from config.channels import Channels
 class Nameday(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.cz_name = ""
-        self.sk_name = ""
         self.send_names.start()
 
     async def _svatek(self):
@@ -21,34 +19,34 @@ class Nameday(commands.Cog):
         names = []
         for i in res:
             names.append(i["name"])
-        self.cz_name = Messages.name_day_cz.format(name=", ".join(names))
-    
+        return Messages.name_day_cz.format(name=", ".join(names))
+
     async def _meniny(self):
         url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
         res = requests.get(url, timeout=10).json()
         names = []
         for i in res:
             names.append(i["name"])
-        self.sk_name = Messages.name_day_sk.format(name=", ".join(names))
-    
+        return Messages.name_day_sk.format(name=", ".join(names))
+
     @commands.slash_command(name="svatek", description=Messages.name_day_cz_brief)
     async def svatek(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(with_message=True)
-        await self._svatek()
-        await inter.edit_original_message(self.cz_name)
+        await inter.response.defer()
+        svatek = await self._svatek()
+        await inter.edit_original_message(svatek)
 
     @commands.slash_command(name="meniny", description=Messages.name_day_sk_brief)
     async def meniny(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.defer(with_message=True)
-        await self._meniny()
-        await inter.edit_original_message(self.sk_name)
+        await inter.response.defer()
+        meniny = await self._meniny()
+        await inter.edit_original_message(meniny)
 
     @tasks.loop(time= time(5,0))
     async def send_names(self):
-        await self._svatek()
-        await self._meniny()
+        svatek = await self._svatek()
+        meniny = await self._meniny()
         channel = self.bot.get_channel(Channels.name_day)
-        await channel.send(f"{self.cz_name}\n{self.sk_name}")
+        await channel.send(f"{svatek}\n{meniny}")
 
 
 def setup(bot):
