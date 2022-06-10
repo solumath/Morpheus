@@ -8,8 +8,8 @@ class Messages(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="count", description="Count all messages from everyone")
     @commands.has_permissions(administrator=True)
+    @commands.command(name="count", description="Count all messages from everyone")
     async def message_count(self, ctx):
         member_ids = [member.id for member in ctx.guild.members]
         messages_count = {}

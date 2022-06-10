@@ -2,12 +2,13 @@ import disnake
 from disnake.utils import get
 from disnake.ext import commands
 
-class Buttons(commands.Cog):
+class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.slash_command(name="select", description="Create select menu")
-    async def select(self, inter, room : disnake.TextChannel, text : str, 
+    async def select(self, inter: disnake.ApplicationCommandInteraction, 
+                    room : disnake.TextChannel, text : str, 
                     min_roles : int, max_roles : int, roles: str):
         """extract roles from string and create select menu"""
         roles = roles.split()
@@ -21,7 +22,7 @@ class Buttons(commands.Cog):
             role = inter.guild.get_role(id)
             roles.append(disnake.SelectOption(label=role.name, value=role.id))
         
-        await inter.send("select menu sent")
+        await inter.response.send_message("select menu sent")
         await room.send(components=disnake.ui.Select(placeholder=text, min_values=min_roles, 
                                                      max_values=max_roles, options=roles, custom_id="role_select"))
 
@@ -61,4 +62,4 @@ class Buttons(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Buttons(bot))
+    bot.add_cog(Roles(bot))

@@ -19,17 +19,17 @@ class Info(commands.Cog):
 		await channel.send(f"Hej debílci, došel {member.mention} tak ho pozdravte. <:feelsWowMan:747845161563979857>")
 
 	@commands.slash_command(name="kredity", description="Prints out credits for BIT")
-	async def kredity(self, ctx):
-		await ctx.send(Messages.kredity)
+	async def kredity(self, inter: disnake.ApplicationCommandInteraction):
+		await inter.response.send_message(Messages.kredity)
 
 	@commands.slash_command(name="user", description="Prints out info about user")
-	async def user_info(self, ctx, target: disnake.Member = None):
-		target = target or ctx.author
+	async def user_info(self, inter: disnake.ApplicationCommandInteraction, target: disnake.Member = None):
+		target = target or inter.author
 
 		headers = {
                     'authorization': keys.authorization
                     }
-		r = requests.get(f'https://discord.com/api/v9/guilds/{ctx.guild.id}/messages/search?author_id={target.id}&include_nsfw=true', headers=headers)
+		r = requests.get(f'https://discord.com/api/v9/guilds/{inter.guild.id}/messages/search?author_id={target.id}&include_nsfw=true', headers=headers)
 		data = json.loads(r.text)
 
 		embed = disnake.Embed(title="User information",
@@ -51,41 +51,41 @@ class Info(commands.Cog):
 		for name, value, inline in fields:
 			embed.add_field(name=name, value=value, inline=inline)
 
-		await ctx.send(embed=embed)
+		await inter.response.send_message(embed=embed)
 
 	@commands.slash_command(name="server", description="Prints out info about server")
-	async def server_info(self, ctx):
+	async def server_info(self, inter: disnake.ApplicationCommandInteraction):
 		embed = disnake.Embed(title="Server information",
-					  colour=ctx.guild.owner.colour,
+					  colour=inter.guild.owner.colour,
 					  timestamp=datetime.utcnow())
 
-		if ctx.guild.icon is not None:
-			embed.set_thumbnail(url=ctx.guild.icon)
+		if inter.guild.icon is not None:
+			embed.set_thumbnail(url=inter.guild.icon)
 
-		statuses = [len(list(filter(lambda m: str(m.status) == "online", ctx.guild.members))),
-					len(list(filter(lambda m: str(m.status) == "idle", ctx.guild.members))),
-					len(list(filter(lambda m: str(m.status) == "dnd", ctx.guild.members))),
-					len(list(filter(lambda m: str(m.status) == "offline", ctx.guild.members)))]
+		statuses = [len(list(filter(lambda m: str(m.status) == "online", inter.guild.members))),
+					len(list(filter(lambda m: str(m.status) == "idle", inter.guild.members))),
+					len(list(filter(lambda m: str(m.status) == "dnd", inter.guild.members))),
+					len(list(filter(lambda m: str(m.status) == "offline", inter.guild.members)))]
 
-		fields = [("ID", ctx.guild.id, True),
-				  ("Owner", ctx.guild.owner.mention, True),
-				  ("Created at", ctx.guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
-				  ("Members", len(ctx.guild.members), True),
-				  ("Humans", len(list(filter(lambda m: not m.bot, ctx.guild.members))), True),
-				  ("Bots", len(list(filter(lambda m: m.bot, ctx.guild.members))), True),
-				  ("Banned members", len(await ctx.guild.bans().flatten()), True),
+		fields = [("ID", inter.guild.id, True),
+				  ("Owner", inter.guild.owner.mention, True),
+				  ("Created at", inter.guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
+				  ("Members", len(inter.guild.members), True),
+				  ("Humans", len(list(filter(lambda m: not m.bot, inter.guild.members))), True),
+				  ("Bots", len(list(filter(lambda m: m.bot, inter.guild.members))), True),
+				  ("Banned members", len(await inter.guild.bans().flatten()), True),
 				  ("Statuses", f"🟩 {statuses[0]} 🟧 {statuses[1]} 🟥 {statuses[2]} ⬛ {statuses[3]}", True),
-				  ("Text channels", len(ctx.guild.text_channels), True),
-				  ("Voice channels", len(ctx.guild.voice_channels), True),
-				  ("Categories", len(ctx.guild.categories), True),
-				  ("Roles", len(ctx.guild.roles), True),
-				  ("Invites", len(await ctx.guild.invites()), True),
+				  ("Text channels", len(inter.guild.text_channels), True),
+				  ("Voice channels", len(inter.guild.voice_channels), True),
+				  ("Categories", len(inter.guild.categories), True),
+				  ("Roles", len(inter.guild.roles), True),
+				  ("Invites", len(await inter.guild.invites()), True),
 				  ("\u200b", "\u200b", True)]
 
 		for name, value, inline in fields:
 			embed.add_field(name=name, value=value, inline=inline)
 
-		await ctx.send(embed=embed)
+		await inter.response.send_message(embed=embed)
 
 
 def setup(bot):

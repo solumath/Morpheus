@@ -17,7 +17,7 @@ class Nameday(commands.Cog):
 
     async def _svatek(self):
         url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
-        res = requests.get(url).json()
+        res = requests.get(url, timeout=10).json()
         names = []
         for i in res:
             names.append(i["name"])
@@ -25,7 +25,7 @@ class Nameday(commands.Cog):
     
     async def _meniny(self):
         url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
-        res = requests.get(url).json()
+        res = requests.get(url, timeout=10).json()
         names = []
         for i in res:
             names.append(i["name"])
@@ -33,13 +33,15 @@ class Nameday(commands.Cog):
     
     @commands.slash_command(name="svatek", description=Messages.name_day_cz_brief)
     async def svatek(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer(with_message=True)
         await self._svatek()
-        await inter.response.send_message(self.cz_name)
+        await inter.edit_original_message(self.cz_name)
 
     @commands.slash_command(name="meniny", description=Messages.name_day_sk_brief)
     async def meniny(self, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer(with_message=True)
         await self._meniny()
-        await inter.response.send_message(self.sk_name)
+        await inter.edit_original_message(self.sk_name)
 
     @tasks.loop(time= time(5,0))
     async def send_names(self):
