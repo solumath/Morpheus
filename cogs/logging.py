@@ -5,7 +5,6 @@ from logging.handlers import TimedRotatingFileHandler
 import json
 import logging
 import random
-import re
 from config.messages import Messages
 
 logger = logging.getLogger()
@@ -53,7 +52,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener("on_message")
     async def reply(self, message):
         """sends messages to users depending on the content"""
-        
+
         if message.embeds:
             for embed in message.embeds:
                 content = embed.to_dict()
@@ -83,7 +82,7 @@ class Logging(commands.Cog):
             await message.channel.send(random.choice(Messages.Morpheus))
         else: 
             for key, value in replies.items():
-                if re.search(fr"^\b{key.lower()}\s", message.content.lower()):
+                if message.content.lower().startswith(key.lower()):
                     await message.channel.send(value)
 
     #-------------------------Logs----------------------------
