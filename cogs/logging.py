@@ -2,6 +2,7 @@ import disnake
 from disnake.ext import commands
 from logging.handlers import TimedRotatingFileHandler
 
+import re
 import json
 import logging
 import random
@@ -82,7 +83,7 @@ class Logging(commands.Cog):
             await message.channel.send(random.choice(Messages.Morpheus))
         else: 
             for key, value in replies.items():
-                if message.content.lower().startswith(key.lower()):
+                if re.search(fr"^\b{key.lower()}\b", message.content.lower()):
                     await message.channel.send(value)
 
     #-------------------------Logs----------------------------
@@ -108,12 +109,12 @@ class Logging(commands.Cog):
         message = await channel.fetch_message(payload.message_id)
         logger.log(23, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
                        f" Author: {message.author}: {message.content}")
-    
+
     @commands.Cog.listener()
     async def on_message_delete(self, ctx):
         logger.log(24, f"Guild: {ctx.guild} || Channel: {ctx.channel} || Message: {ctx.id} ||" 
                        f" Author: {ctx.author}: {ctx.content}")
-    
+
     @commands.Cog.listener()
     async def on_slash_command(self, inter):
         guild = self.bot.get_guild(inter.guild_id)
