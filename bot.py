@@ -23,8 +23,8 @@ async def on_ready():
     if bot_room is not None:
         await bot_room.send(Messages.on_ready_bot.format(bot.user.mention, bot.user.id))
 
-@bot.slash_command(name="purge", description="delete number of messages")
 @commands.has_permissions(manage_messages=True)
+@bot.slash_command(name="purge", description="delete number of messages")
 async def purge(ctx, number_of_messages : int):
     await ctx.channel.purge(limit=number_of_messages)
     await ctx.send("What is real? How do you define real?", delete_after=5)

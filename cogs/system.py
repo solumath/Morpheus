@@ -3,6 +3,7 @@ from disnake.ext import commands
 import os
 
 from config.messages import Messages
+from config.channels import Channels
 
 class System(commands.Cog):
     def __init__(self, bot):
@@ -10,8 +11,8 @@ class System(commands.Cog):
         self.unloadable_cogs = ["system"]
 
 
-    @commands.has_permissions(administrator=True)
-    @commands.slash_command(name="cogs", description="Manipulate with cogs", guild_ids=[845678676530954271])
+    @commands.is_owner()
+    @commands.slash_command(name="cogs", description="Manipulate with cogs")
     async def cogs(self, inter):
         """slash commands for manipulating with extensions""" 
         pass
