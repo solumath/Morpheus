@@ -22,8 +22,8 @@ class Logger(commands.Cog):
         self.logger.log(22, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
                        f" Author: {payload.member} || EmojiAdd: {payload.emoji}")
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
+    @commands.Cog.listener("on_message")
+    async def on_message_log(self, message):
         channel = message.channel
         self.logger.log(23, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
                        f" Author: {message.author}: {message.content}")
