@@ -53,8 +53,6 @@ class Messages(commands.Cog):
                 for x in message.attachments:
                     image.append(x.url)
 
-        ## TODO log message
-
         if message.guild is None:
             return
 
