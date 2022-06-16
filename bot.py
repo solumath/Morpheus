@@ -1,3 +1,4 @@
+from genericpath import isdir, isfile
 import disnake
 from disnake.ext import commands
 from disnake import TextChannel, Embed
@@ -31,11 +32,16 @@ async def purge(ctx, number_of_messages : int):
 
 
 #load all cogs and remove extension from name
-for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            bot.load_extension(f"cogs.{filename[:-3]}")
+for name in os.listdir("./cogs"):
+    filename = f"./cogs/{name}"
+    modulename = f"cogs.{name}"
 
-bot.load_extension("cogs.logger")
+    if isfile(filename) and filename.endswith(".py"):
+        bot.load_extension(modulename[:-3])
+    
+    if isdir(filename) and ("__init__.py" in os.listdir(filename)):
+        bot.load_extension(modulename)
+
 
 @bot.event
 async def on_error(event, *args, **kwargs):
