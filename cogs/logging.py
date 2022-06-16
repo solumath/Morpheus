@@ -1,4 +1,3 @@
-from importlib.resources import path
 import disnake
 from disnake.ext import commands
 from logging.handlers import TimedRotatingFileHandler
