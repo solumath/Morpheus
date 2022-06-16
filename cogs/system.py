@@ -1,3 +1,4 @@
+from genericpath import isdir, isfile
 import disnake
 from disnake.ext import commands
 import os
@@ -69,12 +70,18 @@ class System(commands.Cog):
     @load.autocomplete("extension")
     async def load_autocomp(self, inter: disnake.ApplicationCommandInteraction, user_input: str):
         all_cogs = []
-        for filename in os.listdir("./cogs"):
-                if filename.endswith(".py"):
-                    all_cogs.append(filename[:-3])
+        for name in os.listdir("./cogs"):
+            filename = f"./cogs/{name}"
+            if isfile(filename) and filename.endswith(".py"):
+                all_cogs.append(name[:-3])
+            
+            if isdir(filename) and ("__init__.py" in os.listdir(filename)):
+                all_cogs.append(name)
+        
+        print(all_cogs)
 
         loaded = [cog.lower() for cog in self.bot.cogs]
-        cogs = list(set(loaded)^set(all_cogs))
+        cogs = list(set(all_cogs) - set(loaded))
         if cogs:
             return [cog for cog in cogs if user_input.lower() in cog]
         else:
