@@ -1,4 +1,3 @@
-from cmath import log
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
@@ -16,7 +15,6 @@ logging.addLevelName(22, "REACT")
 logging.addLevelName(23, "EDIT")
 logging.addLevelName(24, "DEL")
 logging.addLevelName(25, "COMM")
-
 
 def setup(bot):
     bot.add_cog(Logger(bot, logger))

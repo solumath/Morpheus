@@ -78,8 +78,6 @@ class System(commands.Cog):
             if isdir(filename) and ("__init__.py" in os.listdir(filename)):
                 all_cogs.append(name)
         
-        print(all_cogs)
-
         loaded = [cog.lower() for cog in self.bot.cogs]
         cogs = list(set(all_cogs) - set(loaded))
         if cogs:
