@@ -1,3 +1,4 @@
+from importlib.resources import path
 import disnake
 from disnake.ext import commands
 from logging.handlers import TimedRotatingFileHandler
@@ -6,11 +7,16 @@ import re
 import json
 import logging
 import random
+import pathlib
 from config.messages import Messages
+
+LOGFILE = "servers/logs/L"
+
+pathlib.Path(LOGFILE).touch(exist_ok=True)
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-handler = TimedRotatingFileHandler(filename=f"servers/logs/L", when="midnight", interval=1, encoding='utf-8', backupCount=31)
+handler = TimedRotatingFileHandler(filename=LOGFILE, when="midnight", interval=1, encoding='utf-8', backupCount=31)
 handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
 handler.suffix = "%d.%m.%Y.log"
 logger.addHandler(handler)
