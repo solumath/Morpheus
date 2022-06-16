@@ -35,6 +35,8 @@ for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             bot.load_extension(f"cogs.{filename[:-3]}")
 
+bot.load_extension("cogs.logger")
+
 @bot.event
 async def on_error(event, *args, **kwargs):
     channel_out = bot.get_channel(Channels.development)
