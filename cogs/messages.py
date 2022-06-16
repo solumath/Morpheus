@@ -1,4 +1,8 @@
 from disnake.ext import commands
+
+import disnake
+import random
+import re
 import json
 import requests
 import time
@@ -7,6 +11,66 @@ import keys
 class Messages(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.slash_command(name="addreply", description="Add autoreply")
+    async def addreply(self, inter: disnake.ApplicationCommandInteraction, key, reply):
+        with open(f"servers/{inter.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
+            dict = json.load(f)
+            if key.lower() in dict.keys():
+                await inter.response.send_message(f"hláška {key} již existuje")
+            else:
+                add = {f"{key.lower()}":reply}
+                dict.update(add)
+                with open(f"servers/{inter.guild.name}/replies.json",'w', encoding='utf-8') as f:
+                    json.dump(dict, f, ensure_ascii=False, indent=4)
+                await inter.response.send_message(f"reply {key} byla přidána")
+
+    @commands.slash_command(name="remreply", description="Remove autoreply")
+    async def remreply(self, inter: disnake.ApplicationCommandInteraction, key):
+        with open(f"servers/{inter.guild.name}/replies.json", 'r+', encoding='utf-8') as f:
+            dict = json.load(f)
+            if key.lower() in dict.keys():
+                dict.pop(key.lower())
+                with open(f"servers/{inter.guild.name}/replies.json", 'w', encoding='utf-8') as f:
+                    json.dump(dict, f, ensure_ascii=False, indent=4)
+                await inter.response.send_message(f"hláška {key} byla odstraněna")
+            else:
+                await inter.response.send_message(f"takovou hlášku jsem nenašel")
+
+    @commands.Cog.listener("on_message")
+    async def reply(self, message):
+        """sends messages to users depending on the content"""
+
+        if message.embeds:
+            for embed in message.embeds:
+                content = embed.to_dict()
+        else:
+            content = message.content
+
+        if not "Traceback" in message.content:
+            image = []
+            if message.attachments:
+                for x in message.attachments:
+                    image.append(x.url)
+
+        ## TODO log message
+
+        if message.guild is None:
+            return
+
+        with open(f"servers/{message.guild.name}/replies.json", 'r') as f:
+            replies = json.load(f)
+
+        if message.author.bot:
+            return
+        elif "uh oh" in message.content:
+            await message.channel.send("uh oh")
+        elif f"<@!{self.bot.user.id}>" in message.content or f"<@{self.bot.user.id}>" in message.content:
+            await message.channel.send(random.choice(Messages.Morpheus))
+        else: 
+            for key, value in replies.items():
+                if re.search(fr"^\b{key.lower()}\b", message.content.lower()):
+                    await message.channel.send(value)
 
     @commands.has_permissions(administrator=True)
     @commands.command(name="count", description="Count all messages from everyone")
