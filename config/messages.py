@@ -15,18 +15,16 @@ class Messages:
                 "He's Beginning To Believe!",
                 "You Have To Let It All Go, Neo - Fear, Doubt, And Disbelief. Free Your Mind!",
                 "You Take The Red Pill - You Stay In Wonderland, And I Show You How Deep The Rabbit Hole Goes.",
-                "I Can Only Show You The Door..."]
+                "I Can Only Show You The Door...",
+                "What is real? How do you define real?",]
 
     on_ready_bot = "Ready!\nLogged in as {}\nID: {}"
     created_folder = "Folder **{}** successfuly created"
     removed_folder = "Folder **{}** successfuly removed"
-    not_found = "Not found **{}**"
+
     not_loaded = "Not loaded **{}**"
-    fail_reload = "Failed to reload **{}**"
     succes_reload = "Reloaded successfully **{}**"
     succes_unload = "Unloaded successfully **{}**"
-    already_loaded = "Already loaded **{}**"
-    fail_load = "Failed to load **{}**"
     succes_load = "Loaded successfully **{}**"
 
     kredity = """```cs\nif ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
