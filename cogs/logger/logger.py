@@ -4,9 +4,9 @@ class Logger(commands.Cog):
     def __init__(self, bot, logger):
         self.bot = bot
         self.logger = logger
-    
+
     @commands.Cog.listener("on_message")
-    async def message_log(self, message):
+    async def on_message_log(self, message):
         if message.embeds:
             for embed in message.embeds:
                 content = embed.to_dict()
@@ -19,7 +19,7 @@ class Logger(commands.Cog):
                 for x in message.attachments:
                     image.append(x.url)
 
-            self.logger.log(21, f"Guild: {message.guild} || Channel: {message.channel} || Message: {message.id} ||"
+        self.logger.log(21, f"Guild: {message.guild} || Channel: {message.channel} || Message: {message.id} ||"
                            f" Author: {message.author}: {content} {image}")
 
     @commands.Cog.listener()
@@ -37,12 +37,6 @@ class Logger(commands.Cog):
         message = await channel.fetch_message(payload.message_id)
         self.logger.log(22, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
                        f" Author: {payload.member} || EmojiAdd: {payload.emoji}")
-
-    @commands.Cog.listener("on_message")
-    async def on_message_log(self, message):
-        channel = message.channel
-        self.logger.log(23, f"Guild: {message.guild} || Channel: {channel} || Message: {message.id} ||" 
-                       f" Author: {message.author}: {message.content}")
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
