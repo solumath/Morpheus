@@ -27,17 +27,17 @@ class Init(commands.Cog):
     async def manual_init(self, inter: disnake.ApplicationCommandInteraction):
         await self.create_files(inter)
         await inter.response.send_message(self.msg)
-    
+
     @commands.Cog.listener("on_guild_join")
     async def create_files(self, inter: disnake.ApplicationCommandInteraction):
         """setup folder for new server"""
         channel = self.bot.get_channel(Channels.development)
-        
+
         try:
             #----------------------Create dir-----------------------------
             if not (os.path.isdir(f"servers/{inter.guild.name}")):
                 os.mkdir(f"servers/{inter.guild.name}")
-            
+
             #----------------------Create config-----------------------------
             if not (os.path.isdir(f"servers/{inter.guild.name}")):
                 with open(f"servers/{inter.guild.name}/config.json", "w") as f:
@@ -65,7 +65,7 @@ class Init(commands.Cog):
         try:
             if (os.path.isdir(f"servers/{inter.guild.name}")):
                 shutil.rmtree(f"servers/{inter.guild.name}")
-                
+
             self.msg = Messages.removed_folder.format(inter.guild.name)
             print(self.msg)
             await channel.send(self.msg)

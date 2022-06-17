@@ -21,7 +21,7 @@ class Roles(commands.Cog):
         for id in opt:
             role = inter.guild.get_role(id)
             roles.append(disnake.SelectOption(label=role.name, value=role.id))
-        
+
         await inter.response.send_message("select menu sent")
         await room.send(components=disnake.ui.Select(placeholder=text, min_values=min_roles, 
                                                      max_values=max_roles, options=roles, custom_id="role_select"))

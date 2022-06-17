@@ -4,8 +4,24 @@ class Logger(commands.Cog):
     def __init__(self, bot, logger):
         self.bot = bot
         self.logger = logger
+    
+    @commands.Cog.listener("on_message")
+    async def message_log(self, message):
+        if message.embeds:
+            for embed in message.embeds:
+                content = embed.to_dict()
+        else:
+            content = message.content
 
-    #-------------------------Logs----------------------------
+        if not "Traceback" in message.content:
+            image = []
+            if message.attachments:
+                for x in message.attachments:
+                    image.append(x.url)
+
+            self.logger.log(21, f"Guild: {message.guild} || Channel: {message.channel} || Message: {message.id} ||"
+                           f" Author: {message.author}: {content} {image}")
+
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         channel = self.bot.get_channel(payload.channel_id)
@@ -45,5 +61,3 @@ class Logger(commands.Cog):
         guild = self.bot.get_guild(inter.guild_id)
         self.logger.log(25, f"Guild: {guild} || Channel: {inter.channel} || Message: {inter.id} ||"
                        f" Author: {inter.author} || Command: {inter.data.name} || Passed: {inter.filled_options}")
-
-

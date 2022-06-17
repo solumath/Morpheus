@@ -55,7 +55,7 @@ class Stream(commands.Cog):
         #         os.remove(output)
         # except Exception:
         #     await ctx.send(Exception)
-        
+
     @commands.slash_command(name="stream", description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
     async def stream(self, ctx, subject, link, start, duration):
         """Download part of stream"""

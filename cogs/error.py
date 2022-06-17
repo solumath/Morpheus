@@ -3,6 +3,7 @@ from disnake.ext import commands
 
 import traceback
 import utility
+from disnake import Embed
 from config.messages import Messages
 from config.channels import Channels
 
@@ -78,6 +79,57 @@ class Error(commands.Cog):
         if channel is not None:
             for message in output:
                 await channel.send(f"```\n{message}\n```")
+
+    @commands.Cog.listener()
+    async def on_error(self, event, *args, **kwargs):
+        channel_out = self.bot.get_channel(Channels.development)
+        output = traceback.format_exc()
+        print(output)
+
+        embeds = []
+        guild = None
+        for arg in args:
+            if arg.guild_id:
+                guild = self.bot.get_guild(arg.guild_id)
+                event_guild = guild.name
+                channel = guild.get_channel(arg.channel_id)
+                message = await channel.fetch_message(arg.message_id)
+                message = message.content[:1000]
+            else:
+                event_guild = "DM"
+                message = arg.message_id
+
+            user = self.bot.get_user(arg.user_id)
+            if not user:
+                user = arg.user_id
+            else:
+                channel = self.bot.get_channel(arg.channel_id)
+                if channel:
+                    message = await channel.fetch_message(arg.message_id)
+                    if message.content:
+                        message = message.content[:1000]
+                    elif message.embeds:
+                        embeds.extend(message.embeds)
+                        message = "Embed v předchozí zprávě"
+                    elif message.attachments:
+                        message_out = ""
+                        for attachment in message.attachments:
+                            message_out += f"{attachment.url}\n"
+                        message = message_out
+                else:
+                    message = arg.message_id
+                user = str(user)
+            embed = Embed(title=f"Ignoring exception on event '{event}'", color=0xFF0000)
+            embed.add_field(name="Zpráva", value=message, inline=False)
+            if arg.guild_id != Channels.my_guild:
+                embed.add_field(name="Guild", value=event_guild)
+
+        if channel_out is not None:
+            output = utility.cut_string(output, 1900)
+            for embed in embeds:
+                await channel_out.send(embed=embed)
+            for message in output:
+                await channel_out.send(f"```\n{message}```")
 
 
 def setup(bot):

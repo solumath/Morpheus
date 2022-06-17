@@ -18,7 +18,7 @@ class Memes(commands.Cog):
     @commands.slash_command(name="nebudsalty", description="Nebud salty 'user'")
     async def nebudsalty(self, inter: disnake.ApplicationCommandInteraction, user = "<@624604891603795968>"):
         await inter.send(f":salt: nebud salty {user}")
-    
+
     @commands.cooldown(rate=1, per=100.0, type=commands.BucketType.user)
     @commands.command()
     async def tagrage(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member, *text):
@@ -26,7 +26,7 @@ class Memes(commands.Cog):
         for x in range(5):
             await inter.send(f"{user.mention} {' '.join(text)}")
             await asyncio.sleep(5)
-    
+
     @commands.slash_command(name="dadjoke", description="Get a dadjoke")
     async def dadjoke(self, inter: disnake.ApplicationCommandInteraction, *, keyword = None):
         """Get random dad joke
@@ -43,7 +43,7 @@ class Memes(commands.Cog):
             params["term"] = keyword
             url += "/search"
         headers: Dict[str, str] = {"Accept": "application/json"}
-        
+
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, params=params) as response:
                 fetched = await response.json()

@@ -11,6 +11,12 @@ import keys
 class Messages(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    @commands.has_permissions(manage_messages=True)
+    @commands.slash_command(name="purge", description="Delete number of messages")
+    async def purge(ctx, number_of_messages : int):
+        await ctx.channel.purge(limit=number_of_messages)
+        await ctx.send("Poof", delete_after=5)
 
     @commands.slash_command(name="addreply", description="Add autoreply")
     async def addreply(self, inter: disnake.ApplicationCommandInteraction, key, reply):
@@ -67,7 +73,7 @@ class Messages(commands.Cog):
             await message.channel.send(random.choice(Messages.Morpheus))
         else: 
             for key, value in replies.items():
-                if re.search(fr"^\b{key.lower()}\b", message.content.lower()):
+                if re.search(fr"^{key.lower()}$", message.content.lower()):
                     await message.channel.send(value)
 
     @commands.has_permissions(administrator=True)

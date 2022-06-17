@@ -5,7 +5,7 @@ from config.channels import Channels
 class Threads(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.Cog.listener("on_message")
     async def create(self, ctx):
         for room in Channels.plans_with_reaction:

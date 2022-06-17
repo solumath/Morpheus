@@ -74,10 +74,10 @@ class System(commands.Cog):
             filename = f"./cogs/{name}"
             if isfile(filename) and filename.endswith(".py"):
                 all_cogs.append(name[:-3])
-            
+
             if isdir(filename) and ("__init__.py" in os.listdir(filename)):
                 all_cogs.append(name)
-        
+
         loaded = [cog.lower() for cog in self.bot.cogs]
         cogs = list(set(all_cogs) - set(loaded))
         if cogs:

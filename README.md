@@ -1,4 +1,5 @@
 # Morpheus
+
 I Can Only Show You The Door...
 
 Discord bot for managing school server.
@@ -10,27 +11,29 @@ and run `docker` (`systemctl start docker.service`)
 
 To run docker user needs to be in `docker` group. (eg. `sudo usermod -aG docker $USER`).
 
-```
+```bash
 docker build .
 ```
 
 and then everytime you want to run the app
 
-```
+```bash
 docker-compose down && docker-compose up --build
 ```
 
-## Local setup 
+## Local setup
+
 Needed Python 3.8+
 
 1. install requirements
-```
-pip3 install -r requirements.txt
-```
+
+    ```bash
+    pip3 install -r requirements.txt
+    ```
 
 2. create folders servers/logs/
 3. run
 
-```
-python3 bot.py
-```
+    ```bash
+    python3 bot.py
+    ```

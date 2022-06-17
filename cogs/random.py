@@ -22,7 +22,7 @@ class Random(commands.Cog):
                    arg1 : str, arg2 : str, arg3 : str = None, arg4 : str = None,
                    arg5 : str = None, arg6 : str = None, arg7 : str = None,
                    arg8 : str = None, arg9 : str = None, arg10 : str = None):
-        
+
         # for now works
         args = [arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10]
         choices = [i for i in args if i]
