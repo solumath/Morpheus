@@ -13,8 +13,8 @@ class Logger(commands.Cog):
         else:
             content = message.content
 
+        image = []
         if not "Traceback" in message.content:
-            image = []
             if message.attachments:
                 for x in message.attachments:
                     image.append(x.url)
