@@ -8,7 +8,7 @@ from config.messages import Messages
 from config.channels import Channels
 
 
-class Nameday(commands.Cog):
+class NameDay(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_names.start()
@@ -50,4 +50,4 @@ class Nameday(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Nameday(bot))
+    bot.add_cog(NameDay(bot))
