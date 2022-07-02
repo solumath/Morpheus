@@ -22,10 +22,12 @@ class Messages:
     created_folder = "Folder **{}** successfuly created"
     removed_folder = "Folder **{}** successfuly removed"
 
+    cogs_brief = "Vypíše seznam všech cogs a jejich stav"
     not_loaded = "Not loaded **{}**"
     succes_reload = "Reloaded successfully **{}**"
     succes_unload = "Unloaded successfully **{}**"
     succes_load = "Loaded successfully **{}**"
+    not_reloadable = "Module **{}** can't be reloaded"
 
     kredity = """```cs\nif ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
                 	return 65\nif ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
