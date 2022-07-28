@@ -10,11 +10,12 @@ import keys
 
 bot = commands.Bot(command_prefix="?", intents=disnake.Intents.all())
 
+
 @bot.event
 async def on_ready():
     print(Messages.on_ready_bot.format(bot.user, bot.user.id))
 
-    #set status for bot
+    # set status for bot
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
     await bot.change_presence(activity=disnake.Game(f"/help | On commit {sha[:7]}"))
@@ -22,7 +23,7 @@ async def on_ready():
     if bot_room is not None:
         await bot_room.send(Messages.on_ready_bot.format(bot.user.mention, bot.user.id))
 
-#load all cogs and remove extension from name
+# load all cogs and remove extension from name
 for name in os.listdir("./cogs"):
     filename = f"./cogs/{name}"
     modulename = f"cogs.{name}"

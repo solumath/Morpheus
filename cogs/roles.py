@@ -2,14 +2,15 @@ import disnake
 from disnake.utils import get
 from disnake.ext import commands
 
+
 class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.slash_command(name="select", description="Create select menu")
-    async def select(self, inter: disnake.ApplicationCommandInteraction, 
-                    room : disnake.TextChannel, text : str, 
-                    min_roles : int, max_roles : int, roles: str):
+    async def select(self, inter: disnake.ApplicationCommandInteraction,
+                     room: disnake.TextChannel, text: str,
+                     min_roles: int, max_roles: int, roles: str):
         """extract roles from string and create select menu"""
         roles = roles.split()
         opt = []
@@ -23,20 +24,21 @@ class Roles(commands.Cog):
             roles.append(disnake.SelectOption(label=role.name, value=role.id))
 
         await inter.response.send_message("select menu sent")
-        await room.send(components=disnake.ui.Select(placeholder=text, min_values=min_roles, 
-                                                     max_values=max_roles, options=roles, custom_id="role_select"))
+        await room.send(components=disnake.ui.Select(placeholder=text, min_values=min_roles,
+                                                     max_values=max_roles, options=roles,
+                                                     custom_id="role_select"))
 
     @commands.Cog.listener("on_dropdown")
     async def cool_select_listener(self, inter: disnake.MessageInteraction):
         if inter.component.custom_id != "role_select":
             return
 
-        #All options from menu
+        # All options from menu
         roles_options = set([int(o.value) for o in inter.component.options])
 
-        #User roles
+        # User roles
         user = inter.author
-        user_has_roles = set(map(lambda role : role.id, user.roles))
+        user_has_roles = set(map(lambda role: role.id, user.roles))
 
         selected = set(map(int, inter.values))
 

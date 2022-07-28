@@ -5,7 +5,10 @@ from cogs.logger.logger import Logger
 
 msg_logger = logging.getLogger("messages")
 msg_logger.setLevel(logging.INFO)
-msg_handler = TimedRotatingFileHandler(filename=f"servers/logs/L", when="midnight", interval=1, encoding='utf-8', backupCount=31)
+msg_handler = TimedRotatingFileHandler(
+    filename="servers/logs/L", when="midnight",
+    interval=1, encoding='utf-8', backupCount=31
+    )
 msg_handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
 msg_handler.suffix = "%d.%m.%Y.log"
 msg_logger.addHandler(msg_handler)
@@ -23,8 +26,10 @@ disnake_handler = logging.FileHandler(filename='disnake.log', encoding='utf-8', 
 disnake_handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
 disnake_logger.addHandler(disnake_handler)
 
+
 def setup(bot):
     bot.add_cog(Logger(bot, msg_logger))
+
 
 def teardown(_):
     msg_logger.removeHandler(msg_handler)

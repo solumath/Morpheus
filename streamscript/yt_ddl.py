@@ -2,7 +2,7 @@ from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import requests
 import lxml.html
-from lxml.etree import QName, SubElement
+from lxml.etree import QName
 from lxml import etree
 from tqdm import tqdm
 import av
@@ -33,14 +33,17 @@ class UnparseableDatetime(BaseException):
         self.string = string
         super().__init__(f"Couldn't parse datetime \"{string}\"")
 
+
 class UnparseableDuration(BaseException):
     def __init__(self, string):
         self.string = string
         super().__init__(f"Couldn't parse duration \"{string}\"")
 
+
 class ConsentCheckFailed(BaseException):
     def __init__(self):
         super().__init__("Didn't manage to pass consent check")
+
 
 class FutureSegmentsException(BaseException):
     def __init__(self):
@@ -162,7 +165,6 @@ def download(stream, seg_range, threads=1):
     results = ThreadPool(threads).imap(download_func, segments)
 
     combined_file = BytesIO()
-    segs_downloaded = 0
     for res in tqdm(results, total=len(segments), unit="seg"):
         combined_file.write(res)
 
@@ -221,7 +223,7 @@ def parse_datetime(inp, utc=True):
             d_time = datetime.strptime(inp, fmt)
             today = datetime.today()
             if not ('d' in fmt):
-                d_time = d_time.replace(year=today.year, month=today.month,day=today.day)
+                d_time = d_time.replace(year=today.year, month=today.month, day=today.day)
             if not ('Y' in fmt):
                 d_time = d_time.replace(year=today.year)
             if utc:
@@ -234,12 +236,13 @@ def parse_datetime(inp, utc=True):
 
 def parse_duration(inp):
     if (x := re.findall("([0-9]+[hmsHMS])", inp)):
-        return sum(int(chunk[:-1]) * {'h':3600,'m':60}.get(chunk[-1], 1) for chunk in x)
+        return sum(int(chunk[:-1]) * {'h': 3600, 'm': 60}.get(chunk[-1], 1) for chunk in x)
     else:
         try:
             return int(inp)
         except ValueError:
             raise UnparseableDuration(inp)
+
 
 def main(parsed):
 
@@ -256,7 +259,7 @@ def main(parsed):
     if parsed.start:
         start_time = parse_datetime(parsed.start, parsed.utc)
     if parsed.duration:
-        duration =  parse_duration(parsed.duration)
+        duration = parse_duration(parsed.duration)
     elif parsed.end:
         end_time = parse_datetime(parsed.end, parsed.utc)
 
@@ -264,22 +267,22 @@ def main(parsed):
 
     # retrieve mpd data from youtube servers
     mpd_data = get_mpd_data(parsed.url)
-    a, v, m, s, l = process_mpd(mpd_data)
+    a, v, m, s, ll = process_mpd(mpd_data)
 
     # if not -s, retrieve start time from mpd data
     if not start_time:
-        start_time = s - timedelta(seconds=m * l)
+        start_time = s - timedelta(seconds=m * ll)
         print(start_time)
     if not duration:
         if end_time:
             duration = (end_time - (start_time or s)).total_seconds()
         else:
-            duration = m * l
+            duration = m * ll
 
     # calculate start and end segments
-    start_segment = m - round((s - start_time).total_seconds() / l)
+    start_segment = m - round((s - start_time).total_seconds() / ll)
     start_segment = max(start_segment, 0)
-    end_segment = start_segment + round(duration / l)
+    end_segment = start_segment + round(duration / ll)
     if end_segment > m:
         raise FutureSegmentsException()
 
@@ -299,7 +302,6 @@ def main(parsed):
 
     print("Muxing into file...")
     mux_to_file(parsed.output, a_data, v_data)
-
 
 
 if __name__ == "__main__":

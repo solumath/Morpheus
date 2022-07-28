@@ -2,6 +2,7 @@ from disnake.ext import commands
 
 from config.channels import Channels
 
+
 class Threads(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

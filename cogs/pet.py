@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw
 from io import BytesIO
 import requests
 
+
 class Pet(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

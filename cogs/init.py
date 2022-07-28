@@ -7,6 +7,7 @@ import json
 from config.messages import Messages
 from config.channels import Channels
 
+
 class Init(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -18,7 +19,7 @@ class Init(commands.Cog):
         with open(f"servers/{inter.guild.name}/config.json", 'r+', encoding='utf-8') as f:
             dict = json.load(f)
             dict['joined'] = info_channel[2:-1]
-            with open(f"servers/{inter.guild.name}/config.json",'w', encoding='utf-8') as f:
+            with open(f"servers/{inter.guild.name}/config.json", 'w', encoding='utf-8') as f:
                 json.dump(dict, f, ensure_ascii=False, indent=4)
             await inter.response.send_message(f"Info channel byl změněn na kanál {info_channel}")
 
@@ -34,16 +35,16 @@ class Init(commands.Cog):
         channel = self.bot.get_channel(Channels.development)
 
         try:
-            #----------------------Create dir-----------------------------
+            # ----------------------Create dir-----------------------------
             if not (os.path.isdir(f"servers/{inter.guild.name}")):
                 os.mkdir(f"servers/{inter.guild.name}")
 
-            #----------------------Create config-----------------------------
+            # ----------------------Create config-----------------------------
             if not (os.path.isdir(f"servers/{inter.guild.name}")):
                 with open(f"servers/{inter.guild.name}/config.json", "w") as f:
                     json.dump({"joined": ""}, f, ensure_ascii=False, indent=4)
 
-            #----------------------Create replies-------------------------
+            # ----------------------Create replies-------------------------
             if not (os.path.isfile(f"servers/{inter.guild.name}/replies.json")):
                 with open(f"servers/{inter.guild.name}/replies.json", "w") as f:
                     json.dump({"PR": "https://github.com/solumath/Morpheus"}, f, ensure_ascii=False, indent=4)

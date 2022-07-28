@@ -1,18 +1,14 @@
 from disnake.ext import commands
 
-import os
-import random
-import subprocess
 import datetime
-import threading
 import asyncio
-from multiprocessing import Pool
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 time = datetime.date.today()
-gauth = GoogleAuth()           
-drive = GoogleDrive(gauth) 
+gauth = GoogleAuth()
+drive = GoogleDrive(gauth)
+
 
 class Stream(commands.Cog):
     def __init__(self, bot):
@@ -20,8 +16,10 @@ class Stream(commands.Cog):
 
     async def download(self, msg, output, link, start, duration, subject, ctx):
         """Thread function for downloading stream and uploading to drive"""
-        args = ["python3", "streamscript/yt_ddl.py", link, "-o", output, "-s", start, "-d", duration]
-        p = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        args = ["python3", "streamscript/yt_ddl.py", link, "-o",
+                output, "-s", start, "-d", duration]
+        p = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
+                                                 stderr=asyncio.subprocess.PIPE)
         out, err = await p.communicate()
 
         if p.returncode == 0:
@@ -32,31 +30,9 @@ class Stream(commands.Cog):
         # TODO semaphor or synchronization so multiple downloads can run in the background
         # TODO if name of file is same, update file instead of uploading another one
         # TODO rewrite upload (cant upload file bigger than 100MB with pydrive)
-        
-        # check for folder with name subject
-        # folders = drive.ListFile({'q': f"title='{subject}' and mimeType='application/vnd.google-apps.folder' and trashed=false"}).GetList()
 
-        # try:
-        #     # check if folder was found if not create folder and upload to it
-        #     if folders != []:
-        #         for folder in folders:
-        #             if folder.get("title") == subject:
-        #                 gfile = drive.CreateFile({'title': output,'parents': [{'id': folder['id']}]})
-        #                 gfile.Upload()
-        #                 os.remove(output)
-        #                 await ctx.send("File successfully uploaded")
-
-        #     else:
-        #         new_folder = drive.CreateFile({'title': subject,"parents":[{'id': env.DRIVE_ID}],'mimeType':"application/vnd.google-apps.folder"})
-        #         new_folder.Upload()
-        #         gfile = drive.CreateFile({'title': output,'parents': [{'id': new_folder['id']}]})
-        #         gfile.Upload()
-        #         await ctx.send("File successfully uploaded")
-        #         os.remove(output)
-        # except Exception:
-        #     await ctx.send(Exception)
-
-    @commands.slash_command(name="stream", description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
+    @commands.slash_command(name="stream",
+                            description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
     async def stream(self, ctx, subject, link, start, duration):
         """Download part of stream"""
         subject = (subject.lower()).replace(" ", "_")

@@ -7,16 +7,17 @@ import aiohttp
 import random
 import asyncio
 
+
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.slash_command(name="drzpicu", description="Drz picu 'user'")
-    async def drzpicu(self, inter: disnake.ApplicationCommandInteraction, user = "<@153480398054227978>"):
+    async def drzpicu(self, inter: disnake.ApplicationCommandInteraction, user="<@153480398054227978>"):
         await inter.send(f"drz picu {user}")
 
     @commands.slash_command(name="nebudsalty", description="Nebud salty 'user'")
-    async def nebudsalty(self, inter: disnake.ApplicationCommandInteraction, user = "<@624604891603795968>"):
+    async def nebudsalty(self, inter: disnake.ApplicationCommandInteraction, user="<@624604891603795968>"):
         await inter.send(f":salt: nebud salty {user}")
 
     @commands.cooldown(rate=1, per=100.0, type=commands.BucketType.user)
@@ -28,7 +29,7 @@ class Memes(commands.Cog):
             await asyncio.sleep(5)
 
     @commands.slash_command(name="dadjoke", description="Get a dadjoke")
-    async def dadjoke(self, inter: disnake.ApplicationCommandInteraction, *, keyword = None):
+    async def dadjoke(self, inter: disnake.ApplicationCommandInteraction, *, keyword=None):
         """Get random dad joke
         Arguments
         ---------

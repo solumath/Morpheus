@@ -49,7 +49,7 @@ class YTDLSource(disnake.PCMVolumeTransformer):
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
 
-    def __init__(self, ctx: commands.Context, source: disnake.FFmpegPCMAudio, *, data: dict, volume = 0.5):
+    def __init__(self, ctx: commands.Context, source: disnake.FFmpegPCMAudio, *, data: dict, volume=0.5):
         super().__init__(source)
 
         self.requester = ctx.author
@@ -73,7 +73,7 @@ class YTDLSource(disnake.PCMVolumeTransformer):
 
     def __str__(self):
         return '**{0.title}** by **{0.uploader}**'.format(self)
-    
+
     @classmethod
     async def create_source(cls, ctx: commands.Context, search: str, *, loop: asyncio.BaseEventLoop = None):
         loop = loop or asyncio.get_event_loop()
@@ -147,7 +147,8 @@ class Song:
                                color=disnake.Color.blurple())
                  .add_field(name='Duration', value=self.source.duration)
                  .add_field(name='Requested by', value=self.requester.mention)
-                 .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
+                 .add_field(name='Uploader',
+                            value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
                  .add_field(name='URL', value='[Click]({0.source.url})'.format(self))
                  .set_thumbnail(url=self.source.thumbnail))
 

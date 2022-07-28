@@ -49,3 +49,5 @@ class Messages:
 
     pet_brief = "Vytvoří gif z uživatele."
     pet_unsupported_avatar = "Defaultní avatar aktuálne není podporovaný."
+
+    welcome = "Hej debílci, došel {} tak ho pozdravte. <:feelsWowMan:747845161563979857>"

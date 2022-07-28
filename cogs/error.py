@@ -7,10 +7,10 @@ from disnake import Embed
 from config.messages import Messages
 from config.channels import Channels
 
+
 class Error(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
@@ -18,14 +18,15 @@ class Error(commands.Cog):
             await inter.response.send_message(Messages.not_enough_perms)
             return
         if isinstance(error, commands.CommandOnCooldown):
-            await inter.response.send_message(Messages.command_cooldowns.format(time = round(error.retry_after, 1)))
+            await inter.response.send_message(
+                Messages.command_cooldowns.format(time=round(error.retry_after, 1)))
             return
         if isinstance(error, disnake.InteractionTimedOut):
             await inter.response.send_message(Messages.command_timed_out)
             return
 
         channel = self.bot.get_channel(Channels.development)
-        await inter.send(f"```Errors happen Mr. Anderson```")
+        await inter.send("```Errors happen Mr. Anderson```")
         url = f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}"
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
@@ -54,14 +55,14 @@ class Error(commands.Cog):
             await ctx.send(error)
             return
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(Messages.command_cooldowns.format(time = round(error.retry_after, 1)))
+            await ctx.send(Messages.command_cooldowns.format(time=round(error.retry_after, 1)))
             return
         if isinstance(error, commands.UserInputError):
             await ctx.send(error)
             return
 
         channel = self.bot.get_channel(Channels.development)
-        message = await ctx.send(f"```Errors happen Mr. Anderson```")
+        message = await ctx.send("```Errors happen Mr. Anderson```")
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         embed = disnake.Embed(title=f"Ignoring exception on command {ctx.command}", color=0xFF0000)
