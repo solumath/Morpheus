@@ -8,7 +8,7 @@ import requests
 import time
 import keys
 
-class Messages(commands.Cog):
+class ManageMessages(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
@@ -99,4 +99,4 @@ class Messages(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Messages(bot))
+    bot.add_cog(ManageMessages(bot))

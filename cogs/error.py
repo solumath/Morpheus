@@ -25,7 +25,7 @@ class Error(commands.Cog):
             return
 
         channel = self.bot.get_channel(Channels.development)
-        await inter.response.send_message(f"```Errors happen Mr. Anderson```")
+        await inter.send(f"```Errors happen Mr. Anderson```")
         url = f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}"
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
