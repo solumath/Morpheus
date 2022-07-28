@@ -1,96 +1,56 @@
-from genericpath import isdir, isfile
 import disnake
 from disnake.ext import commands
-import os
-
+import utility
+import math
+from buttons.system import SystemView, Dropdown
 from config.messages import Messages
-from config.channels import Channels
+
 
 class System(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
         self.unloadable_cogs = ["system"]
 
+    async def create_selects(self):
+        """Slices dictionary of all cogs to chunks for select."""
+        cog_files = list(utility.get_all_cogs().keys())
+        cog_names = list(utility.get_all_cogs().values())
+        all_selects = []
 
-    @commands.is_owner()
-    @commands.slash_command(name="cogs", description="Manipulate with cogs")
-    async def cogs(self, inter):
-        """slash commands for manipulating with extensions""" 
-        pass
+        # 25 is max number of options for one select
+        chunks = math.ceil(len(cog_files)/25)
+        cog_files = list(utility.split(cog_files, chunks))
+        cog_names = list(utility.split(cog_names, chunks))
+        for i in range(0, chunks):
+            all_selects.append([cog_files[i], cog_names[i]])
 
-    @cogs.sub_command(name="load", description="Loads cog file")
-    async def load(self, inter: disnake.ApplicationCommandInteraction, extension: str):
-        try:
-            self.bot.load_extension(f"cogs.{extension}")
-            print(Messages.succes_load.format(extension))
-            await inter.response.send_message(Messages.succes_load.format(extension))
-        except Exception as e:
-            await inter.response.send_message(f"Loading error\n`{e}`")
+        return all_selects
 
-    @cogs.sub_command(name="unload", description="Unloads cog file")
-    async def unload(self, inter: disnake.ApplicationCommandInteraction, extension: str):
-        if extension in self.unloadable_cogs:
-            await inter.response.send_message(Messages.not_loaded.format(extension))
-            return
+    @commands.slash_command(name="cogs", description=Messages.cogs_brief)
+    async def cogs(self, inter: disnake.ApplicationCommandInteraction):
+        """
+        Creates embed with button and select(s) to load/unload/reload cogs.
 
-        try:
-            self.bot.unload_extension(f"cogs.{extension}")
-            print(Messages.succes_unload.format(extension))
-            await inter.response.send_message(Messages.succes_unload.format(extension))
-        except Exception as e:
-            await inter.response.send_message(f"Unloading error\n`{e}`")
+        Max number of cogs can be 100 (4x25).
+        """
 
-    @cogs.sub_command(name="reload", description="Reloads cog(s) file")
-    async def rel(self, inter: disnake.ApplicationCommandInteraction, extension: str, all: bool = False):
-        if all:
-            channel = self.bot.get_channel(inter.channel.id)
-            await inter.response.send_message("Reloading all cogs:")
-            for extension in os.listdir("./cogs"):
-                if extension.endswith(".py"):
-                    try:
-                        self.bot.reload_extension(f"cogs.{extension[:-3]}")
-                        print(Messages.succes_reload.format(extension[:-3]))
-                        await channel.send(Messages.succes_reload.format(extension[:-3]))
-                    except Exception as e:
-                        await channel.send(f"Reloading error\n`{e}`")
-            await channel.send("Done")
+        selects = await self.create_selects()
+        view = SystemView(self.bot, len(selects), selects)
+        embed = Dropdown.create_embed(self, inter.author.colour)
+        await inter.send(embed=embed, view=view)
 
-        else:
-            try:
-                self.bot.reload_extension(f"cogs.{extension}")
-                print(Messages.succes_reload.format(extension))
-                await inter.response.send_message(Messages.succes_reload.format(extension))
-            except Exception as e:
-                await inter.response.send_message(f"Reloading error\n`{e}`")
+        # pass message object to classes
+        message = await inter.original_message()
+        view.message = message
+        for i, cogs in enumerate(selects):
+            view.selects[i].msg = message
 
-    @cogs.sub_command(name="list", description="List of loaded cogs")
-    async def list_cogs(self, inter: disnake.ApplicationCommandInteraction):
-        await inter.response.send_message("\n".join([cog.lower() for cog in self.bot.cogs]))
-
-    @load.autocomplete("extension")
-    async def load_autocomp(self, inter: disnake.ApplicationCommandInteraction, user_input: str):
-        all_cogs = []
-        for name in os.listdir("./cogs"):
-            filename = f"./cogs/{name}"
-            if isfile(filename) and filename.endswith(".py"):
-                all_cogs.append(name[:-3])
-
-            if isdir(filename) and ("__init__.py" in os.listdir(filename)):
-                all_cogs.append(name)
-
-        loaded = [cog.lower() for cog in self.bot.cogs]
-        cogs = list(set(all_cogs) - set(loaded))
-        if cogs:
-            return [cog for cog in cogs if user_input.lower() in cog]
-        else:
-            return ["All cogs loaded."]
-
-    @unload.autocomplete("extension")
-    @rel.autocomplete("extension")
-    async def load_autocomp(self, inter: disnake.ApplicationCommandInteraction, user_input: str):
-        cogs = [cog.lower() for cog in self.bot.cogs if user_input.lower() in cog.lower()]
-        cogs.sort()
-        return cogs
+    @cogs.error
+    async def on_command_error(self, ctx: commands.Context, error):
+        if isinstance(error.__cause__, commands.errors.ExtensionNotLoaded):
+            await ctx.send(Messages.not_loaded.format(error.__cause__.name))
+            return True
 
 
 def setup(bot):

@@ -28,6 +28,7 @@ class Messages:
     succes_unload = "Unloaded successfully **{}**"
     succes_load = "Loaded successfully **{}**"
     not_reloadable = "Module **{}** can't be reloaded"
+    cog_not_unloadable = 'Module `{}` can\'t be unloaded.'
 
     kredity = """```cs\nif ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
                 	return 65\nif ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
