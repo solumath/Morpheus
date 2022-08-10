@@ -51,3 +51,6 @@ class Messages:
     pet_unsupported_avatar = "Defaultní avatar aktuálne není podporovaný."
 
     welcome = "Hej debílci, došel {} tak ho pozdravte. <:feelsWowMan:747845161563979857>"
+
+    bookmark_title = "Bookmark on server **{}**"
+    blocked_bot = "Nemůžu ti posílat zprávy {}"
