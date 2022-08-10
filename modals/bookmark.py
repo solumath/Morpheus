@@ -21,7 +21,7 @@ class BookmarkModal(disnake.ui.Modal):
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         inter.message = self.message
-        title_name = Messages.bookmark_title
+        title_name = Messages.bookmark_title.format(inter.guild.name)
 
         if not inter.text_values["name"] == "":
             title_name = inter.text_values["name"]
