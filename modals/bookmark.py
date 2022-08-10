@@ -21,7 +21,7 @@ class BookmarkModal(disnake.ui.Modal):
 
     async def callback(self, inter: disnake.ModalInteraction) -> None:
         inter.message = self.message
-        title_name = Messages.bookmark_title
+        title_name = Messages.bookmark_title.format(inter.guild.name)
 
         if not inter.text_values["name"] == "":
             title_name = inter.text_values["name"]
@@ -32,7 +32,7 @@ class BookmarkModal(disnake.ui.Modal):
                 for image in images:
                     embed.append(await BookmarkFeatures.create_image_embed(self, inter, image, title_name))
             await inter.author.send(embeds=embed, view=BookmarkView(), files=files_attached)
-            await inter.response.send_message(f"Bookmark **{title_name}** created", ephemeral=True)
+            await inter.response.send_message(f"Bookmark {title_name} created", ephemeral=True)
         except disnake.HTTPException as e:
             if e.code == 50007:
                 await inter.response.send_message(
