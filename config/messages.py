@@ -48,9 +48,10 @@ class Messages:
     name_day_sk_brief = "Vypíše, kto má dnes meniny."
 
     pet_brief = "Vytvoří gif z uživatele."
-    pet_unsupported_avatar = "Defaultní avatar aktuálne není podporovaný."
+    pet_unsupported_avatar = "Defaultní avatar aktuálně není podporovaný."
 
     welcome = "Hej debílci, došel {} tak ho pozdravte. <:feelsWowMan:747845161563979857>"
 
-    bookmark_title = "Bookmark on server **{}**"
+    bookmark_title = "Záložka na serveru **{}**"
     blocked_bot = "Nemůžu ti posílat zprávy {}"
+    bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."
