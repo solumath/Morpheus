@@ -101,15 +101,12 @@ class ManageMessages(commands.Cog):
         await inter.send(Messages.channel_history_retrieving_messages.format(channel.mention))
         messages = await channel.history(limit=limit, oldest_first=old_to_new).flatten()
 
-        name_lenght = 0
         users = {}
         with open(f"{channel}_users.txt", "w") as file:
             for message in messages:
                 users[message.author.id] = message.author.name
 
             for user_id, user_name in users.items():
-                if name_lenght < len(user_name):
-                    name_lenght = len(user_name)
                 file.write(f"{user_id} | {user_name}\n")
 
         timezone = pytz.timezone('Europe/Prague')
@@ -118,7 +115,7 @@ class ManageMessages(commands.Cog):
                 utc_now = message.created_at
                 time = utc_now.astimezone(timezone).strftime("%Y-%m-%d %H:%M:%S")
                 content = message.content.replace("\n", " ")
-                author = str(message.author.id).ljust(name_lenght, " ")
+                author = str(message.author.id).ljust(len(str(message.author.id)), " ")
                 file.write(f"{time} | {author} | {content}\n")
 
         await inter.author.send(file=disnake.File(f"{channel}_history.txt"))
