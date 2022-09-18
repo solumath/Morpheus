@@ -14,13 +14,18 @@ class Error(commands.Cog):
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, error):
-        if isinstance(error, commands.MissingPermissions):
-            await inter.response.send_message(Messages.not_enough_perms)
+        if (
+            isinstance(error, commands.MissingPermissions)
+            or isinstance(error, commands.errors.CheckFailure)
+        ):
+            await inter.response.send_message(Messages.not_enough_perms, ephemeral=True)
             return
+
         if isinstance(error, commands.CommandOnCooldown):
             await inter.response.send_message(
                 Messages.command_cooldowns.format(time=round(error.retry_after, 1)))
             return
+
         if isinstance(error, disnake.InteractionTimedOut):
             await inter.response.send_message(Messages.command_timed_out)
             return
@@ -48,15 +53,21 @@ class Error(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions):
+        if (
+            isinstance(error, commands.MissingPermissions)
+            or isinstance(error, commands.errors.CheckFailure)
+        ):
             await ctx.send(Messages.not_enough_perms)
             return
+
         if isinstance(error, commands.CommandNotFound):
             await ctx.send(error)
             return
+
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(Messages.command_cooldowns.format(time=round(error.retry_after, 1)))
             return
+
         if isinstance(error, commands.UserInputError):
             await ctx.send(error)
             return

@@ -1,4 +1,5 @@
 import disnake
+import utility
 from disnake.utils import get
 from disnake.ext import commands
 
@@ -7,6 +8,7 @@ class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.check(utility.is_bot_admin)
     @commands.slash_command(name="select", description="Create select menu")
     async def select(self, inter: disnake.ApplicationCommandInteraction,
                      room: disnake.TextChannel, text: str,

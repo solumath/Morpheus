@@ -27,6 +27,7 @@ class System(commands.Cog):
 
         return all_selects
 
+    @commands.check(utility.is_bot_admin)
     @commands.slash_command(name="cogs", description=Messages.cogs_brief)
     async def cogs(self, inter: disnake.ApplicationCommandInteraction):
         """
