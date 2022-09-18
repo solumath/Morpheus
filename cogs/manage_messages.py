@@ -1,6 +1,6 @@
 from disnake.ext import commands
-
 import disnake
+
 import random
 import re
 import json
@@ -8,6 +8,7 @@ import requests
 import time
 import keys
 import os
+import pytz
 from config.messages import Messages
 
 
@@ -101,21 +102,33 @@ class ManageMessages(commands.Cog):
         messages = await channel.history(limit=limit, oldest_first=old_to_new).flatten()
 
         name_lenght = 0
-        for message in messages:
-            if name_lenght < len(message.author.name):
-                name_lenght = len(message.author.name)
+        users = {}
+        with open(f"{channel}_users.txt", "w") as file:
+            for message in messages:
+                users[message.author.id] = message.author.name
 
+            for user_id, user_name in users.items():
+                if name_lenght < len(user_name):
+                    name_lenght = len(user_name)
+                file.write(f"{user_id} | {user_name}\n")
+
+        timezone = pytz.timezone('Europe/Prague')
         with open(f"{channel}_history.txt", "w") as file:
             for message in messages:
-                time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+                utc_now = message.created_at
+                time = utc_now.astimezone(timezone).strftime("%Y-%m-%d %H:%M:%S")
                 content = message.content.replace("\n", " ")
-                author = message.author.name.ljust(name_lenght, " ")
+                author = str(message.author.id).ljust(name_lenght, " ")
                 file.write(f"{time} | {author} | {content}\n")
+
         await inter.author.send(file=disnake.File(f"{channel}_history.txt"))
+        await inter.author.send(file=disnake.File(f"{channel}_users.txt"))
         await inter.edit_original_message(Messages.channel_history_success.format(channel))
 
         if os.path.exists(f"{channel}_history.txt"):
             os.remove(f"{channel}_history.txt")
+        if os.path.exists(f"{channel}_users.txt"):
+            os.remove(f"{channel}_users.txt")
 
 
 def setup(bot):
