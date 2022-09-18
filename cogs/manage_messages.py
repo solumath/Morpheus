@@ -7,6 +7,7 @@ import json
 import requests
 import time
 import keys
+import os
 from config.messages import Messages
 
 
@@ -86,6 +87,33 @@ class ManageMessages(commands.Cog):
 
         with open(f"servers/{ctx.guild.name}/messages.json", 'w', encoding='utf-8') as f:
             json.dump(messages_count, f, ensure_ascii=False, indent=4)
+
+    @commands.has_permissions(administrator=True)
+    @commands.slash_command(name="history", description=Messages.channel_history_brief)
+    async def channel_history(
+            self,
+            inter,
+            channel: disnake.TextChannel,
+            old_to_new: bool = commands.Param(default=True, description="Sort messages chronologically"),
+            limit: int = commands.Param(default=None, description="Number of messages to retrieve")
+            ):
+        await inter.response.defer()
+        messages = await channel.history(limit=limit, oldest_first=old_to_new).flatten()
+        name_lenght = 0
+        for message in messages:
+            if name_lenght < len(message.author.name):
+                name_lenght = len(message.author.name)
+        with open(f"{channel}_history.txt", "w") as file:
+            for message in messages:
+                time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+                content = message.content.replace("\n", " ")
+                author = message.author.name.ljust(name_lenght, " ")
+                file.write(f"{time} | {author} | {content}\n")
+        await inter.author.send(file=disnake.File(f"{channel}_history.txt"))
+        await inter.edit_original_message(Messages.channel_history_success.format(channel))
+
+        if os.path.exists(f"{channel}_history.txt"):
+            os.remove(f"{channel}_history.txt")
 
 
 def setup(bot):
