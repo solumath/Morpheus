@@ -1,5 +1,9 @@
 import os
 import re
+import disnake
+from disnake.ext import commands
+from config.app_config import config
+from typing import Union
 from genericpath import isfile
 
 
@@ -28,3 +32,7 @@ def split(array, k):
     n = len(array)
     lists = [array[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
     return lists
+
+
+def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
+    return ctx.author.id in config.admin_ids
