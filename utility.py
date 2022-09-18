@@ -36,3 +36,20 @@ def split(array, k):
 
 def is_bot_admin(ctx: Union[commands.Context, disnake.ApplicationCommandInteraction]):
     return ctx.author.id in config.admin_ids
+
+
+def create_bar(value, total) -> str:
+    prog_bar_str = ""
+    prog_bar_length = 10
+    percentage = 0
+    if total != 0:
+        percentage = value / total
+        for i in range(prog_bar_length):
+            if round(percentage, 1) <= 1 / prog_bar_length * i:
+                prog_bar_str += "░"
+            else:
+                prog_bar_str += "▓"
+    else:
+        prog_bar_str = "░" * prog_bar_length
+    prog_bar_str = prog_bar_str + f" {round(percentage * 100)}%"
+    return prog_bar_str
