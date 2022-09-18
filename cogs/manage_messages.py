@@ -97,12 +97,14 @@ class ManageMessages(commands.Cog):
             old_to_new: bool = commands.Param(default=True, description="Sort messages chronologically"),
             limit: int = commands.Param(default=None, description="Number of messages to retrieve")
             ):
-        await inter.response.defer()
+        await inter.send(Messages.channel_history_retrieving_messages.format(channel.mention))
         messages = await channel.history(limit=limit, oldest_first=old_to_new).flatten()
+
         name_lenght = 0
         for message in messages:
             if name_lenght < len(message.author.name):
                 name_lenght = len(message.author.name)
+
         with open(f"{channel}_history.txt", "w") as file:
             for message in messages:
                 time = message.created_at.strftime("%Y-%m-%d %H:%M:%S")
