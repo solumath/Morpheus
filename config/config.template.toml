@@ -4,9 +4,6 @@ key = ''
 admin_ids = [0]  # first ID is used for mention in case of false verification
 guild_id = 0
 
-[config]
-static = ['config_static', 'toml_dict', 'key']
-
 [channels]
 bot_dev_channel = 768796879042773022
 bot_room = 862395759960522773
