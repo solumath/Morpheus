@@ -2,13 +2,12 @@ import disnake
 from disnake.ext import commands
 from disnake import TextChannel
 from config.messages import Messages
-from config.channels import Channels
 from genericpath import isdir, isfile
 import os
 import git
-import keys
+from config.app_config import config
 
-bot = commands.Bot(command_prefix="?", intents=disnake.Intents.all())
+bot = commands.Bot(command_prefix=config.default_prefix, intents=disnake.Intents.all())
 
 
 @bot.event
@@ -18,8 +17,8 @@ async def on_ready():
     # set status for bot
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
-    await bot.change_presence(activity=disnake.Game(f"/help | On commit {sha[:7]}"))
-    bot_room: TextChannel = bot.get_channel(Channels.development)
+    await bot.change_presence(activity=disnake.Game(f"On commit {sha[:7]}"))
+    bot_room: TextChannel = bot.get_channel(config.bot_dev_channel)
     if bot_room is not None:
         await bot_room.send(Messages.on_ready_bot.format(bot.user.mention, bot.user.id))
 
@@ -35,4 +34,4 @@ for name in os.listdir("./cogs"):
         bot.load_extension(modulename)
 
 
-bot.run(keys.TOKEN)
+bot.run(config.key)

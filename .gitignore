@@ -3,3 +3,4 @@ __pycache__
 servers
 .vscode
 disnake.log
+config/config.toml

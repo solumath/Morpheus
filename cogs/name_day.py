@@ -5,7 +5,7 @@ from datetime import date, time
 from disnake.ext import commands, tasks
 
 from config.messages import Messages
-from config.channels import Channels
+from config.app_config import config
 
 
 class NameDay(commands.Cog):
@@ -45,7 +45,7 @@ class NameDay(commands.Cog):
     async def send_names(self):
         svatek = await self._svatek()
         meniny = await self._meniny()
-        channel = self.bot.get_channel(Channels.name_day)
+        channel = self.bot.get_channel(config.name_day_room)
         await channel.send(f"{svatek}\n{meniny}")
 
 

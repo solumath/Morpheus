@@ -1,0 +1,15 @@
+[base]
+default_prefix = '?'
+key = ''
+admin_ids = [0]  # first ID is used for mention in case of false verification
+guild_id = 0
+
+[config]
+static = ['config_static', 'toml_dict', 'key']
+
+[channels]
+bot_dev_channel = 768796879042773022
+bot_room = 862395759960522773
+thread_room = [851761770770202654, 955860803410624602]
+thread_with_reaction = [880104339107110983]
+name_day_room = 983066687354077254

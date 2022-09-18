@@ -5,7 +5,7 @@ import traceback
 import utility
 from disnake import Embed
 from config.messages import Messages
-from config.channels import Channels
+from config.app_config import config
 
 
 class Error(commands.Cog):
@@ -25,7 +25,7 @@ class Error(commands.Cog):
             await inter.response.send_message(Messages.command_timed_out)
             return
 
-        channel = self.bot.get_channel(Channels.development)
+        channel = self.bot.get_channel(config.bot_dev_channel)
         await inter.send("```Errors happen Mr. Anderson```")
         url = f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}"
 
@@ -33,7 +33,7 @@ class Error(commands.Cog):
         embed = disnake.Embed(title=f"Ignoring exception on command {inter.data.name}", color=0xFF0000)
         embed.add_field(name="Autor", value=str(inter.author))
 
-        if inter.guild and inter.guild.id != Channels.my_guild:
+        if inter.guild and inter.guild.id != config.guild_id:
             embed.add_field(name="Guild", value=inter.guild.name)
         embed.add_field(name="Zpráva", value=inter.filled_options, inline=False)
         embed.add_field(name="Link", value=url, inline=False)
@@ -61,14 +61,14 @@ class Error(commands.Cog):
             await ctx.send(error)
             return
 
-        channel = self.bot.get_channel(Channels.development)
+        channel = self.bot.get_channel(config.bot_dev_channel)
         message = await ctx.send("```Errors happen Mr. Anderson```")
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         embed = disnake.Embed(title=f"Ignoring exception on command {ctx.command}", color=0xFF0000)
         embed.add_field(name="Autor", value=str(ctx.author))
 
-        if ctx.guild and ctx.guild.id != Channels.my_guild:
+        if ctx.guild and ctx.guild.id != config.guild_id:
             embed.add_field(name="Guild", value=ctx.guild.name)
         embed.add_field(name="Zpráva", value=ctx.message.content[:1000], inline=False)
         embed.add_field(name="Link", value=ctx.message.jump_url, inline=False)
@@ -83,7 +83,7 @@ class Error(commands.Cog):
 
     @commands.Cog.listener()
     async def on_error(self, event, *args, **kwargs):
-        channel_out = self.bot.get_channel(Channels.development)
+        channel_out = self.bot.get_channel(config.bot_dev_channel)
         output = traceback.format_exc()
         print(output)
 
@@ -122,7 +122,7 @@ class Error(commands.Cog):
                 user = str(user)
             embed = Embed(title=f"Ignoring exception on event '{event}'", color=0xFF0000)
             embed.add_field(name="Zpráva", value=message, inline=False)
-            if arg.guild_id != Channels.my_guild:
+            if arg.guild_id != config.guild_id:
                 embed.add_field(name="Guild", value=event_guild)
 
         if channel_out is not None:

@@ -5,7 +5,7 @@ import os
 import shutil
 import json
 from config.messages import Messages
-from config.channels import Channels
+from config.app_config import config
 
 
 class Init(commands.Cog):
@@ -32,7 +32,7 @@ class Init(commands.Cog):
     @commands.Cog.listener("on_guild_join")
     async def create_files(self, inter: disnake.ApplicationCommandInteraction):
         """setup folder for new server"""
-        channel = self.bot.get_channel(Channels.development)
+        channel = self.bot.get_channel(config.bot_dev_channel)
 
         try:
             # ----------------------Create dir-----------------------------
@@ -61,7 +61,7 @@ class Init(commands.Cog):
     @commands.Cog.listener("on_guild_remove")
     async def remove_files(self, inter: disnake.ApplicationCommandInteraction):
         """remove folder of server"""
-        channel = self.bot.get_channel(Channels.development)
+        channel = self.bot.get_channel(config.bot_dev_channel)
 
         try:
             if (os.path.isdir(f"servers/{inter.guild.name}")):
