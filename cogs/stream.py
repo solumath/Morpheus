@@ -14,18 +14,18 @@ class Stream(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def download(self, msg, output, link, start, duration, subject, ctx):
+    async def download(self, inter, filename, link, start, duration, subject):
         """Thread function for downloading stream and uploading to drive"""
         args = ["python3", "streamscript/yt_ddl.py", link, "-o",
-                output, "-s", start, "-d", duration]
+                filename, "-s", start, "-d", duration]
         p = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE,
                                                  stderr=asyncio.subprocess.PIPE)
         out, err = await p.communicate()
 
         if p.returncode == 0:
-            await msg.edit(content=f"Successfully downloaded `{output}`")
+            await inter.edit_original_message(content=f"Successfully downloaded `{filename}`")
         else:
-            await msg.edit(content=f"Failed to download `{output}`\n\n```{(out+err).decode()}```")
+            await inter.edit_original_message(content=f"Failed to download `{filename}`\n\n```{(out+err).decode()}```")
 
         # TODO semaphor or synchronization so multiple downloads can run in the background
         # TODO if name of file is same, update file instead of uploading another one
@@ -33,7 +33,7 @@ class Stream(commands.Cog):
 
     @commands.slash_command(name="stream",
                             description="download <SUBJECT> <LINK> <START xx:xx> <DURATION h/m>")
-    async def stream(self, ctx, subject, link, start, duration):
+    async def stream(self, inter, subject, link, start, duration):
         """Download part of stream"""
         subject = (subject.lower()).replace(" ", "_")
         filename = f"{time}_{subject}.mp4"
@@ -42,9 +42,9 @@ class Stream(commands.Cog):
         if link[0] == '<' and link[-1] == '>':
             link = link[1:-1]
 
-        msg = await ctx.send(f"Downloading `{duration}` of `{link}` from {time} saving to `{filename}`...")
+        await inter.send(f"Downloading `{duration}` of `{link}` from {time} saving to `{filename}`...")
 
-        asyncio.create_task(self.download(msg, filename, link, start, duration, subject, ctx))
+        asyncio.create_task(self.download(inter, filename, link, start, duration, subject))
 
 
 def setup(bot):
