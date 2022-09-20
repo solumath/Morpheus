@@ -13,15 +13,15 @@ class Memes(commands.Cog):
         self.bot = bot
         self.ilbinek = bot.get_user(153480398054227978)
         self.jany = bot.get_user(624604891603795968)
-    
+
     @commands.slash_command(name="drzpicu", description="Drz picu 'user'")
-    async def drzpicu(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User=None):
+    async def drzpicu(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = self.ilbinek
         await inter.send(f"drz picu {user.mention}")
 
     @commands.slash_command(name="nebudsalty", description="Nebud salty 'user'")
-    async def nebudsalty(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User=None):
+    async def nebudsalty(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = self.jany
         await inter.send(f":salt: nebud salty {user.mention}")

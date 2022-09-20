@@ -23,9 +23,11 @@ class Stream(commands.Cog):
         out, err = await p.communicate()
 
         if p.returncode == 0:
-            await inter.edit_original_message(content=f"Successfully downloaded `{filename}`")
+            await inter.edit_original_message(f"Successfully downloaded `{filename}`")
         else:
-            await inter.edit_original_message(content=f"Failed to download `{filename}`\n\n```{(out+err).decode()}```")
+            await inter.edit_original_message(
+                f"Failed to download `{filename}`\n\n```{(out+err).decode()}```"
+            )
 
         # TODO semaphor or synchronization so multiple downloads can run in the background
         # TODO if name of file is same, update file instead of uploading another one
