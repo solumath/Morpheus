@@ -54,7 +54,10 @@ class Roles(commands.Cog):
                 min_values=1,
                 max_values=len(category.channels),
                 options=[
-                    disnake.SelectOption(label=channel.name, value=channel.id) for channel in category.channels
+                    disnake.SelectOption(
+                        label=channel.name,
+                        value=channel.id
+                    ) for channel in category.channels
                 ],
                 custom_id="channel:select"
             )
