@@ -26,9 +26,17 @@ class Roles(commands.Cog):
             roles.append(disnake.SelectOption(label=role.name, value=role.id))
 
         await inter.response.send_message("select menu sent")
-        await room.send(components=disnake.ui.Select(placeholder=text, min_values=min_roles,
-                                                     max_values=max_roles, options=roles,
-                                                     custom_id="role_select"))
+        await room.send(
+            components=disnake.ui.Select(
+                placeholder=text,
+                min_values=min_roles,
+                max_values=max_roles,
+                options=[
+                    disnake.SelectOption(label=channel.name, value=channel.id) for channel in roles
+                ],
+                custom_id="role:select"
+            )
+        )
 
     @commands.check(utility.is_bot_admin)
     @commands.slash_command(name="rooms", description="Create select menu for rooms")
@@ -46,7 +54,7 @@ class Roles(commands.Cog):
                 min_values=1,
                 max_values=len(category.channels),
                 options=[
-                    disnake.SelectOption(label=channel.name, value=channel.id)for channel in category.channels
+                    disnake.SelectOption(label=channel.name, value=channel.id) for channel in category.channels
                 ],
                 custom_id="channel:select"
             )
@@ -55,21 +63,26 @@ class Roles(commands.Cog):
     @commands.Cog.listener("on_dropdown")
     async def cool_select_listener(self, inter: disnake.MessageInteraction):
         if inter.component.custom_id == "channel:select":
-            await inter.response.defer()
+            options = set([int(o.value) for o in inter.component.options])
+            selected = set(map(int, inter.values))
+            to_remove = options - selected
+
             channels = []
             for channel_id in inter.values:
                 channel = self.bot.get_channel(int(channel_id))
                 channels.append(channel)
-                if channel.permissions_for(inter.author).view_channel:
-                    await channel.set_permissions(inter.author, view_channel=False)
-                    continue
                 await channel.set_permissions(inter.author, view_channel=True)
+
+            for channel_id in to_remove:
+                channel = self.bot.get_channel(int(channel_id))
+                await channel.set_permissions(inter.author, view_channel=False)
+
             await inter.send(
                 f"You selected {' '.join([channel.mention for channel in channels])}.",
                 ephemeral=True
                 )
 
-        elif inter.component.custom_id == "role_select":
+        elif inter.component.custom_id == "role:select":
             # All options from menu
             roles_options = set([int(o.value) for o in inter.component.options])
 
