@@ -30,39 +30,77 @@ class Roles(commands.Cog):
                                                      max_values=max_roles, options=roles,
                                                      custom_id="role_select"))
 
+    @commands.check(utility.is_bot_admin)
+    @commands.slash_command(name="rooms", description="Create select menu for rooms")
+    async def rooms(
+                    self,
+                    inter: disnake.ApplicationCommandInteraction,
+                    category: disnake.CategoryChannel,
+                    text: str = commands.Param(description="Placeholder for select"),
+                    ):
+        """extract all channels from category for permission overwrite"""
+
+        await inter.send(
+            components=disnake.ui.Select(
+                placeholder=text,
+                min_values=1,
+                max_values=len(category.channels),
+                options=[
+                    disnake.SelectOption(label=channel.name, value=channel.id)for channel in category.channels
+                ],
+                custom_id="channel:select"
+            )
+        )
+
     @commands.Cog.listener("on_dropdown")
     async def cool_select_listener(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id != "role_select":
-            return
+        if inter.component.custom_id == "channel:select":
+            await inter.response.defer()
+            channels = []
+            for channel_id in inter.values:
+                channel = self.bot.get_channel(int(channel_id))
+                channels.append(channel)
+                if channel.permissions_for(inter.author).view_channel:
+                    await channel.set_permissions(inter.author, view_channel=False)
+                    continue
+                await channel.set_permissions(inter.author, view_channel=True)
+            await inter.send(
+                f"You selected {' '.join([channel.mention for channel in channels])}.",
+                ephemeral=True
+                )
 
-        # All options from menu
-        roles_options = set([int(o.value) for o in inter.component.options])
+        elif inter.component.custom_id == "role_select":
+            # All options from menu
+            roles_options = set([int(o.value) for o in inter.component.options])
 
-        # User roles
-        user = inter.author
-        user_has_roles = set(map(lambda role: role.id, user.roles))
+            # User roles
+            user = inter.author
+            user_has_roles = set(map(lambda role: role.id, user.roles))
 
-        selected = set(map(int, inter.values))
+            selected = set(map(int, inter.values))
 
-        not_selected = roles_options - selected
+            not_selected = roles_options - selected
 
-        to_remove = set.intersection(not_selected, user_has_roles)
-        to_add = selected - user_has_roles
+            to_remove = set.intersection(not_selected, user_has_roles)
+            to_add = selected - user_has_roles
 
-        selected = []
-        if to_add:
-            for role_id in to_add:
-                role = get(inter.guild.roles, id=role_id)
-                selected.append(role)
-                await user.add_roles(role)
+            selected = []
+            if to_add:
+                for role_id in to_add:
+                    role = get(inter.guild.roles, id=role_id)
+                    selected.append(role)
+                    await user.add_roles(role)
 
-        if to_remove:
-            for role_id in to_remove:
-                role = get(inter.guild.roles, id=role_id)
-                await user.remove_roles(role)
+            if to_remove:
+                for role_id in to_remove:
+                    role = get(inter.guild.roles, id=role_id)
+                    await user.remove_roles(role)
 
-        selected = [role.mention for role in selected]
-        await inter.response.send_message(f"You selected {' '.join(selected)}.", ephemeral=True)
+            selected = [role.mention for role in selected]
+            await inter.response.send_message(f"You selected {' '.join(selected)}.", ephemeral=True)
+
+        else:
+            pass
 
 
 def setup(bot):
