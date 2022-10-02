@@ -1,6 +1,6 @@
 import disnake
 import requests
-from datetime import date, time
+from datetime import date, time, datetime
 
 from disnake.ext import commands, tasks
 
@@ -12,6 +12,8 @@ class NameDay(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_names.start()
+    
+    local_tz = datetime.now().astimezone().tzinfo
 
     async def _svatek(self):
         url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
@@ -41,7 +43,7 @@ class NameDay(commands.Cog):
         meniny = await self._meniny()
         await inter.edit_original_message(meniny)
 
-    @tasks.loop(time=time(5, 0))
+    @tasks.loop(time=time(7, 0, tzinfo=local_tz))
     async def send_names(self):
         svatek = await self._svatek()
         meniny = await self._meniny()
