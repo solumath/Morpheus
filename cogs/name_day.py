@@ -12,8 +12,6 @@ class NameDay(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.send_names.start()
-    
-    local_tz = datetime.now().astimezone().tzinfo
 
     local_tz = datetime.now().astimezone().tzinfo
 
