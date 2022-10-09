@@ -30,26 +30,26 @@ class Init(commands.Cog):
         await inter.response.send_message(self.msg)
 
     @commands.Cog.listener("on_guild_join")
-    async def create_files(self, inter: disnake.ApplicationCommandInteraction):
+    async def create_files(self, guild):
         """setup folder for new server"""
         channel = self.bot.get_channel(config.bot_dev_channel)
 
         try:
             # ----------------------Create dir-----------------------------
-            if not (os.path.isdir(f"servers/{inter.guild.name}")):
-                os.mkdir(f"servers/{inter.guild.name}")
+            if not (os.path.isdir(f"servers/{guild.name}")):
+                os.mkdir(f"servers/{guild.name}")
 
             # ----------------------Create config-----------------------------
-            if not (os.path.isdir(f"servers/{inter.guild.name}")):
-                with open(f"servers/{inter.guild.name}/config.json", "w") as f:
+            if not (os.path.isdir(f"servers/{guild.name}")):
+                with open(f"servers/{guild.name}/config.json", "w") as f:
                     json.dump({"joined": ""}, f, ensure_ascii=False, indent=4)
 
             # ----------------------Create replies-------------------------
-            if not (os.path.isfile(f"servers/{inter.guild.name}/replies.json")):
-                with open(f"servers/{inter.guild.name}/replies.json", "w") as f:
+            if not (os.path.isfile(f"servers/{guild.name}/replies.json")):
+                with open(f"servers/{guild.name}/replies.json", "w") as f:
                     json.dump({"PR": "https://github.com/solumath/Morpheus"}, f, ensure_ascii=False, indent=4)
 
-            self.msg = Messages.created_folder.format(inter.guild.name)
+            self.msg = Messages.created_folder.format(guild.name)
             print(self.msg)
             await channel.send(self.msg)
 
@@ -59,15 +59,15 @@ class Init(commands.Cog):
             await channel.send(self.msg)
 
     @commands.Cog.listener("on_guild_remove")
-    async def remove_files(self, inter: disnake.ApplicationCommandInteraction):
+    async def remove_files(self, guild):
         """remove folder of server"""
         channel = self.bot.get_channel(config.bot_dev_channel)
 
         try:
-            if (os.path.isdir(f"servers/{inter.guild.name}")):
-                shutil.rmtree(f"servers/{inter.guild.name}")
+            if (os.path.isdir(f"servers/{guild.name}")):
+                shutil.rmtree(f"servers/{guild.name}")
 
-            self.msg = Messages.removed_folder.format(inter.guild.name)
+            self.msg = Messages.removed_folder.format(guild.name)
             print(self.msg)
             await channel.send(self.msg)
 

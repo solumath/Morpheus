@@ -35,6 +35,10 @@ class Config:
     thread_with_reaction: List[int] = get_attr(toml_dict, "channels", "thread_with_reaction")
     name_day_room: int = get_attr(toml_dict, "channels", "name_day_room")
 
+    # Users
+    jany: int = get_attr(toml_dict, "users", "jany")
+    ilbinek: int = get_attr(toml_dict, "users", "ilbinek")
+
 
 config = Config()
 

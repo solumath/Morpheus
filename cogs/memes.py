@@ -1,6 +1,7 @@
 import disnake
 from disnake.ext import commands
 from typing import Dict
+from config.app_config import config
 
 import re
 import aiohttp
@@ -11,8 +12,8 @@ import asyncio
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.ilbinek = bot.get_user(153480398054227978)
-        self.jany = bot.get_user(624604891603795968)
+        self.jany = bot.get_user(config.jany)
+        self.ilbinek = bot.get_user(config.ilbinek)
 
     @commands.slash_command(name="drzpicu", description="Drz picu 'user'")
     async def drzpicu(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
