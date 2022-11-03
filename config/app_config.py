@@ -34,6 +34,7 @@ class Config:
     thread_room: List[int] = get_attr(toml_dict, "channels", "thread_room")
     thread_with_reaction: List[int] = get_attr(toml_dict, "channels", "thread_with_reaction")
     name_day_room: int = get_attr(toml_dict, "channels", "name_day_room")
+    webhook: int = get_attr(toml_dict, "channels", "webhook")
 
     # Users
     jany: int = get_attr(toml_dict, "users", "jany")

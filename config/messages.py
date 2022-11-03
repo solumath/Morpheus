@@ -59,3 +59,5 @@ class Messages:
     channel_history_brief = "Get a channel history with date, content and author."
     channel_history_success = "Accessing history successful, file `{}_history.txt` created."
     channel_history_retrieving_messages = "Retrieving messages from channel {}."
+
+    webhook_backup_brief = "Backups whole channel with webhook."

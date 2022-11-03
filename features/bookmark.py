@@ -69,6 +69,7 @@ class BookmarkFeatures():
 
         if upload_limit:
             embed.add_field(name="Poznámka", value=Messages.bookmark_upload_limit, inline=False)
+
         embed.add_field(
             name="Channel",
             value=f"{inter.message.channel.mention}"

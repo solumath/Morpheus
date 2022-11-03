@@ -10,6 +10,7 @@ bot_room = 862395759960522773
 thread_room = [851761770770202654, 955860803410624602]
 thread_with_reaction = [880104339107110983]
 name_day_room = 983066687354077254
+webhook = 0
 
 [users]
 jany = 0
