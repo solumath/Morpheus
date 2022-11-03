@@ -1,7 +1,7 @@
 aiohttp>=3.8.1
 async_timeout>=4.0.2
 av>=9.2.0
-disnake>=2.5.2
+disnake>=2.7.0
 GitPython>=3.1.27
 lxml>=4.8.0
 Pillow>=9.2.0
