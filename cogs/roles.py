@@ -9,10 +9,10 @@ class Roles(commands.Cog):
         self.bot = bot
 
     @commands.check(utility.is_bot_admin)
-    @commands.slash_command(name="select", description="Create select menu")
+    @commands.slash_command(name="select", description="Create role select menu")
     async def select(self, inter: disnake.ApplicationCommandInteraction,
-                     room: disnake.TextChannel, text: str,
-                     min_roles: int, max_roles: int, roles: str):
+                     placeholder: str, roles: str,
+                     min_roles: int, max_roles: int):
         """extract roles from string and create select menu"""
         roles = roles.split()
         opt = []
@@ -25,15 +25,12 @@ class Roles(commands.Cog):
             role = inter.guild.get_role(id)
             roles.append(disnake.SelectOption(label=role.name, value=role.id))
 
-        await inter.response.send_message("select menu sent")
-        await room.send(
+        await inter.send(
             components=disnake.ui.Select(
-                placeholder=text,
+                placeholder=placeholder,
                 min_values=min_roles,
                 max_values=max_roles,
-                options=[
-                    disnake.SelectOption(label=channel.name, value=channel.id) for channel in roles
-                ],
+                options=roles,
                 custom_id="role:select"
             )
         )
@@ -44,14 +41,14 @@ class Roles(commands.Cog):
                     self,
                     inter: disnake.ApplicationCommandInteraction,
                     category: disnake.CategoryChannel,
-                    text: str = commands.Param(description="Placeholder for select"),
+                    placeholder: str,
                     ):
         """extract all channels from category for permission overwrite"""
 
         await inter.send(
             components=disnake.ui.Select(
-                placeholder=text,
-                min_values=1,
+                placeholder=placeholder,
+                min_values=0,
                 max_values=len(category.channels),
                 options=[
                     disnake.SelectOption(
@@ -66,9 +63,18 @@ class Roles(commands.Cog):
     @commands.Cog.listener("on_dropdown")
     async def cool_select_listener(self, inter: disnake.MessageInteraction):
         if inter.component.custom_id == "channel:select":
-            options = set([int(o.value) for o in inter.component.options])
+            channel_options = set([int(o.value) for o in inter.component.options])
+
+            # No channel selected
+            if inter.values is None:
+                for channel_id in channel_options:
+                    channel = self.bot.get_channel(int(channel_id))
+                    await channel.set_permissions(inter.author, view_channel=False)
+                await inter.send("All channels removed.", ephemeral=True)
+                return
+
             selected = set(map(int, inter.values))
-            to_remove = options - selected
+            to_remove = channel_options - selected
 
             channels = []
             for channel_id in inter.values:
@@ -93,6 +99,15 @@ class Roles(commands.Cog):
             user = inter.author
             user_has_roles = set(map(lambda role: role.id, user.roles))
 
+            # No roles selected
+            if inter.values is None:
+                for role_id in roles_options:
+                    role = get(inter.guild.roles, id=role_id)
+                    await user.remove_roles(role)
+                await inter.send("All roles removed.", ephemeral=True)
+                return
+
+            # Selected roles
             selected = set(map(int, inter.values))
 
             not_selected = roles_options - selected
