@@ -4,6 +4,15 @@ I Can Only Show You The Door...
 
 Discord bot for managing school server.
 
+## Pre-commit (useful for dev)
+
+We have setup pre-commit in this repository. To use it use these commands:
+
+```bash
+pip install -r requirements-dev.txt
+pre-commit install
+```
+
 ## Docker compose setup (recomended)
 
 Install `docker` and `docker-compose` for your system (will vary from system to system)
