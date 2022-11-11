@@ -62,6 +62,7 @@ class Roles(commands.Cog):
 
     @commands.Cog.listener("on_dropdown")
     async def cool_select_listener(self, inter: disnake.MessageInteraction):
+        await inter.response.defer()
         if inter.component.custom_id == "channel:select":
             channel_options = set([int(o.value) for o in inter.component.options])
 
@@ -87,9 +88,7 @@ class Roles(commands.Cog):
                 await channel.set_permissions(inter.author, view_channel=False)
 
             await inter.send(
-                f"You selected {' '.join([channel.mention for channel in channels])}.",
-                ephemeral=True
-                )
+                f"You selected {' '.join([channel.mention for channel in channels])}.", ephemeral=True)
 
         elif inter.component.custom_id == "role:select":
             # All options from menu
@@ -128,7 +127,7 @@ class Roles(commands.Cog):
                     await user.remove_roles(role)
 
             selected = [role.mention for role in selected]
-            await inter.response.send_message(f"You selected {' '.join(selected)}.", ephemeral=True)
+            await inter.send(f"You selected {' '.join(selected)}.", ephemeral=True)
 
         else:
             pass
