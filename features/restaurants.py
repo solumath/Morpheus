@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 
 
-class RestaurantsScraper:
+class RestaurantsScraper():
     def __init__(self):
         self.urls = {
             'zagreb': 'https://zagreb.cz/denni-menu/',

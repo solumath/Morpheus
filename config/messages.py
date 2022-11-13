@@ -61,3 +61,6 @@ class Messages:
     channel_history_retrieving_messages = "Retrieving messages from channel {}."
 
     webhook_backup_brief = "Backups whole channel with webhook."
+
+    restaurant_menu_brief = "Get menu from restaurant"
+    restaurant_all_menus_brief = "Get all menus from known restaurants"
