@@ -43,7 +43,7 @@ class Memes(commands.Cog):
         keyword: search for a certain keyword in a joke
         """
         if keyword is not None and ("&" in keyword or "?" in keyword):
-            await inter.send("I didn't find a joke like that.")
+            return await inter.send("I didn't find a joke like that.")
 
         params: Dict[str, str] = {"limit": "30"}
         url: str = "https://icanhazdadjoke.com"
