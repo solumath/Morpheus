@@ -3,14 +3,21 @@ from logging.handlers import TimedRotatingFileHandler
 
 from cogs.logger.logger import Logger
 
+
+def my_logger(default_name):
+    """define log file name"""
+    base_filename, ext, date = default_name.split(".")
+    return f"{base_filename}.{date}.{ext}"
+
+
 msg_logger = logging.getLogger("messages")
 msg_logger.setLevel(logging.INFO)
 msg_handler = TimedRotatingFileHandler(
-    filename="servers/logs/L", when="midnight",
-    interval=1, encoding='utf-8', backupCount=31
+    filename="servers/logs/L.log", when="midnight",
+    interval=1, encoding='utf-8', backupCount=365
     )
 msg_handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s: %(message)s'))
-msg_handler.suffix = "%d.%m.%Y.log"
+msg_handler.namer = my_logger
 msg_logger.addHandler(msg_handler)
 
 logging.addLevelName(21, "MSG")
