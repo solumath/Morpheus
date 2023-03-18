@@ -64,3 +64,11 @@ class Messages:
 
     restaurant_menu_brief = "Get menu from restaurant"
     restaurant_all_menus_brief = "Get all menus from known restaurants"
+
+    # FUN COG
+    cat_brief = "Pošle náhodný obrázek kočky"
+    dog_brief = "Pošle náhodný obrázek psa"
+    fox_brief = "Pošle náhodný obrázek lišky"
+    duck_brief = "Pošle náhodný obrázek kachny"
+    dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
+    yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
