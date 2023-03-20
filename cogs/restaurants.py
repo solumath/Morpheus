@@ -1,11 +1,12 @@
+import io
+
 import disnake
+import unidecode
 from disnake.ext import commands
+
 import utility
 from config.messages import Messages
 from features.restaurants import RestaurantsScraper
-import io
-import unidecode
-
 
 restaurants = []
 days = ["pondeli", "utery", "streda", "ctvrtek", "patek", "sobota", "nedele", "dnes"]

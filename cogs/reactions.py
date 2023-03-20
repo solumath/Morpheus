@@ -1,6 +1,7 @@
 from disnake.ext import commands
-from features.reaction_context import ReactionContext
+
 from cogs.bookmark import Bookmark
+from features.reaction_context import ReactionContext
 
 
 class Reactions(commands.Cog):

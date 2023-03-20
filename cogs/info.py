@@ -1,11 +1,11 @@
-import disnake
-from disnake.ext import commands
-from datetime import datetime
 import json
-import requests
-from config.messages import Messages
+from datetime import datetime
 
-import keys
+import disnake
+import requests
+from disnake.ext import commands
+
+from config.messages import Messages
 
 
 class Info(commands.Cog):
@@ -28,7 +28,7 @@ class Info(commands.Cog):
         target = target or inter.author
 
         headers = {
-                    'authorization': keys.authorization
+                    'authorization': ''
                     }
         r = requests.get(f'https://discord.com/api/v9/guilds/{inter.guild.id}/messages/search?author_id={target.id}&include_nsfw=true', headers=headers)  # noqa: E501
         data = json.loads(r.text)

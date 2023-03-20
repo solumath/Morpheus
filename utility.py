@@ -1,10 +1,12 @@
 import os
 import re
+from typing import Union
+
 import disnake
 from disnake.ext import commands
-from config.app_config import config
-from typing import Union
 from genericpath import isfile
+
+from config.app_config import config
 
 
 def cut_string(string: str, part_len: int):

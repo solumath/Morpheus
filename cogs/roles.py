@@ -1,7 +1,8 @@
 import disnake
-import utility
-from disnake.utils import get
 from disnake.ext import commands
+from disnake.utils import get
+
+import utility
 
 
 class Roles(commands.Cog):

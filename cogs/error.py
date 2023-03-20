@@ -1,11 +1,12 @@
+import traceback
+
 import disnake
+from disnake import Embed
 from disnake.ext import commands
 
-import traceback
 import utility
-from disnake import Embed
-from config.messages import Messages
 from config.app_config import config
+from config.messages import Messages
 
 
 class Error(commands.Cog):

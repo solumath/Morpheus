@@ -1,20 +1,19 @@
-from requests.packages.urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
-import requests
-import lxml.html
-from lxml.etree import QName
-from lxml import etree
-from tqdm import tqdm
-import av
-
-from multiprocessing.pool import ThreadPool
-from multiprocessing import cpu_count
-from io import BytesIO
-from datetime import datetime, timedelta
-import time
 import re
-
+import time
 from argparse import ArgumentParser
+from datetime import datetime, timedelta
+from io import BytesIO
+from multiprocessing import cpu_count
+from multiprocessing.pool import ThreadPool
+
+import av
+import lxml.html
+import requests
+from lxml import etree
+from lxml.etree import QName
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+from tqdm import tqdm
 
 # init session
 s = requests.Session()

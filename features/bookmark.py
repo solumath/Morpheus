@@ -1,7 +1,9 @@
-import disnake
 import re
-from utility import split
+
+import disnake
+
 from config.messages import Messages
+from utility import split
 
 
 class BookmarkFeatures():

@@ -3,13 +3,13 @@ Here are commands that call random apis for fun things.
 examples - animal pictures, dadjokes
 """
 
-import aiohttp
 import contextlib
 import random
 import re
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List
 
+import aiohttp
 import disnake
 from disnake.ext import commands
 

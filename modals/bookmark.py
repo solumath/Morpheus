@@ -1,4 +1,5 @@
 import disnake
+
 from buttons.bookmark import BookmarkView
 from config.messages import Messages
 from features.bookmark import BookmarkFeatures
