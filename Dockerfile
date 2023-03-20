@@ -12,5 +12,6 @@ RUN /usr/local/bin/python -m pip install --upgrade pip
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . .
+RUN git config --global --add safe.directory /morpheus
 
 ENTRYPOINT [ "python3", "bot.py" ]

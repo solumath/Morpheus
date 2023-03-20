@@ -1,5 +1,5 @@
 class Messages:
-    Morpheus = ["Remember...All I'm Offering Is The Truth. Nothing More.", 
+    Morpheus = ["Remember...All I'm Offering Is The Truth. Nothing More.",
                 "I Have Dreamed A Dream, But Now That Dream Is Gone From Me.",
                 "What Was Said Was For You, And You Alone.",
                 "A Sentinel For Every Man, Woman, And Child In Zion. That Sounds Exactly Like The Thinking Of A Machine To Me.",
@@ -22,6 +22,7 @@ class Messages:
     created_folder = "Folder **{}** successfuly created"
     removed_folder = "Folder **{}** successfuly removed"
 
+    # SYSTEM
     cogs_brief = "Vypíše seznam všech cogs a jejich stav"
     not_loaded = "Not loaded **{}**"
     succes_reload = "Reloaded successfully **{}**"
@@ -29,6 +30,13 @@ class Messages:
     succes_load = "Loaded successfully **{}**"
     not_reloadable = "Module **{}** can't be reloaded"
     cog_not_unloadable = 'Module `{}` can\'t be unloaded.'
+
+    # PERMISSIONS
+    bot_admin_only = "This command can be used only by BOT Admins."
+    not_enough_perms = "You do not posses enough strenght to use this force."
+
+    # GIT
+    git_pull_brief = "Stáhne aktuálni změny z repa"
 
     kredity = """```cs\nif ("pokazil jsem volitelný" or "Pokazil jsem aspoň 2 povinné")
                 	return 65\nif ("Pokazil jsem 1 povinný" or "Mám průměr nad 2.0")
@@ -39,19 +47,21 @@ class Messages:
     filename_error = "Error: {} - {}."
     command_timed_out = "Příkaz nereagoval a byl nečekaně ukončen."
     command_cooldowns = "This command is on cooldown. Please try again after {time} seconds."
-    not_enough_perms = "You do not posses enough strenght to beat me!"
     member_not_found = "{user} Nikoho takového jsem nenašel."
 
+    # NAMEDAY
     name_day_cz = "Dnes má svátek {name}."
     name_day_cz_brief = "Vypíše, kdo má dnes svátek."
     name_day_sk = "Dnes má meniny {name}."
     name_day_sk_brief = "Vypíše, kto má dnes meniny."
 
+    # PET
     pet_brief = "Vytvoří gif z uživatele."
     pet_unsupported_avatar = "Defaultní avatar aktuálně není podporovaný."
 
     welcome = "Hej debílci, došel {} tak ho pozdravte. <:feelsWowMan:747845161563979857>"
 
+    # BOOKMARK
     bookmark_title = "Záložka na serveru **{}**"
     blocked_bot = "Nemůžu ti posílat zprávy {}"
     bookmark_upload_limit = "Zpráva obsahuje přílohu přesahující upload limit, doporučuji si tuto přílohu stáhnout. V připadě smazání původní zprávy nebude příloha dostupná."

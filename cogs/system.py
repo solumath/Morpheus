@@ -1,16 +1,45 @@
+import math
+
 import disnake
 from disnake.ext import commands
+
 import utility
-import math
-from buttons.system import SystemView, Dropdown
+from buttons.system import Dropdown, SystemView
 from config.messages import Messages
+from features.git import Git
+from permissions import permission_check
 
 
 class System(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.git = Git()
 
         self.unloadable_cogs = ["system"]
+
+    @commands.group(pass_context=True)
+    async def git(self, ctx: commands.Context):
+        pass
+
+    @git.command(brief=Messages.git_pull_brief)
+    @commands.check(permission_check.is_bot_admin)
+    async def pull(self, ctx: commands.Context):
+        message: disnake.Message = await ctx.send("Pulling")
+
+        pull_result = await self.git.pull()
+        pull_parts = utility.cut_string(pull_result, 1900)
+
+        await message.edit(content=f"```{pull_parts[0]}```")
+
+        for part in pull_parts[1:]:
+            await ctx.send(f"```{part}```")
+
+    @commands.check(permission_check.is_bot_admin)
+    @commands.command()
+    async def shutdown(self, ctx):
+        await ctx.send("shutting down")
+        await self.bot.close()
+        exit(0)
 
     async def create_selects(self):
         """Slices dictionary of all cogs to chunks for select."""
