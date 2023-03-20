@@ -4,4 +4,5 @@ servers
 .vscode
 disnake.log
 config/config.toml
-sqlite.db
+*.db
+venv
