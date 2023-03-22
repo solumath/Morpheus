@@ -65,7 +65,7 @@ class ManageMessages(commands.Cog):
             await message.channel.send(random.choice(Messages.Morpheus))
         else:
             for key, value in replies.items():
-                if re.search(fr"^{key.lower()}$", message.content.lower()):
+                if key.lower() == message.content.lower():
                     await message.channel.send(value)
 
     @commands.has_permissions(administrator=True)
