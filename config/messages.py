@@ -82,3 +82,6 @@ class Messages:
     duck_brief = "Pošle náhodný obrázek kachny"
     dadjoke_brief = "Pošle náhodný dadjoke nebo vyhledá podle zadaného slova"
     yo_mamajoke_brief = "Pošle náhodný Yo momma joke"
+
+    # EMOJI
+    emoji_download_brief = "Stáhne všechny emoji ze serveru a pošle je emojis.zip"

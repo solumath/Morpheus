@@ -1,8 +1,9 @@
+import asyncio
+
 import disnake
 from disnake.ext import commands
-from config.app_config import config
 
-import asyncio
+from config.app_config import config
 
 
 class Memes(commands.Cog):

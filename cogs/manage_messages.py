@@ -1,14 +1,14 @@
-from disnake.ext import commands
-import disnake
-
-import random
-import re
 import json
-import requests
-import time
-import keys
 import os
+import random
+import time
+
+import disnake
 import pytz
+import requests
+from disnake.ext import commands
+
+from config.app_config import config
 from config.messages import Messages
 
 
@@ -73,9 +73,7 @@ class ManageMessages(commands.Cog):
     async def message_count(self, ctx):
         member_ids = [member.id for member in ctx.guild.members]
         messages_count = {}
-        headers = {
-                    'authorization': keys.authorization
-                    }
+        headers = {'authorization': config.key}
         for ids in member_ids:
             r = requests.get(f'https://discord.com/api/v9/guilds/{ctx.guild.id}/messages/search?author_id={ids}&include_nsfw=true', headers=headers)  # noqa: E501
             data = json.loads(r.text)
