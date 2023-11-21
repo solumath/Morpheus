@@ -31,6 +31,7 @@ class Config:
 
     # Special channel IDs
     bot_dev_channel: int = get_attr(toml_dict, "channels", "bot_dev_channel")
+    bot_gay_channel: int = get_attr(toml_dict, "channels", "bot_gay_channel")
     bot_room: int = get_attr(toml_dict, "channels", "bot_room")
     thread_room: List[int] = get_attr(toml_dict, "channels", "thread_room")
     thread_with_reaction: List[int] = get_attr(toml_dict, "channels", "thread_with_reaction")
