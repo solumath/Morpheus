@@ -41,20 +41,23 @@ class Gays(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(name="leadgay", description="Gay leaderboard")
-    async def gays(self, inter: disnake.ApplicationCommandInteraction):
+    async def gays(self, inter: disnake.ApplicationCommandInteraction, count: int = 10):
+        global mention_author_count, mention_count
+        mention_author_count = {}
+        mention_count = {}
         await inter.response.defer()
         guild = self.bot.get_guild(config.guild_id)
         channel = guild.get_channel(config.bot_gay_channel)
         if isinstance(channel, TextChannel):
             await iterate_messages(channel)
        
-        mention_count_sorted = dict(sorted(mention_count.items(), key=lambda item: item[1], reverse=True)[:10])
+        mention_count_sorted = dict(sorted(mention_count.items(), key=lambda item: item[1], reverse=True)[:count])
         output = '# Naši nejlepší gejové:\n```'
         for mention, count in mention_count_sorted.items():
             output += f'{mention.name}: {count}\n'
         output += '```\n'
 
-        mention_author_count_sorted = dict(sorted(mention_author_count.items(), key=lambda item: item[1], reverse=True)[:10])
+        mention_author_count_sorted = dict(sorted(mention_author_count.items(), key=lambda item: item[1], reverse=True)[:count])
         output += '# Naši nejlepší tagři:\n```'
         for mention, count in mention_author_count_sorted.items():
             output += f'{mention.name}: {count}\n'
