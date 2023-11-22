@@ -53,14 +53,14 @@ class Gays(commands.Cog):
        
         mention_count_sorted = dict(sorted(mention_count.items(), key=lambda item: item[1], reverse=True)[:count])
         output = '# Naši nejlepší gejové:\n```'
-        for mention, count in mention_count_sorted.items():
-            output += f'{mention.name}: {count}\n'
+        for mention, tag_count in mention_count_sorted.items():
+            output += f'{mention.name}: {tag_count}\n'
         output += '```\n'
 
         mention_author_count_sorted = dict(sorted(mention_author_count.items(), key=lambda item: item[1], reverse=True)[:count])
         output += '# Naši nejlepší tagři:\n```'
-        for mention, count in mention_author_count_sorted.items():
-            output += f'{mention.name}: {count}\n'
+        for mention, tag_count in mention_author_count_sorted.items():
+            output += f'{mention.name}: {tag_count}\n'
         output += '```'
 
         await inter.edit_original_response(output)
