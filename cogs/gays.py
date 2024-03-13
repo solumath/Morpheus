@@ -1,8 +1,8 @@
 import disnake
-from config.app_config import config
-from disnake.ext import commands
 from disnake.channel import TextChannel
+from disnake.ext import commands
 
+from config.app_config import config
 
 mention_count = {}
 mention_author_count = {}
@@ -50,7 +50,7 @@ class Gays(commands.Cog):
         channel = guild.get_channel(config.bot_gay_channel)
         if isinstance(channel, TextChannel):
             await iterate_messages(channel)
-       
+
         mention_count_sorted = dict(sorted(mention_count.items(), key=lambda item: item[1], reverse=True)[:count])
         output = '# Naši nejlepší gejové:\n```'
         for mention, tag_count in mention_count_sorted.items():
