@@ -1,7 +1,60 @@
 version: '3.8'
 
 services:
+    db:
+        deploy:
+            restart_policy:
+                condition: unless-stopped
+                delay: 5s
+                window: 20s
+        image: postgres:12-alpine
+        environment:
+            POSTGRES_HOST_AUTH_METHOD: "trust"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        networks:
+            - db
+
     bot:
+        deploy:
+            restart_policy:
+                condition: unless-stopped
+                delay: 5s
+                window: 20s
         build: .
         volumes:
             - .:/morpheus:Z
+        depends_on:
+            - db
+            - lavalink
+        networks:
+            - lavalink
+            - db
+
+    lavalink:
+        image: ghcr.io/lavalink-devs/lavalink:4
+        container_name: lavalink
+        deploy:
+            restart_policy:
+                condition: unless-stopped
+                delay: 5s
+                window: 20s
+        volumes:
+            - ./config/application.yml:/opt/Lavalink/application.yml
+            # use chown on folder to fix permissions "chown 322:322 plugins/"
+            - ./plugins/:/opt/Lavalink/plugins/
+        env_file:
+            - ./config/lavalink_config.env
+        networks:
+            - lavalink
+        expose:
+            - "2333"
+
+networks:
+    lavalink:
+        name: lavalink
+    db:
+        name: db
+
+volumes:
+    postgres_data:

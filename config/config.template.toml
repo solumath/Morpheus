@@ -1,18 +1,34 @@
 [base]
-default_prefix = '?'
-key = ''
+default_prefix = "?"
+key = ""
 admin_ids = [0]  # first ID is used for mention in case of false verification
 guild_id = 0
 
+[database]
+db_string = "postgresql://postgres:postgres@db:5432/postgres"
+
 [channels]
-bot_dev_channel = 768796879042773022
-bot_gay_channel = 920015190085472256
-bot_room = 862395759960522773
-thread_room = [851761770770202654, 955860803410624602]
-thread_with_reaction = [880104339107110983]
-name_day_room = 983066687354077254
+bot_channel = 863730103195664384
+bot_dev_channel = 863730103195664384
+thread_channels = [851761770770202654, 955860803410624602]  # channel that creates threads
+threads_with_reaction = [880104339107110983]                # channel that creates threads with reactions
+name_day_channel = 863730103195664384
+gay_channel = 920015190085472256
 webhook = 0
 
-[users]
+allowed_channels = [
+    "bot_channel",
+    "bot_dev_channel"
+]
+
+[extensions]
+extensions = ['admin', 'emoji', 'fun', 'guildconfig', 'info',
+    'latex', 'logger', 'memes', 'nameday', 'pet', 'random', 'restaurants',
+    'roles', 'threads', 'voice', 'weather']
+
+[memes]
 jany = 0
 ilbinek = 0
+
+[weather]
+token = ""

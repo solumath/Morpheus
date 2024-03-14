@@ -13,6 +13,16 @@ def get_attr(toml_dict: dict, section: str, attr_key: str):
         return toml.load("config/config.template.toml", _dict=dict)[section][attr_key]
 
 
+def eval_channels(toml_dict: dict, channels: list):
+    """
+    Evaluate channel 'config variable name' to ID
+    """
+    for idx, channel_name in enumerate(channels):
+        if isinstance(channel_name, str):
+            channels[idx] = get_attr(toml_dict, "channels", channel_name)
+    return channels
+
+
 class Config:
     """
     Wrapper class for Config and config template.\n
@@ -29,18 +39,28 @@ class Config:
     guild_id: int = get_attr(toml_dict, "base", "guild_id")
     default_prefix: str = get_attr(toml_dict, "base", "default_prefix")
 
+    extensions: List[str] = get_attr(toml_dict, "extensions", "extensions")
+
+    # database
+    db_string: str = get_attr(toml_dict, "database", "db_string")
+
     # Special channel IDs
     bot_dev_channel: int = get_attr(toml_dict, "channels", "bot_dev_channel")
-    bot_gay_channel: int = get_attr(toml_dict, "channels", "bot_gay_channel")
-    bot_room: int = get_attr(toml_dict, "channels", "bot_room")
-    thread_room: List[int] = get_attr(toml_dict, "channels", "thread_room")
-    thread_with_reaction: List[int] = get_attr(toml_dict, "channels", "thread_with_reaction")
-    name_day_room: int = get_attr(toml_dict, "channels", "name_day_room")
+    bot_channel: int = get_attr(toml_dict, "channels", "bot_channel")
+    thread_channels: List[int] = get_attr(toml_dict, "channels", "thread_channels")
+    threads_with_reaction: List[int] = get_attr(toml_dict, "channels", "threads_with_reaction")
+    name_day_channel: int = get_attr(toml_dict, "channels", "name_day_channel")
+    gay_channel: int = get_attr(toml_dict, "channels", "gay_channel")
     webhook: int = get_attr(toml_dict, "channels", "webhook")
 
-    # Users
-    jany: int = get_attr(toml_dict, "users", "jany")
-    ilbinek: int = get_attr(toml_dict, "users", "ilbinek")
+    allowed_channels: List[int] = eval_channels(toml_dict, get_attr(toml_dict, "channels", "allowed_channels"))
+
+    # Memes
+    jany: int = get_attr(toml_dict, "memes", "jany")
+    ilbinek: int = get_attr(toml_dict, "memes", "ilbinek")
+
+    # Weather
+    weather_token: str = get_attr(toml_dict, "weather", "token")
 
 
 config = Config()

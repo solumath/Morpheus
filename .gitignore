@@ -2,7 +2,12 @@ keys.py
 __pycache__
 servers
 .vscode
-disnake.log
+discord.log
 config/config.toml
 *.db
 venv
+logs
+.ruff_cache
+.devcontainer
+emojis.zip
+application.yml
