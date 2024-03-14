@@ -37,7 +37,8 @@ class System(Base, commands.Cog):
     @is_bot_admin()
     @git_group.command(name="pull", description=SystemMess.git_pull_brief)
     async def pull(self, inter: discord.Interaction):
-        message: discord.Message = await inter.response.send_message("Pulling")
+        await inter.response.send_message("`Pulling`")
+        message = await inter.original_response()
 
         pull_result = await self.git.pull()
         pull_parts = utils.cut_string(pull_result, 1900)
@@ -50,7 +51,7 @@ class System(Base, commands.Cog):
     @is_bot_admin()
     @app_commands.command(name="shutdown", description=SystemMess.shutdown_brief)
     async def shutdown(self, inter: discord.Interaction):
-        await inter.response.send_message("shutting down")
+        await inter.response.send_message("`Shutting down...`")
         exit(0)
 
     @is_bot_admin()

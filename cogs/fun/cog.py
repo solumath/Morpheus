@@ -65,7 +65,6 @@ class Fun(Base, commands.Cog):
     @app_commands.command(name="cat", description=FunMess.cat_brief)
     async def cat(self, inter: discord.Interaction, breed: str = None):
         """Get random image of a cat"""
-        raise commands.UserInputError("test")
         image_bytes, file_name = await self.get_image(inter, "https://api.thecatapi.com/v1/images/search")
         image_file = discord.File(image_bytes, filename=file_name)
 
