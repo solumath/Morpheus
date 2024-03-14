@@ -8,11 +8,11 @@ guild_id = 0
 db_string = "postgresql://postgres:postgres@db:5432/postgres"
 
 [channels]
-bot_channel = 863730103195664384
-bot_dev_channel = 863730103195664384
-thread_channels = [851761770770202654, 955860803410624602]  # channel that creates threads
+bot_channel = 862395759960522773
+bot_dev_channel = 768796879042773022
+thread_channels = [880104339107110983, 955860803410624602]  # channel that creates threads
 threads_with_reaction = [880104339107110983]                # channel that creates threads with reactions
-name_day_channel = 863730103195664384
+name_day_channel = 983066687354077254
 gay_channel = 920015190085472256
 webhook = 0
 
@@ -22,9 +22,11 @@ allowed_channels = [
 ]
 
 [extensions]
-extensions = ['admin', 'emoji', 'fun', 'guildconfig', 'info',
+extensions = [
+    'admin', 'emoji', 'fun', 'guildconfig', 'info',
     'latex', 'logger', 'memes', 'nameday', 'pet', 'random', 'restaurants',
-    'roles', 'threads', 'voice', 'weather']
+    'roles', 'threads', 'voice', 'weather'
+]
 
 [memes]
 jany = 0
