@@ -6,7 +6,6 @@ import discord
 import git
 import wavelink
 from discord.ext import commands
-from genericpath import isdir
 
 from config.app_config import config
 from custom.views import instantiate_views
@@ -38,6 +37,9 @@ class Bot(commands.Bot):
         # add views
         instantiate_views(self)
 
+        # get bot data
+        await bot.application_info()
+
     async def on_ready(self) -> None:
         synced = await self.tree.sync()
         ready_string = f"Logged in as {self.user.mention} | {self.user.id}\n"
@@ -57,13 +59,9 @@ class Bot(commands.Bot):
 
     async def init_cogs(self) -> None:
         """Loads all cogs from the cogs folder"""
-        for name in os.listdir("./cogs"):
-            filename = f"./cogs/{name}"
-            modulename = f"cogs.{name}"
-
-            if isdir(filename) and ("__init__.py" in os.listdir(filename)):
-                await bot.load_extension(modulename)
-                logging.info(f"Loaded {name}, {modulename}")
+        for cog in config.extensions:
+            await bot.load_extension(f"cogs.{cog}")
+            logging.info(f"Loaded {cog}")
 
 
 bot: Bot = Bot()

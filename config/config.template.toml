@@ -23,9 +23,9 @@ allowed_channels = [
 
 [extensions]
 extensions = [
-    'admin', 'emoji', 'fun', 'guildconfig', 'info',
+    'admin', 'emoji', 'fun', 'guildconfig', 'info', 'bookmark', 'error',
     'latex', 'logger', 'memes', 'nameday', 'pet', 'random', 'restaurants',
-    'roles', 'threads', 'voice', 'weather'
+    'roles', 'threads', 'voice', 'weather', 'gay', 'system',
 ]
 
 [memes]
