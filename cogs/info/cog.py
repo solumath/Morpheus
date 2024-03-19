@@ -64,7 +64,7 @@ class Info(Base, commands.Cog):
             title=inter.guild.name, colour=inter.guild.owner.colour, description=inter.guild.description
         )
         add_author_footer(embed, inter.user)
-        style = DiscordTimestamps.ShortDateTime
+        style = DiscordTimestamps.ShortDateTime.value
 
         if inter.guild.icon is not None:
             embed.set_thumbnail(url=inter.guild.icon)
