@@ -8,6 +8,7 @@ from custom.enums import DiscordTimestamps
 from database.guild import GuildDB
 from utils.embed_utils import add_author_footer
 
+from . import features as info_features
 from .messages import InfoMess
 
 
@@ -90,8 +91,9 @@ class Info(Base, commands.Cog):
         embed.add_field(name="Active invites", value=len(await inter.guild.invites()), inline=True)
         embed.add_field(name="Guild level", value=inter.guild.premium_tier, inline=True)
         embed.add_field(name="Boosters", value=inter.guild.premium_subscription_count, inline=True)
-        embed.add_field(
-            name="Emojis count/max", value=f"{len(inter.guild.emojis)}/{inter.guild.emoji_limit}", inline=True
-        )
+
+        emojis, animated_emojis = info_features.get_emoji_count(inter.guild)
+        embed.add_field(name="Emojis count/max", value=f"{emojis}/{inter.guild.emoji_limit}", inline=True)
+        embed.add_field(name="Animated emojis", value=f"{animated_emojis}/{inter.guild.emoji_limit}", inline=True)
 
         await inter.edit_original_response(embed=embed)
