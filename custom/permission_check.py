@@ -1,5 +1,3 @@
-from typing import Union
-
 import discord
 from discord.ext import commands
 
@@ -8,11 +6,13 @@ from config.app_config import config
 from .custom_errors import NotAdminError
 
 
-def is_bot_admin(raise_exception: bool = True):
-    """@Decorator that checks if the user is a bot admin.
+def is_bot_admin(ctx: commands.Context | discord.Interaction, raise_exception: bool = True):
+    """Checks if the user is a bot admin.
 
     Parameters
     -----------
+    ctx : `commands.Context` | `discord.Interaction`
+        The context of the command.
     raise_exception : `bool`
         If True, raises `NotAdminError`. If False, returns `bool`.
 
@@ -26,13 +26,10 @@ def is_bot_admin(raise_exception: bool = True):
     `bool`
         True if the user is a bot admin, False otherwise.
     """
+    author_id = ctx.user.id if isinstance(ctx, discord.Interaction) else ctx.author.id
+    if author_id in config.admin_ids:
+        return True
 
-    async def predicate(ctx: Union[commands.Context, discord.Interaction]):
-        if ctx.author.id in config.admin_ids:
-            return True
-
-        if not raise_exception:
-            return False
-        raise NotAdminError
-
-    return commands.check(predicate)
+    if not raise_exception:
+        return False
+    raise NotAdminError

@@ -13,9 +13,8 @@ class Roles(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.permanent_views = [RolesSelectView, ChannelsSelectView]
 
-    @is_bot_admin()
+    @app_commands.check(is_bot_admin)
     @app_commands.command(name="roles_select", description=RolesMess.role_select_brief)
     async def roles_select(
         self, inter: discord.Interaction, placeholder: str, roles: str, min_roles: int, max_roles: int
@@ -32,7 +31,7 @@ class Roles(Base, commands.Cog):
 
         await inter.response.send_message(view=view)
 
-    @is_bot_admin()
+    @app_commands.check(is_bot_admin)
     @app_commands.command(name="channels_select", description=RolesMess.channel_select_brief)
     async def channels_select(
         self,

@@ -34,7 +34,7 @@ class System(Base, commands.Cog):
 
     git_group = app_commands.Group(name="git", description=SystemMess.git_brief)
 
-    @is_bot_admin()
+    @app_commands.check(is_bot_admin)
     @git_group.command(name="pull", description=SystemMess.git_pull_brief)
     async def pull(self, inter: discord.Interaction):
         await inter.response.send_message("`Pulling`")
@@ -48,13 +48,13 @@ class System(Base, commands.Cog):
         for part in pull_parts[1:]:
             await inter.followup.send(inter, f"```{part}```")
 
-    @is_bot_admin()
+    @app_commands.check(is_bot_admin)
     @app_commands.command(name="shutdown", description=SystemMess.shutdown_brief)
     async def shutdown(self, inter: discord.Interaction):
         await inter.response.send_message("`Shutting down...`")
         exit(0)
 
-    @is_bot_admin()
+    @app_commands.check(is_bot_admin)
     @app_commands.command(name="cogs", description=SystemMess.cogs_brief)
     async def cogs(self, inter: discord.Interaction):
         """
