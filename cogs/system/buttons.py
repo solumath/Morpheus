@@ -38,7 +38,7 @@ class SystemView(discord.ui.View):
         await self.message.edit(view=None)
 
     async def interaction_check(self, inter: discord.Interaction) -> bool:
-        if not is_bot_admin(False):
+        if not is_bot_admin(inter, False):
             await inter.response.send_message(SystemMess.not_enough_perms, ephemeral=True)
             return False
         return True
@@ -89,8 +89,7 @@ class CogSelect(discord.ui.Select):
     async def callback(self, inter: discord.MessageInteraction) -> None:
         """React to user selecting cog(s)."""
         await inter.response.defer()
-        if not is_bot_admin(False):
-            await inter.followup.send(SystemMess.not_enough_perms, ephemeral=True)
+        if not is_bot_admin(inter):
             return
 
         unloadable = [cog for cog in self.unloadable_cogs if cog in self.values]

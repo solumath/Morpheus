@@ -14,7 +14,6 @@ class Base:
 
     def __init__(self):
         self.tasks = []
-        self.permanent_views = []
 
     @cached_property
     def base_guild(self) -> discord.TextChannel:
@@ -42,5 +41,3 @@ class Base:
 
     def cog_load(self) -> None:
         load_config()
-        for view in self.permanent_views:
-            self.bot.add_view(view(self.bot))

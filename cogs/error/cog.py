@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from cogs.base import Base
@@ -17,15 +18,21 @@ class Error(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        self.bot.tree.error(coro=self.__dispatch_to_app_command_handler)
 
-    async def __dispatch_to_app_command_handler(
-        self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError
-    ):
-        self.bot.dispatch("app_command_error", interaction, error)
+    def cog_load(self):
+        tree = self.bot.tree
+        self._old_tree_error = tree.on_error
+        tree.on_error = self.on_app_command_error
+
+    def cog_unload(self):
+        tree = self.bot.tree
+        tree.on_error = self._old_tree_error
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        if isinstance(error, app_commands.CommandInvokeError):
+            error = error.original
+
         if isinstance(error, custom_errors.NotAdminError):
             await ctx.reply(error.message)
             return
@@ -78,8 +85,10 @@ class Error(Base, commands.Cog):
         for message in output:
             await channel.send(f"```\n{message}\n```")
 
-    @commands.Cog.listener()
-    async def on_app_command_error(self, inter: discord.Interaction, error: discord.app_commands.AppCommandError):
+    async def on_app_command_error(self, inter: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandInvokeError):
+            error = error.original
+
         if isinstance(error, custom_errors.NotAdminError):
             await inter.response.send_message(error.message, ephemeral=True)
             return
