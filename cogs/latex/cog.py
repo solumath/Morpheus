@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from cogs.base import Base
 from custom.cooldowns import default_cooldown
+from custom.custom_errors import ApiError
 
 PNG_HEADER = b"\x89PNG\r\n\x1a\n"
 
@@ -36,4 +37,4 @@ class Latex(Base, commands.Cog):
                         datastream = io.BytesIO(data)
                         await ctx.send(file=discord.File(datastream, "latex.png"))
                 except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                    await ctx.send("Website unreachable")
+                    raise ApiError("Website is not responding")
