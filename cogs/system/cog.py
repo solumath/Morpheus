@@ -7,8 +7,8 @@ import utils.utils as utils
 from cogs.base import Base
 from custom.permission_check import is_bot_admin
 
-from .buttons import CogSelect, SystemView
-from .features import split_cogs
+from . import features
+from .buttons import SystemView
 from .messages import SystemMess
 
 
@@ -63,9 +63,9 @@ class System(Base, commands.Cog):
         Max number of cogs can be 100 (4x25).
         """
         await inter.response.defer()
-        cogs = await split_cogs()
+        cogs = await features.split_cogs()
         view = SystemView(self.bot, len(cogs), cogs)
-        embed = CogSelect.create_embed(self, inter.user.colour)
+        embed = features.create_embed(self.bot)
         message = await inter.followup.send(embed=embed, view=view)
 
         # pass message object to classes

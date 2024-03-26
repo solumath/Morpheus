@@ -12,3 +12,6 @@ class SystemMess(GlobalMessages):
     success_load = "Loaded successfully **{cogs}**"
     not_reloadable = "Extension(s) **{cogs}** can't be reloaded"
     cog_not_unloadable = "Extension(s) `{cogs}` can't be unloaded."
+    embed_title = "Cogs information"
+    embed_description = "```✅ Loaded ({loaded}) / ❌ Unloaded ({unloaded}) / 🔄 All ({all})```"
+    override = "📄 Bold items are overrides of config.extension"

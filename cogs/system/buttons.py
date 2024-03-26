@@ -1,10 +1,9 @@
 import discord
 from discord.ext import commands
 
-from config.app_config import config
 from custom.permission_check import is_bot_admin
 
-from .features import get_all_cogs
+from . import features
 from .messages import SystemMess
 
 
@@ -22,7 +21,7 @@ class SystemView(discord.ui.View):
             self.add_item(self.selects[i])
 
     @discord.ui.button(label="Reload off", style=discord.ButtonStyle.secondary)
-    async def reload_button(self, inter: discord.Interaction, button: discord.ui.Button):
+    async def reload_button(self, inter: discord.Interaction, button: discord.ui.Button) -> None:
         for i, _ in enumerate(self.selects):
             self.selects[i].reload = not self.selects[i].reload
 
@@ -35,10 +34,10 @@ class SystemView(discord.ui.View):
 
         await inter.response.edit_message(view=self)
 
-    async def on_timeout(self):
+    async def on_timeout(self) -> None:
         await self.message.edit(view=None)
 
-    async def interaction_check(self, inter: discord.Interaction):
+    async def interaction_check(self, inter: discord.Interaction) -> bool:
         if not is_bot_admin(False):
             await inter.response.send_message(SystemMess.not_enough_perms, ephemeral=True)
             return False
@@ -57,7 +56,7 @@ class CogSelect(discord.ui.Select):
         super().__init__(
             placeholder=self.get_initials(),
             min_values=1,
-            max_values=len(self.cogs[0]),
+            max_values=len(self.cogs),
             options=self.create_select(),
         )
 
@@ -70,7 +69,7 @@ class CogSelect(discord.ui.Select):
     def get_initials(self) -> str:
         """Creates placeholder for selects from names of cogs."""
         first = self.cogs[0][0]
-        last = self.cogs[len(self.cogs[0]) - 1][0]
+        last = self.cogs[len(self.cogs) - 1][0]
         return f"{first.title()} - {last.title()}"
 
     def create_select(self) -> list[discord.SelectOption]:
@@ -87,65 +86,12 @@ class CogSelect(discord.ui.Select):
                 options.append(discord.SelectOption(label=cog.title(), value=cog, emoji="❌"))
         return options
 
-    def create_embed(self, author_colour):
-        def split_list(array, k):
-            """Splits list into K parts of approximate equal length"""
-
-            def index(i):
-                return i * (n // k) + min(i, n % k)
-
-            if not array:
-                return []
-            n = len(array)
-            return [array[index(i) : index(i + 1)] for i in range(k)]
-
-        embed = discord.Embed(title="Cogs information and loading", colour=author_colour)
-        bot_cogs = [cog.lower() for cog in self.bot.cogs]
-        cogs = get_all_cogs()
-        cog_count = len(cogs)
-
-        cog_loaded = []
-        cog_unloaded = []
-        for cog_name, _ in cogs:
-            if cog_name in bot_cogs:
-                if cog_name not in config.extensions:
-                    cog_loaded.append(f"✅ **{cog_name.title()}**\n\n")
-                else:
-                    cog_loaded.append(f"✅ {cog_name.title()}\n\n")
-            else:
-                if cog_name in config.extensions:
-                    cog_unloaded.append(f"❌ **{cog_name.title()}**\n\n")
-                else:
-                    cog_unloaded.append(f"❌ {cog_name.title()}\n\n")
-
-        loaded_count = len(cog_loaded)
-        unloaded_count = len(cog_unloaded)
-
-        embed.add_field(
-            name="✅ Loaded / ❌ Unloaded / 🔄 All",
-            value=f"**{loaded_count} / {unloaded_count} / {cog_count}**",
-            inline=False,
-        )
-
-        chunks_count = 2 if cog_count > 20 else 3
-
-        loaded_chunks = split_list(cog_loaded, chunks_count)
-        unloaded_chunks = split_list(cog_unloaded, chunks_count)
-
-        for loaded_chunk in loaded_chunks:
-            embed.add_field(name="\u200b", value="".join(loaded_chunk), inline=True)
-
-        for unloaded_chunk in unloaded_chunks:
-            embed.add_field(name="\u200b", value="".join(unloaded_chunk), inline=True)
-
-        embed.set_footer(text="Bold items are overrides of config.extension")
-        return embed
-
-    async def callback(self, inter: discord.MessageInteraction):
+    async def callback(self, inter: discord.MessageInteraction) -> None:
         """React to user selecting cog(s)."""
         await inter.response.defer()
         if not is_bot_admin(False):
             await inter.followup.send(SystemMess.not_enough_perms, ephemeral=True)
+            return
 
         unloadable = [cog for cog in self.unloadable_cogs if cog in self.values]
         if unloadable:
@@ -167,7 +113,7 @@ class CogSelect(discord.ui.Select):
                         await self.bot.unload_extension(f"cogs.{cog}")
                         print(SystemMess.success_unload(cogs=cog))
                     except Exception as e:
-                        await inter.followup.send(f"Loading error\n`{e}`")
+                        await inter.followup.send(f"Unloading error\n`{e}`")
         else:
             cogs = set()
             for cog in self.values:
@@ -179,5 +125,6 @@ class CogSelect(discord.ui.Select):
                     await inter.followup.send(f"Reloading error\n`{e}`")
             if cogs:
                 await inter.followup.send(SystemMess.success_reload(cogs=", ".join(cogs)))
+
         self.options = self.create_select()
-        await self.message.edit(embed=self.create_embed(inter.user.colour), view=self._view)
+        await self.message.edit(embed=features.create_embed(self.bot), view=self._view)
