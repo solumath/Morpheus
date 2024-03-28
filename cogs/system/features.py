@@ -11,7 +11,12 @@ from .messages import SystemMess
 
 
 def get_all_cogs() -> list[tuple[str, str]]:
-    """get all cog modules"""
+    """Get all cog modules
+
+    Returns:
+    --------
+    List[cog name, path]
+    """
     path = "./cogs"
     all_cogs = []
 
@@ -28,7 +33,12 @@ def get_all_cogs() -> list[tuple[str, str]]:
 
 
 async def split_cogs() -> list[tuple[str, str]]:
-    """Slices dictionary of all cogs to chunks for select."""
+    """Slices list of all cogs to chunks for select.
+
+    Returns:
+    --------
+    List[cog name, path]
+    """
     cog_pairs = get_all_cogs()
     all_cogs = []
     pairs_count = len(cog_pairs)
@@ -50,16 +60,15 @@ def create_embed(bot: commands.Bot) -> discord.Embed:
     cog_loaded = []
     cog_unloaded = []
     for cog_name, _ in cogs:
+        name = cog_name.title()
         if cog_name in bot_cogs:
             if cog_name not in config.extensions:
-                cog_loaded.append(f"✅ **{cog_name.title()}**\n\n")
-            else:
-                cog_loaded.append(f"✅ {cog_name.title()}\n\n")
+                name = f"{name}"
+            cog_loaded.append(f"```✅ {name}```\n\n")
         else:
             if cog_name in config.extensions:
-                cog_unloaded.append(f"❌ **{cog_name.title()}**\n\n")
-            else:
-                cog_unloaded.append(f"❌ {cog_name.title()}\n\n")
+                name = f"{name}"
+            cog_unloaded.append(f"```❌ {name}```\n\n")
 
     loaded_count = len(cog_loaded)
     unloaded_count = len(cog_unloaded)
