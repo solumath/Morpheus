@@ -63,14 +63,14 @@ class System(Base, commands.Cog):
         Max number of cogs can be 100 (4x25).
         """
         await inter.response.defer()
-        cogs = await features.split_cogs()
-        view = SystemView(self.bot, len(cogs), cogs)
+        cog_chunks = await features.split_cogs()
+        view = SystemView(self.bot, cog_chunks)
         embed = features.create_embed(self.bot)
         message = await inter.followup.send(embed=embed, view=view)
 
         # pass message object to classes
         view.message = message
-        for i, _ in enumerate(cogs):
+        for i in range(len(cog_chunks)):
             view.selects[i].message = message
 
     @cogs.error

@@ -8,21 +8,20 @@ from .messages import SystemMess
 
 
 class SystemView(discord.ui.View):
-    def __init__(self, bot: commands.Bot, count: int, cogs: list):
+    def __init__(self, bot: commands.Bot, cog_chunks: list):
         super().__init__()
         self.bot = bot
-        self.count = count
-        self.cogs = cogs
+        self.cogs = cog_chunks
         self.message = None
         self.selects = []
 
-        for i in range(count):
-            self.selects.append(CogSelect(bot, self, cogs[i]))
+        for i in range(len(cog_chunks)):
+            self.selects.append(CogSelect(bot, self, cog_chunks[i]))
             self.add_item(self.selects[i])
 
     @discord.ui.button(label="Reload off", style=discord.ButtonStyle.secondary)
     async def reload_button(self, inter: discord.Interaction, button: discord.ui.Button) -> None:
-        for i, _ in enumerate(self.selects):
+        for i in range(len(self.selects)):
             self.selects[i].reload = not self.selects[i].reload
 
         if self.selects[0].reload:
