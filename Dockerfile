@@ -2,6 +2,7 @@ FROM python:3.12-alpine3.19
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV TZ=Europe/Prague
 
 RUN apk update && apk add gcc g++ musl-dev ffmpeg-dev git openjdk17-jdk openjdk17-jre libffi-dev
 WORKDIR /morpheus
