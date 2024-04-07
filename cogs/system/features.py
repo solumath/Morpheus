@@ -64,11 +64,11 @@ def create_embed(bot: commands.Bot) -> discord.Embed:
         if cog_name in bot_cogs:
             if cog_name not in config.extensions:
                 name = f"{name}"
-            cog_loaded.append(f"```✅ {name}```\n\n")
+            cog_loaded.append(f"✅ {name}\n\n")
         else:
             if cog_name in config.extensions:
                 name = f"{name}"
-            cog_unloaded.append(f"```❌ {name}```\n\n")
+            cog_unloaded.append(f"❌ {name}\n\n")
 
     loaded_count = len(cog_loaded)
     unloaded_count = len(cog_unloaded)

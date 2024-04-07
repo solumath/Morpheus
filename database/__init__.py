@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from config.app_config import config
 
@@ -11,4 +11,4 @@ class Database:
 
 
 database = Database()
-session = sessionmaker(database.db)()
+session: Session = sessionmaker(database.db)()

@@ -25,6 +25,21 @@ def split_to_parts(items, size: int) -> list:
     return result
 
 
+def cut_string_by_words(string: str, part_len: int, delimiter: str) -> list:
+    """returns list of strings with length of part_len, only whole words"""
+    result = []
+    while True:
+        if len(string) < part_len:
+            result.append(string)
+            break
+        chunk = string[:part_len]
+        last_delimiter = chunk.rindex(delimiter)  # get index of last delimiter
+        chunk = chunk[:last_delimiter]
+        result.append(chunk)
+        string = string[len(chunk) :]
+    return result
+
+
 def create_bar(value, total) -> str:
     prog_bar_str = ""
     prog_bar_length = 10
