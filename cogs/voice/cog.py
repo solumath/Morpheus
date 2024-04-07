@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import cast
 
@@ -320,3 +321,33 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=VoiceMess.stuck)
         await player.message.edit(view=None)
         await player.message.reply(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        channel_id = before.channel.id if before.channel else after.channel.id
+        channel = self.bot.get_channel(channel_id)
+        if not channel:
+            return
+
+        # check users in channel
+        members = channel.members
+        users = [member for member in members if not member.bot]
+        if users:
+            return
+
+        # wait again if users join
+        player: WavelinkPlayer = cast(WavelinkPlayer, channel.guild.voice_client)
+        await asyncio.sleep(player.inactive_timeout)
+
+        # check users in channel
+        members = channel.members
+        users = [member for member in members if not member.bot]
+        if users:
+            return
+
+        # disconnect the player
+        await player.message.edit(view=None)
+        description = VoiceMess.inactive(time=player.inactive_timeout)
+        embed = VoiceFeatures.create_embed(description=description)
+        await player.home.channel.send(embed=embed)
+        await player.disconnect()
