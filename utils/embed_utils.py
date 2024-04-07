@@ -1,9 +1,34 @@
+import platform
 from datetime import datetime, timezone
 from typing import Iterable
 
 import discord
+from discord.ext import commands
 
 from config.messages import GlobalMessages
+
+from .utils import get_commands_count
+
+
+def info_embed(bot: commands.Bot) -> discord.Embed:
+    embed = discord.Embed(title="Morpheus", url=GlobalMessages.morpheus_url, color=discord.Colour.yellow())
+    embed.add_field(name="ID", value=bot.user.id, inline=False)
+    embed.add_field(name="Python", value=platform.python_version())
+    embed.add_field(name="Discordpy", value=discord.__version__)
+    embed.add_field(name="Latency", value=f"{round(bot.latency * 1000)} ms")
+    embed.add_field(name="Guilds", value=len(bot.guilds))
+
+    commands = get_commands_count(bot)
+    commands = GlobalMessages.commands_count(
+        sum=commands.get("sum", "Missing"),
+        context=commands.get("context", "Missing"),
+        slash=commands.get("slash", "Missing"),
+        message=commands.get("message", "Missing"),
+        user=commands.get("user", "Missing"),
+    )
+    embed.add_field(name="Commands", value=commands, inline=False)
+    embed.set_thumbnail(url=bot.user.avatar.url)
+    return embed
 
 
 def add_author_footer(

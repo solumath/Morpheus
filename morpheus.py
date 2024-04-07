@@ -8,8 +8,11 @@ import wavelink
 from discord.ext import commands
 
 from config.app_config import config
+from config.messages import GlobalMessages
 from custom.views import instantiate_views
 from database import database_init
+from utils import embed_utils
+from utils.utils import get_commands_count
 
 
 class Bot(commands.Bot):
@@ -42,10 +45,24 @@ class Bot(commands.Bot):
 
     async def on_ready(self) -> None:
         synced = await self.tree.sync()
+        commands = get_commands_count(self)
+
         ready_string = f"Logged in as {self.user.mention} | {self.user.id}\n"
         ready_string += f"Python {platform.python_version()}\n"
-        ready_string += f"discord.py {discord.__version__}\n"
+        ready_string += f"Discordpy {discord.__version__}\n"
         ready_string += f"Synced {len(synced)} commands"
+        ready_string += f"Latency: {round(self.latency * 1000)} ms"
+        ready_string += f"Connected to {len(self.guilds)} guilds"
+        ready_string += GlobalMessages.commands_count(
+            sum=commands.get("sum", "Missing"),
+            context=commands.get("context", "Missing"),
+            slash=commands.get("slash", "Missing"),
+            message=commands.get("message", "Missing"),
+            user=commands.get("user", "Missing"),
+        )
+
+        embed: discord.Embed = embed_utils.info_embed(self)
+        embed.add_field(name="Synced commands", value=f"{len(synced)}")
 
         # set status for bot
         repo = git.Repo(search_parent_directories=True)
@@ -53,7 +70,7 @@ class Bot(commands.Bot):
         await bot.change_presence(activity=discord.Game(f"On commit {sha[:7]}"))
         bot_room: discord.TextChannel = bot.get_channel(config.bot_dev_channel)
         if bot_room is not None:
-            await bot_room.send(ready_string)
+            await bot_room.send(embed=embed)
 
         logging.info(ready_string)
 
@@ -64,6 +81,6 @@ class Bot(commands.Bot):
             logging.info(f"Loaded {cog}")
 
 
-bot: Bot = Bot()
+bot = Bot()
 
 bot.run(config.key)

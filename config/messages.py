@@ -22,6 +22,8 @@ class GlobalMessages(metaclass=Formatable):
         "I Can Only Show You The Door...",
         "What is real? How do you define real?",
     ]
+    morpheus_url = "https://github.com/solumath/Morpheus"
+    commands_count = "All commands - **{sum}**\nContext commands - **{context}**\nSlash commands - **{slash}**\nMessage commands - **{message}**\nUser commands - **{user}**"
 
     not_enough_perms = "You do not have permissions to use this."
     command_on_cooldown = "This command is on cooldown. Please try again in {time}."

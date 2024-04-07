@@ -15,3 +15,4 @@ class SystemMess(GlobalMessages):
     embed_title = "Cogs information"
     embed_description = "```✅ Loaded ({loaded}) / ❌ Unloaded ({unloaded}) / 🔄 All ({all})```"
     override = "📄 Bold items are overrides of config.extension"
+    morpheus_brief = "Information about Morpheus"

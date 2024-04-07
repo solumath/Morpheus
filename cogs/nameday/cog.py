@@ -71,4 +71,6 @@ class NameDay(Base, commands.Cog):
         name_day_cz = await self._name_day_cz()
         name_day_sk = await self._name_day_sk()
         mentions = discord.AllowedMentions.none()
-        await self.name_day_channel.send(f"{name_day_cz}\n{name_day_sk}", allowed_mentions=mentions)
+        for channel in self.config.name_day_channels:
+            channel = self.bot.get_channel(channel)
+            await channel.send(f"{name_day_cz}\n{name_day_sk}", allowed_mentions=mentions)

@@ -28,10 +28,6 @@ class Base:
         return self.bot.get_channel(self.config.bot_dev_channel)
 
     @cached_property
-    def name_day_channel(self) -> discord.TextChannel:
-        return self.bot.get_channel(self.config.name_day_channel)
-
-    @cached_property
     def gay_channel(self) -> discord.TextChannel:
         return self.bot.get_channel(self.config.gay_channel)
 

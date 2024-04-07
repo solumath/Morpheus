@@ -2,6 +2,8 @@ import math
 from datetime import datetime
 
 import discord
+from discord import AppCommandType
+from discord.ext import commands
 
 
 def cut_string(string: str, part_len: int):
@@ -66,3 +68,19 @@ async def get_or_fetch_channel(bot, channel_id) -> discord.TextChannel:
     if channel is None:
         channel: discord.TextChannel = await bot.fetch_channel(channel_id)
     return channel
+
+
+def get_commands_count(bot: commands.Bot) -> dict[str, int]:
+    context_commands = len(bot.commands)
+    slash_commands = len(bot.tree.get_commands(type=AppCommandType.chat_input))
+    message_commands = len(bot.tree.get_commands(type=AppCommandType.message))
+    user_commands = len(bot.tree.get_commands(type=AppCommandType.user))
+    commands_sum = context_commands + slash_commands + user_commands + message_commands
+
+    return {
+        "context": context_commands,
+        "slash": slash_commands,
+        "message": message_commands,
+        "user": user_commands,
+        "sum": commands_sum,
+    }
