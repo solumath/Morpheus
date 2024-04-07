@@ -60,7 +60,7 @@ class Voice(Base, commands.Cog):
     )
     async def autoplay(self, inter: discord.Interaction, mode: app_commands.Choice[int]) -> None:
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         play_mode = {
@@ -81,7 +81,7 @@ class Voice(Base, commands.Cog):
     async def skip(self, inter: discord.Interaction, count: app_commands.Range[int, 1] = None) -> None:
         """Skip the current song."""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         if not count:
@@ -105,7 +105,7 @@ class Voice(Base, commands.Cog):
     ) -> None:
         """Move to song from old_place to new_place"""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         track = player.queue.get_at(old_place - 1)
@@ -119,7 +119,7 @@ class Voice(Base, commands.Cog):
     async def filter(self, inter: discord.Interaction, pitch: int = 1, speed: int = 1, rate: int = 1) -> None:
         """Set the filter to a specific style."""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         filters: wavelink.Filters = player.filters
@@ -132,7 +132,7 @@ class Voice(Base, commands.Cog):
     async def pause_resume(self, inter: discord.Interaction) -> None:
         """Pause or Resume the Player depending on its current state."""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         await player.pause(not player.paused)
@@ -147,7 +147,7 @@ class Voice(Base, commands.Cog):
     async def volume(self, inter: discord.Interaction, value: int) -> None:
         """Change the volume of the player."""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         await player.set_volume(value)
@@ -159,7 +159,7 @@ class Voice(Base, commands.Cog):
     async def stop(self, inter: discord.Interaction) -> None:
         """Disconnect the Player."""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         await player.disconnect()
@@ -171,7 +171,7 @@ class Voice(Base, commands.Cog):
     async def shuffle(self, inter: discord.Interaction) -> None:
         """Shuffle the queue."""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         if player.autoplay == wavelink.AutoPlayMode.enabled:
@@ -186,8 +186,9 @@ class Voice(Base, commands.Cog):
     async def remove(self, inter: discord.Interaction, place: app_commands.Range[int, 1]) -> None:
         """Remove track from the queue"""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
+
         place = place - 1  # 0 based index
         if place > player.queue.count:
             description = VoiceMess.remove_error(index=place)
@@ -205,7 +206,7 @@ class Voice(Base, commands.Cog):
     async def queue(self, inter: discord.Interaction) -> None:
         """Show the current queue."""
         player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
-        if not await VoiceFeatures.is_connected(inter):
+        if not await VoiceFeatures.default_checks(inter, player):
             return
 
         await inter.response.send_message(content="Fetching queue...")
