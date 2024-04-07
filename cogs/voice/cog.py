@@ -295,11 +295,29 @@ class Voice(Base, commands.Cog):
             author = self.bot.user
         embed = VoiceFeatures.now_playing_embed(player, author, recommended=recommended)
 
-        if hasattr(player, "message"):
-            await player.message.edit(view=None)
-
         if not hasattr(player, "view"):
             player.view = VoiceView(self.bot)
 
         message = await player.home[0].send(embed=embed, view=player.view)
         player.message = message
+
+    @commands.Cog.listener()
+    async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
+        player: wavelink.Player | None = payload.player
+        if not player:
+            await player.home[0].send(VoiceMess.bot_not_connected)
+            return
+
+        await player.message.edit(view=None)
+
+    @commands.Cog.listener()
+    async def on_wavelink_track_stuck(self, payload: wavelink.TrackStuckEventPayload) -> None:
+        player: wavelink.Player | None = payload.player
+        if not player:
+            await player.home[0].send(VoiceMess.bot_not_connected)
+            return
+
+        await player.skip(force=True)
+        embed = VoiceFeatures.create_embed(description=VoiceMess.stuck)
+        await player.message.edit(view=None)
+        await player.message.reply(embed=embed)
