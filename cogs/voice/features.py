@@ -16,7 +16,7 @@ class VoiceFeatures:
             try:
                 player: wavelink.Player = await inter.user.voice.channel.connect(cls=wavelink.Player)
             except AttributeError:
-                await inter.response.send_message(VoiceMess.join_channel)
+                await inter.response.send_message(VoiceMess.join_channel, ephemeral=True)
                 return
             except discord.ClientException:
                 await inter.response.send_message(VoiceMess.unable_to_join)
@@ -40,15 +40,13 @@ class VoiceFeatures:
         # Defaults to YouTube for non URL based queries...
         tracks: wavelink.Search = await wavelink.Playable.search(query)
         if not tracks:
-            await inter.response.send_message(
-                f"{inter.user.mention} - Could not find any tracks with that query. Please try again."
-            )
+            await inter.response.send_message(VoiceMess.no_tracks_found(user=inter.user.mention))
             return
 
         if isinstance(tracks, wavelink.Playlist):
             # tracks is a playlist...
             if place:
-                await inter.response.send_message("You cannot add a playlist to a specific place in the queue.")
+                await inter.response.send_message(VoiceMess.playlist_place, ephemeral=True)
                 return
             for track in tracks:
                 track.extras = {"requester": inter.user.id}

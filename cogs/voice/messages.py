@@ -16,6 +16,8 @@ class VoiceMess(GlobalMessages):
     unable_to_join = "I was unable to join this voice channel. Please try again."
     join_channel = "Please join a voice channel first before using this command."
     home_channel = "You can only play songs in {channel}, as the player has already started there."
+    no_track_found = "{user} - Could not find any tracks with that query. Please try again."
+    playlist_place = "You cannot add a playlist to a specific place in the queue."
     pause = "⏸️ {user} Paused the player"
     resume = "▶️ {user} Resumed the player"
     stop = "⏹️ {user} Destroyed the player"
