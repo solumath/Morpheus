@@ -11,7 +11,7 @@ from database.voice import PlaylistDB
 from utils.embed_utils import PaginationView
 
 from .buttons import VoiceView
-from .features import VoiceFeatures
+from .features import VoiceFeatures, WavelinkPlayer
 from .messages import VoiceMess
 
 playlists = {}
@@ -59,7 +59,7 @@ class Voice(Base, commands.Cog):
         ]
     )
     async def autoplay(self, inter: discord.Interaction, mode: app_commands.Choice[int]) -> None:
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -80,7 +80,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="skip", description=VoiceMess.play_brief)
     async def skip(self, inter: discord.Interaction, count: app_commands.Range[int, 1] = None) -> None:
         """Skip the current song."""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -104,7 +104,7 @@ class Voice(Base, commands.Cog):
         new_place: app_commands.Range[int, 1],
     ) -> None:
         """Move to song from old_place to new_place"""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -118,7 +118,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="filter", description=VoiceMess.play_brief)
     async def filter(self, inter: discord.Interaction, pitch: int = 1, speed: int = 1, rate: int = 1) -> None:
         """Set the filter to a specific style."""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -131,7 +131,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="pause_resume", description=VoiceMess.play_brief)
     async def pause_resume(self, inter: discord.Interaction) -> None:
         """Pause or Resume the Player depending on its current state."""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -146,7 +146,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="volume", description=VoiceMess.play_brief)
     async def volume(self, inter: discord.Interaction, value: int) -> None:
         """Change the volume of the player."""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -158,7 +158,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="stop", description=VoiceMess.play_brief)
     async def stop(self, inter: discord.Interaction) -> None:
         """Disconnect the Player."""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -170,7 +170,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="shuffle", description=VoiceMess.play_brief)
     async def shuffle(self, inter: discord.Interaction) -> None:
         """Shuffle the queue."""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -185,7 +185,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="remove", description=VoiceMess.play_brief)
     async def remove(self, inter: discord.Interaction, place: app_commands.Range[int, 1]) -> None:
         """Remove track from the queue"""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -205,7 +205,7 @@ class Voice(Base, commands.Cog):
     @voice_group.command(name="queue", description=VoiceMess.play_brief)
     async def queue(self, inter: discord.Interaction) -> None:
         """Show the current queue."""
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
@@ -271,18 +271,18 @@ class Voice(Base, commands.Cog):
         logging.info(f"Wavelink Node connected: {payload.node!r} | Resumed: {payload.resumed}")
 
     @commands.Cog.listener()
-    async def on_wavelink_inactive_player(self, player: wavelink.Player) -> None:
+    async def on_wavelink_inactive_player(self, player: WavelinkPlayer) -> None:
         description = VoiceMess.inactive(time=player.inactive_timeout)
         embed = VoiceFeatures.create_embed(description=description)
 
-        await player.home[0].send(embed=embed)
+        await player.home.channel.send(embed=embed)
         await player.disconnect()
 
     @commands.Cog.listener()
     async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload) -> None:
-        player: wavelink.Player | None = payload.player
+        player: WavelinkPlayer | None = payload.player
         if not player:
-            await player.home[0].send(VoiceMess.bot_not_connected)
+            await player.home.channel.send(VoiceMess.bot_not_connected)
             return
 
         original: wavelink.Playable | None = payload.original
@@ -299,23 +299,21 @@ class Voice(Base, commands.Cog):
         if not hasattr(player, "view"):
             player.view = VoiceView(self.bot)
 
-        message = await player.home[0].send(embed=embed, view=player.view)
+        message = await player.home.channel.send(embed=embed, view=player.view)
         player.message = message
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
-        player: wavelink.Player | None = payload.player
-        if not player:
-            await player.home[0].send(VoiceMess.bot_not_connected)
+        player: WavelinkPlayer | None = payload.player
+        if player:
+            await player.message.edit(view=None)
             return
-
-        await player.message.edit(view=None)
 
     @commands.Cog.listener()
     async def on_wavelink_track_stuck(self, payload: wavelink.TrackStuckEventPayload) -> None:
-        player: wavelink.Player | None = payload.player
+        player: WavelinkPlayer | None = payload.player
         if not player:
-            await player.home[0].send(VoiceMess.bot_not_connected)
+            await player.home.channel.send(VoiceMess.bot_not_connected)
             return
 
         await player.skip(force=True)

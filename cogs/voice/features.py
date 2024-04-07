@@ -7,14 +7,24 @@ import wavelink
 from .messages import VoiceMess
 
 
+class Home:
+    def __init__(self, channel: discord.TextChannel, voice_channel: discord.VoiceChannel):
+        self.channel = channel
+        self.voice_channel = voice_channel
+
+
+class WavelinkPlayer(wavelink.Player):
+    home: Home
+
+
 class VoiceFeatures:
     @classmethod
     async def play(cls, inter: discord.Interaction, query: str, place: int = None) -> None:
-        player: wavelink.Player = cast(wavelink.Player, inter.guild.voice_client)
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
 
         if not player:
             try:
-                player: wavelink.Player = await inter.user.voice.channel.connect(cls=wavelink.Player)
+                player: WavelinkPlayer = await inter.user.voice.channel.connect(cls=WavelinkPlayer)
             except AttributeError:
                 await inter.response.send_message(VoiceMess.join_channel, ephemeral=True)
                 return
@@ -29,9 +39,9 @@ class VoiceFeatures:
 
         # Lock the player to this channel...
         if not hasattr(player, "home"):
-            player.home = (inter.channel, inter.guild.voice_client.channel)
-        elif (player.home[0] != inter.channel) and (player.home[1] != inter.channel):
-            await inter.response.send_message(VoiceMess.home_channel(channel=player.home[0].mention))
+            player.home = Home(inter.channel, inter.guild.voice_client.channel)
+        elif (player.home.channel != inter.channel) and (player.home.voice_chanel != inter.channel):
+            await inter.response.send_message(VoiceMess.home_channel(channel=player.home.channel.mention))
             return
 
         # This will handle fetching Tracks and Playlists...
@@ -40,7 +50,7 @@ class VoiceFeatures:
         # Defaults to YouTube for non URL based queries...
         tracks: wavelink.Search = await wavelink.Playable.search(query)
         if not tracks:
-            await inter.response.send_message(VoiceMess.no_tracks_found(user=inter.user.mention))
+            await inter.response.send_message(VoiceMess.no_track_found(user=inter.user.mention), ephemeral=True)
             return
 
         if isinstance(tracks, wavelink.Playlist):
@@ -77,7 +87,7 @@ class VoiceFeatures:
 
     @classmethod
     def now_playing_embed(
-        cls, player: wavelink.Player, author: discord.User, recommended: bool = False
+        cls, player: WavelinkPlayer, author: discord.User, recommended: bool = False
     ) -> discord.Embed:
         """Create an embed for the now playing message."""
         current_track = player.current
@@ -106,7 +116,7 @@ class VoiceFeatures:
         return embed
 
     @classmethod
-    async def default_checks(cls, inter: discord.Interaction, player: wavelink.Player) -> bool:
+    async def default_checks(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
         """Check if the bot is connected and the user can interact."""
         if not await cls.is_connected(inter, player):
             return False
@@ -115,7 +125,7 @@ class VoiceFeatures:
         return True
 
     @classmethod
-    async def is_connected(cls, inter: discord.Interaction, player: wavelink.Player) -> bool:
+    async def is_connected(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
         """Check if the bot is connected to a voice channel.
 
         This should not happen if so update message and return False.
@@ -127,7 +137,7 @@ class VoiceFeatures:
         return True
 
     @classmethod
-    async def can_interact(cls, inter: discord.Interaction, player: wavelink.Player) -> bool:
+    async def can_interact(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
         """Check if the user can interact with the bot.
 
         Must be in the voice channel with bot.
