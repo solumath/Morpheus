@@ -55,7 +55,7 @@ class VoiceFeatures:
 
         if isinstance(tracks, wavelink.Playlist):
             # tracks is a playlist...
-            if place:
+            if place or place == 0:
                 await inter.response.send_message(VoiceMess.playlist_place, ephemeral=True)
                 return
             for track in tracks:
@@ -67,7 +67,7 @@ class VoiceFeatures:
         else:
             track: wavelink.Playable = tracks[0]
             track.extras = {"requester": inter.user.id}
-            if place:
+            if place or place == 0:
                 player.queue.put_at(place, track)
             else:
                 await player.queue.put_wait(track)

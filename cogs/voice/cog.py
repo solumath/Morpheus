@@ -228,12 +228,14 @@ class Voice(Base, commands.Cog):
             queue.append(f"{i + 1}. [{track.title}]({track.uri}) - {track.author}")
 
         if not queue:
-            await inter.edit_original_response(content="Queue is empty")
+            await inter.edit_original_response(content=VoiceMess.empty_queue)
             return
 
         embeds = []
         for i in range(0, len(queue), 10):
-            embed = discord.Embed(title="Queue", description="\n".join(queue[i : i + 10]))
+            embed = discord.Embed(
+                title=f"Queue ({player.queue.count} tracks)", description="\n".join(queue[i : i + 10])
+            )
             embeds.append(embed)
 
         view = PaginationView(inter.user, embeds, show_page=True)
@@ -335,8 +337,12 @@ class Voice(Base, commands.Cog):
         if users:
             return
 
-        # wait again if users join
         player: WavelinkPlayer = cast(WavelinkPlayer, channel.guild.voice_client)
+        if not player:
+            # bot not connected
+            return
+
+        # wait again if users join
         await asyncio.sleep(player.inactive_timeout)
 
         # check users in channel

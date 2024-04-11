@@ -41,3 +41,4 @@ class VoiceMess(GlobalMessages):
     current_track_queue = "{playing_emoji} [`{current_track.title}`]({current_track.uri}) - {current_track.author} {playing_emoji}"
     inactive = "The player has been idle for `{time}` seconds. Goodbye!"
     stuck = "The player got stuck. Skipping the song."
+    empty_queue = "The queue is empty."
