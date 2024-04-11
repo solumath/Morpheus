@@ -7,7 +7,8 @@ from .messages import BookmarkMess
 class BookmarkView(discord.ui.View):
     def __init__(self, link: str = None):
         super().__init__(timeout=None)
-        self.add_item(discord.ui.Button(label="Original message", url=link))
+        if link:
+            self.add_item(discord.ui.Button(style=discord.ButtonStyle.link, label="Original message", url=link))
 
     @discord.ui.button(emoji="🗑", style=discord.ButtonStyle.danger, custom_id="trash:delete")
     async def delete_message(self, inter: discord.Interaction, button: discord.ui.Button):

@@ -11,3 +11,4 @@ logs
 .devcontainer
 emojis.zip
 application.yml
+*.log

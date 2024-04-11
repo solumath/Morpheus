@@ -4,7 +4,7 @@ from cogs.bookmark.buttons import BookmarkView
 from cogs.roles.dropdowns import ChannelsSelectView, RolesSelectView
 
 
-def instantiate_views(bot: commands.Bot) -> None:
+def init_views(bot: commands.Bot) -> None:
     """
     Instantiate and add permanent views to the bot.
 
@@ -17,6 +17,6 @@ def instantiate_views(bot: commands.Bot) -> None:
     -------
     None
     """
-    views = {RolesSelectView, ChannelsSelectView, BookmarkView}
-    for view in views:
-        bot.add_view(view(bot))
+    bot.add_view(RolesSelectView(bot))
+    bot.add_view(ChannelsSelectView(bot))
+    bot.add_view(BookmarkView())

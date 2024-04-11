@@ -9,16 +9,16 @@ from discord.ext import commands
 
 from config.app_config import config
 from config.messages import GlobalMessages
-from custom.views import instantiate_views
+from custom.views import init_views
 from database import database_init
 from utils import embed_utils
 from utils.utils import get_commands_count
 
 
-class Bot(commands.Bot):
+class Morpheus(commands.Bot):
     def __init__(self) -> None:
         super().__init__(command_prefix="?", intents=discord.Intents.all())
-        self.bot_handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+        self.bot_handler = logging.FileHandler(filename="morpheus.log", encoding="utf-8", mode="w")
         self.bot_formatter = logging.Formatter("%(asctime)s: %(levelname)s: %(message)s")
 
         discord.utils.setup_logging(handler=self.bot_handler, formatter=self.bot_formatter)
@@ -38,10 +38,10 @@ class Bot(commands.Bot):
         await self.init_cogs()
 
         # add views
-        instantiate_views(self)
+        init_views(self)
 
         # get bot data
-        await bot.application_info()
+        await self.application_info()
 
     async def on_ready(self) -> None:
         synced = await self.tree.sync()
@@ -50,9 +50,9 @@ class Bot(commands.Bot):
         ready_string = f"Logged in as {self.user.mention} | {self.user.id}\n"
         ready_string += f"Python {platform.python_version()}\n"
         ready_string += f"Discordpy {discord.__version__}\n"
-        ready_string += f"Synced {len(synced)} commands"
-        ready_string += f"Latency: {round(self.latency * 1000)} ms"
-        ready_string += f"Connected to {len(self.guilds)} guilds"
+        ready_string += f"Synced {len(synced)} commands\n"
+        ready_string += f"Latency: {round(self.latency * 1000)} ms\n"
+        ready_string += f"Connected to {len(self.guilds)} guilds\n"
         ready_string += GlobalMessages.commands_count(
             sum=commands.get("sum", "Missing"),
             context=commands.get("context", "Missing"),
@@ -67,8 +67,8 @@ class Bot(commands.Bot):
         # set status for bot
         repo = git.Repo(search_parent_directories=True)
         sha = repo.head.object.hexsha
-        await bot.change_presence(activity=discord.Game(f"On commit {sha[:7]}"))
-        bot_room: discord.TextChannel = bot.get_channel(config.bot_dev_channel)
+        await self.change_presence(activity=discord.Game(f"On commit {sha[:7]}"))
+        bot_room: discord.TextChannel = self.get_channel(config.bot_dev_channel)
         if bot_room is not None:
             await bot_room.send(embed=embed)
 
@@ -77,10 +77,10 @@ class Bot(commands.Bot):
     async def init_cogs(self) -> None:
         """Loads all cogs from the cogs folder"""
         for cog in config.extensions:
-            await bot.load_extension(f"cogs.{cog}")
+            await self.load_extension(f"cogs.{cog}")
             logging.info(f"Loaded {cog}")
 
 
-bot = Bot()
+morpheus = Morpheus()
 
-bot.run(config.key)
+morpheus.run(config.key)
