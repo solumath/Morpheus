@@ -9,7 +9,6 @@ from discord.ext import commands
 
 from cogs.base import Base
 from database.voice import PlaylistDB
-from utils.embed_utils import PaginationView
 
 from .features import VoiceFeatures, WavelinkPlayer
 from .messages import VoiceMess
@@ -210,35 +209,12 @@ class Voice(Base, commands.Cog):
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
-        await inter.response.send_message(content="Fetching queue...")
-
-        current_track = player.current
-        if current_track:
-            queue = [VoiceMess.current_track_queue(playing_emoji=VoiceMess.playing_emoji, current_track=current_track)]
-        else:
-            queue = []
-
-        if player.queue:
-            future = [track for track in player.queue]
-        elif player.autoplay == wavelink.AutoPlayMode.enabled:
-            future = [track for track in player.auto_queue]
-        else:
-            future = []
-        for i, track in enumerate(future):
-            queue.append(f"{i + 1}. [{track.title}]({track.uri}) - {track.author}")
-
-        if not queue:
+        await inter.response.send_message(content=VoiceMess.fetching_queue)
+        embeds, view = VoiceFeatures.get_queue(inter, player, inter.user)
+        if not embeds:
             await inter.edit_original_response(content=VoiceMess.empty_queue)
             return
 
-        embeds = []
-        for i in range(0, len(queue), 10):
-            embed = discord.Embed(
-                title=f"Queue ({player.queue.count} tracks)", description="\n".join(queue[i : i + 10])
-            )
-            embeds.append(embed)
-
-        view = PaginationView(inter.user, embeds, show_page=True)
         await inter.edit_original_response(content="", embed=embeds[0], view=view)
         view.message = await inter.original_response()
 

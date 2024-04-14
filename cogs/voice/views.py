@@ -167,3 +167,15 @@ class VoiceView(discord.ui.View):
         description = VoiceMess.clear(user=inter.user.mention)
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
+
+    @discord.ui.button(label="Queue", emoji="📄", style=discord.ButtonStyle.secondary, custom_id="voice:queue")
+    async def queue_button(self, inter: discord.Interaction, button: discord.ui.Button):
+        """Change the volume of the player."""
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
+        await inter.response.send_message(content=VoiceMess.fetching_queue)
+        embeds, view = VoiceFeatures.get_queue(inter, player, inter.user)
+        if not embeds:
+            await inter.edit_original_response(content=VoiceMess.empty_queue)
+            return
+        await inter.edit_original_response(content="", embed=embeds[0], view=view)
+        view.message = await inter.original_response()

@@ -10,6 +10,8 @@ if TYPE_CHECKING:
     # prevent circular import
     from . import views
 
+from utils.embed_utils import PaginationView
+
 from .messages import VoiceMess
 
 
@@ -122,6 +124,37 @@ class VoiceFeatures:
         if current_track.album.name:
             embed.add_field(name="Album", value=current_track.album.name, inline=False)
         return embed
+
+    def get_queue(
+        self, player: WavelinkPlayer, user: discord.User
+    ) -> tuple[discord.Embed, discord.ui.View] | tuple[None, None]:
+        current_track = player.current
+        if current_track:
+            queue = [VoiceMess.current_track_queue(playing_emoji=VoiceMess.playing_emoji, current_track=current_track)]
+        else:
+            queue = []
+
+        if player.queue:
+            future = [track for track in player.queue]
+        elif player.autoplay == wavelink.AutoPlayMode.enabled:
+            future = [track for track in player.auto_queue]
+        else:
+            future = []
+        for i, track in enumerate(future):
+            queue.append(f"{i + 1}. [{track.title}]({track.uri}) - {track.author}")
+
+        if not queue:
+            return None, None
+
+        embeds = []
+        for i in range(0, len(queue), 10):
+            embed = discord.Embed(
+                title=f"Queue ({player.queue.count} tracks)", description="\n".join(queue[i : i + 10])
+            )
+            embeds.append(embed)
+
+        view = PaginationView(user, embeds, show_page=True)
+        return embeds, view
 
     @classmethod
     async def default_checks(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
