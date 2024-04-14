@@ -14,25 +14,37 @@ class VoiceView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
+    async def interaction_check(self, inter: discord.Interaction) -> bool:
+        player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
+        if not await VoiceFeatures.default_checks(inter, player):
+            return False
+
+        # history is empty
+        if player.queue.history.is_empty and player.auto_queue.history.is_empty:
+            self.back_button.disabled = True
+        else:
+            self.back_button.disabled = False
+
+        return True
+
     @discord.ui.button(label="Down", emoji="🔉", style=discord.ButtonStyle.secondary, custom_id="voice:volume_down")
     async def volume_down_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Change the volume of the player."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         await player.set_volume(player.volume - 10)
         description = VoiceMess.volume_down(user=inter.user.mention, volume=player.volume)
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @discord.ui.button(label="Back", emoji="⏮️", style=discord.ButtonStyle.secondary, custom_id="voice:back")
+    @discord.ui.button(
+        label="Back", emoji="⏮️", style=discord.ButtonStyle.secondary, disabled=True, custom_id="voice:back"
+    )
     async def back_button(self, inter: discord.Interaction, button: discord.ui.Button):
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
-        await player.pause(not player.paused)
+        print(player.queue.history)
+        await player.skip(force=True)
 
         description = VoiceMess.back(user=inter.user.mention)
         embed = VoiceFeatures.create_embed(description=description)
@@ -42,8 +54,6 @@ class VoiceView(discord.ui.View):
     @discord.ui.button(label="Pause", emoji="⏸️", style=discord.ButtonStyle.secondary, custom_id="voice:pause")
     async def pause_resume_button(self, inter: discord.Interaction, button: discord.ui.Button):
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         await player.pause(not player.paused)
         if player.paused:
@@ -62,8 +72,6 @@ class VoiceView(discord.ui.View):
     async def next_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Skip the current song."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         await player.skip(force=True)
         description = VoiceMess.skip(user=inter.user.mention)
@@ -74,8 +82,6 @@ class VoiceView(discord.ui.View):
     async def volume_up_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Change the volume of the player."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         await player.set_volume(player.volume + 10)
         description = VoiceMess.volume_up(user=inter.user.mention, volume=player.volume)
@@ -86,8 +92,6 @@ class VoiceView(discord.ui.View):
     async def shuffle_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Randomize the queue."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         if player.autoplay == wavelink.AutoPlayMode.enabled:
             player.auto_queue.shuffle()
@@ -101,8 +105,6 @@ class VoiceView(discord.ui.View):
     async def loop_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Change the volume of the player."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         if player.queue.mode == wavelink.QueueMode.normal:
             player.queue.mode = wavelink.QueueMode.loop_all
@@ -128,8 +130,6 @@ class VoiceView(discord.ui.View):
     async def stop_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Change the volume of the player."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         await player.disconnect()
         description = VoiceMess.stop(user=inter.user.mention)
@@ -141,8 +141,6 @@ class VoiceView(discord.ui.View):
     async def autoplay_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Change the autoplay mode."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         if player.autoplay == wavelink.AutoPlayMode.partial:
             player.autoplay = wavelink.AutoPlayMode.enabled
@@ -161,8 +159,6 @@ class VoiceView(discord.ui.View):
     async def clear_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Change the volume of the player."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
-            return
 
         if player.autoplay == wavelink.AutoPlayMode.enabled:
             player.auto_queue.reset()

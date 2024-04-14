@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import discord
 import wavelink
 
-from . import views
+if TYPE_CHECKING:
+    # prevent circular import
+    from . import views
+
 from .messages import VoiceMess
 
 
