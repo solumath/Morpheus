@@ -78,7 +78,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="skip", description=VoiceMess.play_brief)
+    @voice_group.command(name="skip", description=VoiceMess.skip_brief)
     async def skip(self, inter: discord.Interaction, count: app_commands.Range[int, 1] = None) -> None:
         """Skip the current song."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
@@ -97,7 +97,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="move_track", description=VoiceMess.play_brief)
+    @voice_group.command(name="move_track", description=VoiceMess.move_brief)
     async def move_track(
         self,
         inter: discord.Interaction,
@@ -116,7 +116,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="filter", description=VoiceMess.play_brief)
+    @voice_group.command(name="filter", description=VoiceMess.filter_brief)
     async def filter(self, inter: discord.Interaction, pitch: int = 1, speed: int = 1, rate: int = 1) -> None:
         """Set the filter to a specific style."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
@@ -129,7 +129,7 @@ class Voice(Base, commands.Cog):
         await player.set_filters(filters)
         await inter.response.send_message(f"Set filter to pitch: {pitch}, speed: {speed}, rate: {rate}")
 
-    @voice_group.command(name="pause_resume", description=VoiceMess.play_brief)
+    @voice_group.command(name="pause_resume", description=VoiceMess.pause_resume_brief)
     async def pause_resume(self, inter: discord.Interaction) -> None:
         """Pause or Resume the Player depending on its current state."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
@@ -144,7 +144,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="volume", description=VoiceMess.play_brief)
+    @voice_group.command(name="volume", description=VoiceMess.volume_brief)
     async def volume(self, inter: discord.Interaction, value: int) -> None:
         """Change the volume of the player."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
@@ -156,7 +156,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="stop", description=VoiceMess.play_brief)
+    @voice_group.command(name="stop", description=VoiceMess.stop_brief)
     async def stop(self, inter: discord.Interaction) -> None:
         """Disconnect the Player."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
@@ -168,7 +168,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="shuffle", description=VoiceMess.play_brief)
+    @voice_group.command(name="shuffle", description=VoiceMess.shuffle_brief)
     async def shuffle(self, inter: discord.Interaction) -> None:
         """Shuffle the queue."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
@@ -183,7 +183,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="remove", description=VoiceMess.play_brief)
+    @voice_group.command(name="remove", description=VoiceMess.remove_brief)
     async def remove(self, inter: discord.Interaction, place: app_commands.Range[int, 1]) -> None:
         """Remove track from the queue"""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
@@ -203,7 +203,7 @@ class Voice(Base, commands.Cog):
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
 
-    @voice_group.command(name="queue", description=VoiceMess.play_brief)
+    @voice_group.command(name="queue", description=VoiceMess.queue_brief)
     async def queue(self, inter: discord.Interaction) -> None:
         """Show the current queue."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
