@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from typing import cast
 
 import discord
 import wavelink
 
+from . import views
 from .messages import VoiceMess
 
 
@@ -15,6 +18,8 @@ class Home:
 
 class WavelinkPlayer(wavelink.Player):
     home: Home
+    view: views.VoiceView
+    message: discord.Message
 
 
 class VoiceFeatures:

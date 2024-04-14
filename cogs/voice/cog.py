@@ -11,9 +11,9 @@ from cogs.base import Base
 from database.voice import PlaylistDB
 from utils.embed_utils import PaginationView
 
-from .buttons import VoiceView
 from .features import VoiceFeatures, WavelinkPlayer
 from .messages import VoiceMess
+from .views import VoiceView
 
 playlists = {}
 
@@ -294,7 +294,7 @@ class Voice(Base, commands.Cog):
         recommended = original.recommended if original and original.recommended else False
 
         if hasattr(track.extras, "requester"):
-            author = await self.bot.fetch_user(track.extras.requester)
+            author = self.bot.get_user(track.extras.requester)
         else:
             author = self.bot.user
         embed = VoiceFeatures.now_playing_embed(player, author, recommended=recommended)
