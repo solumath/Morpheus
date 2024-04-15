@@ -112,6 +112,7 @@ class PaginationView(discord.ui.View):
         self.perma_lock = perma_lock
         self.max_page = len(embeds)
         self.embeds = embeds
+        self.message: discord.Message
         super().__init__(timeout=timeout)
         if self.max_page <= 1:
             return

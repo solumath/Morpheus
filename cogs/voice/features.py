@@ -88,6 +88,64 @@ class VoiceFeatures:
             await player.play(player.queue.get(), volume=30)
 
     @classmethod
+    async def pause_resume(cls, player: WavelinkPlayer, user: discord.User) -> discord.Embed:
+        await player.pause(not player.paused)
+        if player.paused:
+            description = VoiceMess.pause(user=user.mention)
+        else:
+            description = VoiceMess.resume(user=user.mention)
+        embed = cls.create_embed(description=description)
+        return embed
+
+    @classmethod
+    async def stop(cls, player: WavelinkPlayer, user: discord.User) -> discord.Embed:
+        await player.disconnect()
+        await player.message.edit(view=None)
+        description = VoiceMess.stop(user=user.mention)
+        embed = VoiceFeatures.create_embed(description=description)
+        return embed
+
+    @classmethod
+    def shuffle_queue(cls, player: WavelinkPlayer, user: discord.User) -> discord.Embed:
+        if not player.auto_queue.is_empty:
+            player.auto_queue.shuffle()
+        if not player.queue.is_empty:
+            player.queue.shuffle()
+
+        embed = cls.create_embed(description=VoiceMess.shuffle(user=user.mention))
+        return embed
+
+    @classmethod
+    def get_queue(
+        cls, player: WavelinkPlayer, user: discord.User
+    ) -> tuple[discord.Embed, PaginationView] | tuple[None, None]:
+        current_track = player.current
+        if current_track:
+            queue = [VoiceMess.current_track_queue(playing_emoji=VoiceMess.playing_emoji, current_track=current_track)]
+        else:
+            queue = []
+
+        future_queue = []
+        if player.queue:
+            future_queue = [track for track in player.queue]
+        if player.autoplay == wavelink.AutoPlayMode.enabled:
+            future_queue = future_queue + [track for track in player.auto_queue]
+
+        for i, track in enumerate(future_queue):
+            queue.append(f"{i + 1}. [{track.title}]({track.uri}) - {track.author}")
+
+        if not queue:
+            return None, None
+
+        embeds = []
+        for i in range(0, len(queue), 10):
+            embed = discord.Embed(title=f"Queue ({len(queue)} tracks)", description="\n".join(queue[i : i + 10]))
+            embeds.append(embed)
+
+        view = PaginationView(user, embeds, show_page=True)
+        return embeds, view
+
+    @classmethod
     def create_embed(
         cls, title: str = None, description: str = None, color: discord.Color = discord.Color.dark_blue()
     ) -> discord.Embed:
@@ -125,37 +183,6 @@ class VoiceFeatures:
             embed.add_field(name="Album", value=current_track.album.name, inline=False)
         return embed
 
-    def get_queue(
-        self, player: WavelinkPlayer, user: discord.User
-    ) -> tuple[discord.Embed, discord.ui.View] | tuple[None, None]:
-        current_track = player.current
-        if current_track:
-            queue = [VoiceMess.current_track_queue(playing_emoji=VoiceMess.playing_emoji, current_track=current_track)]
-        else:
-            queue = []
-
-        if player.queue:
-            future = [track for track in player.queue]
-        elif player.autoplay == wavelink.AutoPlayMode.enabled:
-            future = [track for track in player.auto_queue]
-        else:
-            future = []
-        for i, track in enumerate(future):
-            queue.append(f"{i + 1}. [{track.title}]({track.uri}) - {track.author}")
-
-        if not queue:
-            return None, None
-
-        embeds = []
-        for i in range(0, len(queue), 10):
-            embed = discord.Embed(
-                title=f"Queue ({player.queue.count} tracks)", description="\n".join(queue[i : i + 10])
-            )
-            embeds.append(embed)
-
-        view = PaginationView(user, embeds, show_page=True)
-        return embeds, view
-
     @classmethod
     async def default_checks(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
         """Check if the bot is connected and the user can interact."""
@@ -173,7 +200,7 @@ class VoiceFeatures:
         """
         if not player:
             await inter.message.edit(view=None)
-            await inter.response.send_message(VoiceMess.bot_not_connected)
+            await inter.response.send_message(VoiceMess.bot_not_connected, ephemeral=True)
             return False
         return True
 

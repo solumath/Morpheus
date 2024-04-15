@@ -135,12 +135,7 @@ class Voice(Base, commands.Cog):
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
-        await player.pause(not player.paused)
-        if player.paused:
-            description = VoiceMess.pause(user=inter.user.mention)
-        else:
-            description = VoiceMess.resume(user=inter.user.mention)
-        embed = VoiceFeatures.create_embed(description=description)
+        embed = await VoiceFeatures.pause_resume(player, inter.user)
         await inter.response.send_message(embed=embed)
 
     @voice_group.command(name="volume", description=VoiceMess.volume_brief)
@@ -162,9 +157,7 @@ class Voice(Base, commands.Cog):
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
-        await player.disconnect()
-        description = VoiceMess.stop(user=inter.user.mention)
-        embed = VoiceFeatures.create_embed(description=description)
+        embed = await VoiceFeatures.stop(player, inter.user)
         await inter.response.send_message(embed=embed)
 
     @voice_group.command(name="shuffle", description=VoiceMess.shuffle_brief)
@@ -174,12 +167,7 @@ class Voice(Base, commands.Cog):
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
-        if player.autoplay == wavelink.AutoPlayMode.enabled:
-            player.auto_queue.shuffle()
-        else:
-            player.queue.shuffle()
-        description = VoiceMess.shuffle(user=inter.user.mention)
-        embed = VoiceFeatures.create_embed(description=description)
+        embed = VoiceFeatures.shuffle_queue(player)
         await inter.response.send_message(embed=embed)
 
     @voice_group.command(name="remove", description=VoiceMess.remove_brief)
@@ -210,7 +198,7 @@ class Voice(Base, commands.Cog):
             return
 
         await inter.response.send_message(content=VoiceMess.fetching_queue)
-        embeds, view = VoiceFeatures.get_queue(inter, player, inter.user)
+        embeds, view = VoiceFeatures.get_queue(player, inter.user)
         if not embeds:
             await inter.edit_original_response(content=VoiceMess.empty_queue)
             return
