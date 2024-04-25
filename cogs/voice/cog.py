@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import textwrap
 from typing import cast
 
 import discord
@@ -14,15 +15,22 @@ from .features import VoiceFeatures, WavelinkPlayer
 from .messages import VoiceMess
 from .views import VoiceView
 
-playlists = {}
+
+def truncate_string(string: str, limit: int = 100) -> str:
+    return textwrap.shorten(string, width=limit, placeholder="...")
 
 
-async def autocomp_playlists(inter: discord.Interaction, user_input: str):
-    guild_playlists = playlists[inter.guild.id]
+async def autocomp_play(inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
+    if not user_input:
+        return []
+
+    tracks: wavelink.Search = await wavelink.Playable.search(user_input, source="spsearch:")
+    if not tracks:
+        tracks: wavelink.Search = await wavelink.Playable.search(user_input)
+
     return [
-        app_commands.Choice(name=playlist.name, value=playlist.link)
-        for playlist in guild_playlists
-        if user_input.lower() in playlist
+        app_commands.Choice(name=truncate_string(f"{track.title} - {track.author}"), value=track.uri)
+        for track in tracks[:10]
     ]
 
 
@@ -30,6 +38,18 @@ async def autocomp_playlists(inter: discord.Interaction, user_input: str):
 class VoiceGroup(app_commands.Group):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+playlists = {}
+
+
+async def autocomp_playlists(inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
+    guild_playlists = playlists[inter.guild.id]
+    return [
+        app_commands.Choice(name=playlist.name, value=playlist.link)
+        for playlist in guild_playlists
+        if user_input.lower() in playlist
+    ]
 
 
 class Voice(Base, commands.Cog):
@@ -47,6 +67,7 @@ class Voice(Base, commands.Cog):
     voice_group = VoiceGroup(name="voice", description=VoiceMess.voice_group_brief)
 
     @voice_group.command(name="play", description=VoiceMess.play_brief)
+    @app_commands.autocomplete(query=autocomp_play)
     async def play(self, inter: discord.Interaction, query: str, place: app_commands.Range[int, 1] = None) -> None:
         """Play a song with the given query."""
         await VoiceFeatures.play(inter, query, place)
@@ -313,6 +334,10 @@ class Voice(Base, commands.Cog):
         members = channel.members
         users = [member for member in members if not member.bot]
         if users:
+            return
+
+        if not player:
+            # bot not connected
             return
 
         # disconnect the player
