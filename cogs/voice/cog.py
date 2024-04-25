@@ -188,7 +188,7 @@ class Voice(Base, commands.Cog):
         if not await VoiceFeatures.default_checks(inter, player):
             return
 
-        embed = VoiceFeatures.shuffle_queue(player)
+        embed = VoiceFeatures.shuffle_queue(player, inter.user)
         await inter.response.send_message(embed=embed)
 
     @voice_group.command(name="remove", description=VoiceMess.remove_brief)

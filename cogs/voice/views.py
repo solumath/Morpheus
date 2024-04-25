@@ -87,7 +87,7 @@ class VoiceView(discord.ui.View):
     async def shuffle_button(self, inter: discord.Interaction, button: discord.ui.Button):
         """Randomize the queue."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        embed = VoiceFeatures.shuffle_queue(player)
+        embed = VoiceFeatures.shuffle_queue(player, inter.user)
         await inter.response.send_message(embed=embed)
 
     @discord.ui.button(label="Looping off", emoji="⛔", style=discord.ButtonStyle.secondary, custom_id="voice:loop")
