@@ -12,3 +12,4 @@ logs
 emojis.zip
 application.yml
 *.log
+plugins/*
