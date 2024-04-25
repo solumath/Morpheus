@@ -138,8 +138,8 @@ class VoiceFeatures:
             return None, None
 
         embeds = []
-        for i in range(0, len(queue), 10):
-            embed = discord.Embed(title=f"Queue ({len(queue)} tracks)", description="\n".join(queue[i : i + 10]))
+        for i in range(0, len(future_queue), 10):
+            embed = discord.Embed(title=f"Queue ({len(future_queue)} tracks)", description="\n".join(queue[i : i + 11]))
             embeds.append(embed)
 
         view = PaginationView(user, embeds, show_page=True)
