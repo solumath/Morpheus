@@ -30,7 +30,7 @@ services:
             - db
 
     lavalink:
-        image: ghcr.io/lavalink-devs/lavalink:v4-update-lp
+        image: ghcr.io/lavalink-devs/lavalink:4
         container_name: lavalink
         deploy:
             restart_policy:
@@ -41,6 +41,7 @@ services:
             - ./config/application.yml:/opt/Lavalink/application.yml
             # use chown on folder to fix permissions "chown 322:322 plugins/"
             - ./plugins/:/opt/Lavalink/plugins/
+            - ./config/Lavalink.jar:/opt/Lavalink/Lavalink.jar
         env_file:
             - ./config/lavalink_config.env
         networks:
