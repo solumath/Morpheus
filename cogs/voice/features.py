@@ -199,7 +199,8 @@ class VoiceFeatures:
         This should not happen if so update message and return False.
         """
         if not player:
-            await inter.message.edit(view=None)
+            if inter.message:
+                await inter.message.edit(view=None)
             await inter.response.send_message(VoiceMess.bot_not_connected, ephemeral=True)
             return False
         return True
