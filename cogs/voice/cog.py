@@ -205,8 +205,7 @@ class Voice(Base, commands.Cog):
             await inter.response.send_message(embed=embed, ephemeral=True)
             return
 
-        track = player.queue.peek(place)
-        player.queue.remove(place)
+        track = player.queue.delete(place)
         description = VoiceMess.remove(user=inter.user.mention, track=track, url=track.uri)
         embed = VoiceFeatures.create_embed(description=description)
         await inter.response.send_message(embed=embed)
