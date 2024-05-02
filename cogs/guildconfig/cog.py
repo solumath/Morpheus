@@ -16,10 +16,9 @@ async def autocomp_replies(inter: discord.Interaction, user_input: str) -> list[
     user_input = user_input.lower()
     phrases = GuildDB.get_guild(inter.guild.id).phrases_dict
     return [
-        app_commands.Choice(name=phrase, value=phrase)
-        for phrase in phrases.keys()
-        if user_input in phrase.lower()
+        app_commands.Choice(name=phrase, value=phrase) for phrase in phrases.keys() if user_input in phrase.lower()
     ][:10]
+
 
 @app_commands.guild_only()
 @default_cooldown()
