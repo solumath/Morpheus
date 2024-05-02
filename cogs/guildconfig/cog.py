@@ -12,6 +12,15 @@ from utils import utils
 from .messages import GuildConfigMess
 
 
+async def autocomp_replies(inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
+    user_input = user_input.lower()
+    phrases = GuildDB.get_guild(inter.guild.id).phrases_dict
+    return [
+        app_commands.Choice(name=phrase, value=phrase)
+        for phrase in phrases.keys()
+        if user_input in phrase.lower()
+    ][:10]
+
 @app_commands.guild_only()
 @default_cooldown()
 class ReplyGroup(app_commands.Group):
@@ -73,6 +82,7 @@ class GuildConfig(Base, commands.Cog):
         await inter.response.send_message(GuildConfigMess.reply_added(key=key))
 
     @reply_group.command(name="remove", description=GuildConfigMess.rem_reply_brief)
+    @app_commands.autocomplete(key=autocomp_replies)
     async def remove_reply(self, inter: discord.Interaction, key: str):
         phrase = GuildPhraseDB.remove_phrase(inter.guild.id, key)
         if not phrase:
