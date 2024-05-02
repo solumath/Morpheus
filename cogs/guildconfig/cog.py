@@ -100,9 +100,9 @@ class GuildConfig(Base, commands.Cog):
             return
 
         blue_c = "\u001b[2;34m"
-        yellow_c = "\u001b[2;33m"
+        pink_c = "\u001b[2;35m"
         default_c = "\u001b[0m"
-        replies_list = [f"{blue_c}{key}{default_c}: {yellow_c}{value}{default_c}\n" for key, value in phrases.items()]
+        replies_list = [f"{blue_c}{key}{default_c}: {pink_c}{value}{default_c}\n" for key, value in phrases.items()]
         replies_str = "".join(replies_list)
         replies = utils.cut_string_by_words(replies_str, 1800, "\n")
         await inter.response.send_message(f"{GuildConfigMess.reply_list}```ansi\n{replies[0]}```")
