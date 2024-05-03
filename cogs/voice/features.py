@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import textwrap
 from datetime import timedelta
 from typing import TYPE_CHECKING, cast
 
 import discord
 import wavelink
+from discord import app_commands
+from discord.ext import commands
+
+from database.voice import PlaylistDB
+from utils.interaction import custom_send
+from utils.user_utils import get_or_fetch_user
 
 if TYPE_CHECKING:
     # prevent circular import
@@ -36,10 +43,10 @@ class VoiceFeatures:
             try:
                 player: WavelinkPlayer = await inter.user.voice.channel.connect(cls=WavelinkPlayer, self_deaf=True)
             except AttributeError:
-                await inter.response.send_message(VoiceMess.join_channel, ephemeral=True)
+                await custom_send(inter, VoiceMess.join_channel, ephemeral=True)
                 return
             except discord.ClientException:
-                await inter.response.send_message(VoiceMess.unable_to_join)
+                await custom_send(inter, VoiceMess.unable_to_join)
                 return
 
         if player.autoplay == wavelink.AutoPlayMode.disabled:
@@ -51,7 +58,7 @@ class VoiceFeatures:
         if not hasattr(player, "home"):
             player.home = Home(inter.channel, inter.guild.voice_client.channel)
         elif (player.home.channel != inter.channel) and (player.home.voice_chanel != inter.channel):
-            await inter.response.send_message(VoiceMess.home_channel(channel=player.home.channel.mention))
+            await custom_send(inter, VoiceMess.home_channel(channel=player.home.channel.mention), ephemeral=True)
             return
 
         # This will handle fetching Tracks and Playlists...
@@ -60,20 +67,18 @@ class VoiceFeatures:
         # Defaults to YouTube for non URL based queries...
         tracks: wavelink.Search = await wavelink.Playable.search(query)
         if not tracks:
-            await inter.response.send_message(VoiceMess.no_track_found(user=inter.user.mention), ephemeral=True)
+            await custom_send(inter, VoiceMess.track_not_found(user=inter.user.mention), ephemeral=True)
             return
 
         if isinstance(tracks, wavelink.Playlist):
             # tracks is a playlist...
             if place or place == 0:
-                await inter.response.send_message(VoiceMess.playlist_place, ephemeral=True)
+                await custom_send(inter, VoiceMess.playlist_place, ephemeral=True)
                 return
             for track in tracks:
                 track.extras = {"requester": inter.user.id}
             added: int = await player.queue.put_wait(tracks)
-            await inter.response.send_message(
-                f"[Added the playlist **`{tracks.name}`** ({added} songs) to the queue.]({query})"
-            )
+            await custom_send(inter, VoiceMess.playlist_added_queue(tracks=tracks.name, added=added, url=query))
         else:
             track: wavelink.Playable = tracks[0]
             track.extras = {"requester": inter.user.id}
@@ -81,7 +86,7 @@ class VoiceFeatures:
                 player.queue.put_at(place, track)
             else:
                 await player.queue.put_wait(track)
-            await inter.response.send_message(f"[Added **`{track}`** to the queue.]({track.uri})")
+            await custom_send(inter, VoiceMess.track_added_queue(track=track, url=track.uri))
 
         if not player.playing:
             # Play now since we aren't playing anything...
@@ -215,3 +220,73 @@ class VoiceFeatures:
             await inter.response.send_message(VoiceMess.not_in_channel, ephemeral=True)
             return False
         return True
+
+
+class Autocomplete:
+    bot: commands.Bot
+
+    @classmethod
+    def truncate_string(cls, string: str, limit: int = 100) -> str:
+        return textwrap.shorten(string, width=limit, placeholder="...")
+
+    @classmethod
+    async def playlist_name(cls, bot: commands.Bot, playlist: PlaylistDB) -> str:
+        guild = bot.get_guild(int(playlist.guild_id)) if playlist.guild_id else None
+        author = await get_or_fetch_user(bot, int(playlist.author_id))
+        if not guild:
+            return cls.truncate_string(f"[{author.display_name}] - {playlist.name}")
+
+        return cls.truncate_string(f"[{author.display_name} | {guild.name}] - {playlist.name}")
+
+    @classmethod
+    async def create_choices(cls, playlists: list[PlaylistDB], user_input: str) -> list[app_commands.Choice[str]]:
+        playlists_found = [
+            app_commands.Choice(
+                name=await Autocomplete.playlist_name(cls.bot, playlist),
+                value=f"{playlist.guild_id},{playlist.author_id},{playlist.name}",
+            )
+            for playlist in playlists
+            if user_input in playlist.name.lower()
+        ][:25]
+        return playlists_found
+
+    @classmethod
+    async def autocomp_play(cls, inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
+        if not user_input:
+            return []
+
+        tracks: wavelink.Search = await wavelink.Playable.search(user_input, source="spsearch:")
+        if not tracks:
+            tracks: wavelink.Search = await wavelink.Playable.search(user_input)
+
+        tracks_found = [
+            app_commands.Choice(name=VoiceFeatures.truncate_string(f"{track.title} - {track.author}"), value=track.uri)
+            for track in tracks[:10]
+        ]
+
+        if not tracks_found:
+            return [app_commands.Choice(name=VoiceMess.no_track_found, value="")]
+
+        return tracks_found
+
+    @classmethod
+    async def autocomp_playlists(cls, inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
+        playlists = PlaylistDB.get_available_playlists(str(inter.guild.id), str(inter.user.id))
+        playlists_found = await cls.create_choices(playlists, user_input.lower())
+
+        if not playlists_found:
+            return [app_commands.Choice(name=VoiceMess.no_playlist_found, value="")]
+
+        return playlists_found
+
+    @classmethod
+    async def autocomp_remove_playlists(
+        cls, inter: discord.Interaction, user_input: str
+    ) -> list[app_commands.Choice[str]]:
+        playlists = PlaylistDB.get_author_playlists(str(inter.user.id))
+        playlists_found = await cls.create_choices(playlists, user_input.lower())
+
+        if not playlists_found:
+            return [app_commands.Choice(name=VoiceMess.no_playlist_found, value="")]
+
+        return playlists_found

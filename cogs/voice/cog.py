@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import textwrap
 from typing import cast
 
 import discord
@@ -11,27 +10,9 @@ from discord.ext import commands
 from cogs.base import Base
 from database.voice import PlaylistDB
 
-from .features import VoiceFeatures, WavelinkPlayer
+from .features import Autocomplete, VoiceFeatures, WavelinkPlayer
 from .messages import VoiceMess
 from .views import VoiceView
-
-
-def truncate_string(string: str, limit: int = 100) -> str:
-    return textwrap.shorten(string, width=limit, placeholder="...")
-
-
-async def autocomp_play(inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
-    if not user_input:
-        return []
-
-    tracks: wavelink.Search = await wavelink.Playable.search(user_input, source="spsearch:")
-    if not tracks:
-        tracks: wavelink.Search = await wavelink.Playable.search(user_input)
-
-    return [
-        app_commands.Choice(name=truncate_string(f"{track.title} - {track.author}"), value=track.uri)
-        for track in tracks[:10]
-    ]
 
 
 @app_commands.guild_only()
@@ -40,34 +21,23 @@ class VoiceGroup(app_commands.Group):
         super().__init__(*args, **kwargs)
 
 
-playlists = {}
-
-
-async def autocomp_playlists(inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
-    guild_playlists = playlists[inter.guild.id]
-    return [
-        app_commands.Choice(name=playlist.name, value=playlist.link)
-        for playlist in guild_playlists
-        if user_input.lower() in playlist
-    ]
+@app_commands.guild_only()
+class PlaylistGroup(app_commands.Group):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class Voice(Base, commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
-        global playlists
-        # playlists = self.get_playlists()
-
-    def get_playlists(self):
-        guilds = PlaylistDB.get_guilds()
-        for guild in guilds:
-            playlists[guild] = PlaylistDB.get_playlists(guild)
+        Autocomplete.bot = bot
 
     voice_group = VoiceGroup(name="voice", description=VoiceMess.voice_group_brief)
+    playlist_group = PlaylistGroup(name="playlist", description=VoiceMess.playlist_group_brief)
 
     @voice_group.command(name="play", description=VoiceMess.play_brief)
-    @app_commands.autocomplete(query=autocomp_play)
+    @app_commands.autocomplete(query=Autocomplete.autocomp_play)
     async def play(self, inter: discord.Interaction, query: str, place: app_commands.Range[int, 1] = None) -> None:
         """Play a song with the given query."""
         await VoiceFeatures.play(inter, query, place)
@@ -226,36 +196,65 @@ class Voice(Base, commands.Cog):
         await inter.edit_original_response(content="", embed=embeds[0], view=view)
         view.message = await inter.original_response()
 
-    # @voice_group.command(name="playlist", description=VoiceMess.play_brief)
-    # @app_commands.autocomplete(name=autocomp_playlists)
-    # async def playlist(self, inter: discord.Interaction, name: str) -> None:
-    #     """Get playlist from db"""
-    #     playlist = PlaylistDB.get_playlist(inter.guild.id, name)
-    #     await VoiceFeatures.play(inter, playlist.url)
+    @playlist_group.command(name="play", description=VoiceMess.play_brief)
+    @app_commands.autocomplete(name=Autocomplete.autocomp_playlists)
+    async def playlist_play(self, inter: discord.Interaction, name: str) -> None:
+        """Get playlist from db
 
-    @voice_group.command(name="add_playlist", description=VoiceMess.add_playlist_brief)
-    async def add_playlist(self, inter: discord.Interaction, name: str, url: str) -> None:
+        Parameters
+        ----------
+        name : str
+            Guild ID, Author ID, Playlist Name
+        """
+        guild_id, author_id, playlist_name = name.split(",")
+        playlist_url = PlaylistDB.get_playlist(guild_id, author_id, playlist_name)
+        if not playlist_url:
+            await inter.response.send_message(content=VoiceMess.playlist_not_found(name=playlist_name), ephemeral=True)
+            return
+
+        await inter.response.defer()
+        await VoiceFeatures.play(inter, playlist_url)
+
+    @playlist_group.command(name="add", description=VoiceMess.add_playlist_brief)
+    async def playlist_add(
+        self, inter: discord.Interaction, name: app_commands.Range[str, 1, 100], url: str, is_global: bool
+    ) -> None:
         """Add playlist to db"""
         await inter.response.defer(ephemeral=True)
-        add = PlaylistDB.add_playlist(inter.guild.id, name, url)
+        guild_id = str(inter.guild.id) if not is_global else None
+        add = PlaylistDB.add_playlist(guild_id, str(inter.user.id), name, url)
         if add is None:
-            await inter.edit_original_response(content=f"Playlist with name {name} already exists\n")
+            await inter.edit_original_response(content=VoiceMess.playlist_exists(name=name))
             return
-        await inter.edit_original_response(content=f"Playlist {name} added\n{url}")
 
-    @voice_group.command(name="remove_playlist", description=VoiceMess.remove_playlist_brief)
-    async def remove_playlist(self, inter: discord.Interaction, name: str, url: str) -> None:
-        """Remove playlist from db"""
+        await inter.edit_original_response(content=VoiceMess.playlist_added(name=add.name, url=add.url))
+
+    @playlist_group.command(name="remove", description=VoiceMess.remove_playlist_brief)
+    @app_commands.autocomplete(name=Autocomplete.autocomp_remove_playlists)
+    async def playlist_remove(self, inter: discord.Interaction, name: str) -> None:
+        """Remove playlist from db
+
+        Parameters
+        ----------
+        name : str
+            Guild ID, Author ID, Playlist Name
+        """
         await inter.response.defer(ephemeral=True)
-        remove = PlaylistDB.remove_playlist(inter.guild.id, inter.user.id, name)
-        if remove is None:
-            await inter.edit_original_response(content=f"Playlist with name {name} doesn't exists\n")
+        try:
+            guild_id, author_id, playlist_name = name.split(",")
+        except ValueError:
+            await inter.edit_original_response(content=VoiceMess.use_autocomplete)
             return
-        await inter.edit_original_response(content=f"Playlist {name} removed\n{url}")
+
+        removed = PlaylistDB.remove_playlist(str(inter.user.id), guild_id, author_id, playlist_name)
+        if removed is None:
+            await inter.edit_original_response(content=VoiceMess.playlist_not_found(name=playlist_name))
+            return
+        await inter.edit_original_response(content=VoiceMess.playlist_removed(name=removed.name, url=removed.url))
 
     @commands.Cog.listener()
     async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload) -> None:
-        logging.info(f"Wavelink Node connected: {payload.node!r} | Resumed: {payload.resumed}")
+        logging.info(VoiceMess.node_connected(node=f"{payload.node!r}", resumed=payload.resumed))
 
     @commands.Cog.listener()
     async def on_wavelink_inactive_player(self, player: WavelinkPlayer) -> None:

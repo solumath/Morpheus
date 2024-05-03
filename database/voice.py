@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, UniqueConstraint
+from sqlalchemy import String, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
 
 from database import database, session
 
@@ -8,41 +9,58 @@ from database import database, session
 class PlaylistDB(database.base):
     __tablename__ = "playlist"
 
-    __table_args__ = (UniqueConstraint("guild_id", "name"),)
+    __table_args__ = (UniqueConstraint("name", "author_id", "guild_id"),)
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    url = Column(String, nullable=False)
-    guild_id = Column(String, nullable=False)
-    author_id = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    guild_id: Mapped[str] = mapped_column(nullable=True)  # if None, it's a global playlist
+    author_id: Mapped[str] = mapped_column(nullable=False)
+    url: Mapped[str] = mapped_column(nullable=False)
 
     @classmethod
-    def add_playlist(cls, guild_id: str, author_id: str, name: str, url: str) -> PlaylistDB | None:
-        if cls.get_playlist(guild_id, name):
-            return
-        playlist = cls(guild_id=str(guild_id), author_id=str(author_id), name=str(name), url=str(url))
+    def add_playlist(cls, guild_id: str | None, author_id: str, name: str, url: str) -> PlaylistDB | None:
+        if cls.get_playlist(guild_id, author_id, name):
+            return None
+
+        playlist = cls(guild_id=guild_id, author_id=author_id, name=name, url=url)
         session.add(playlist)
         session.commit()
         return playlist
 
     @classmethod
-    def remove_playlist(cls, guild_id: str, author_id: str, name: str) -> PlaylistDB | None:
-        if cls.author_id != str(author_id):
-            return
-        playlist = session.query(cls).filter_by(guild_id=str(guild_id), name=str(name)).first()
+    def remove_playlist(
+        cls, inter_author_id: str, guild_id: str | None, author_id: str, name: str
+    ) -> PlaylistDB | None:
+        if inter_author_id != author_id:
+            return None
+
+        guild_id = None if guild_id == "None" else guild_id
+        playlist = session.query(cls).filter_by(guild_id=guild_id, author_id=author_id, name=name).first()
+
         session.delete(playlist)
         session.commit()
         return playlist
 
     @classmethod
-    def get_playlist(cls, guild_id: str, name: str) -> PlaylistDB:
-        playlist = session.query(cls).filter_by(guild_id=str(guild_id), name=str(name)).first()
-        return playlist.url
+    def get_playlist(cls, guild_id: str | None, author_id: str, name: str) -> str | None:
+        guild_id = None if guild_id == "None" else guild_id
+        playlist = session.query(cls).filter_by(guild_id=guild_id, author_id=author_id, name=name).first()
+        if playlist:
+            return playlist.url
+
+        return None
 
     @classmethod
-    def get_playlists(cls, guild_id: str) -> list[PlaylistDB]:
-        playlists = session.query(cls).filter_by(guild_id=str(guild_id)).all()
-        return playlists
+    def get_author_playlists(cls, author_id: str) -> list[PlaylistDB]:
+        return session.query(cls).filter_by(author_id=author_id).order_by(cls.name).all()
+
+    @classmethod
+    def get_available_playlists(cls, guild_id: str, author_id: str) -> list[PlaylistDB]:
+        my_playlists = cls.get_author_playlists(author_id)
+        guild_playlists = (
+            session.query(cls).filter(cls.author_id != author_id, cls.guild_id == guild_id).order_by(cls.name).all()
+        )
+        return [*my_playlists, *guild_playlists]
 
     @classmethod
     def get_guilds(cls) -> list[str]:
