@@ -58,8 +58,8 @@ class Info(Base, commands.Cog):
         await inter.response.send_message(embed=embed)
 
     @default_cooldown()
-    @app_commands.command(name="guild_info", description="Prints out info about server")
-    async def server_info(self, inter: discord.Interaction):
+    @app_commands.command(name="guild_info", description=InfoMess.guild_info_brief)
+    async def guild_info(self, inter: discord.Interaction):
         await inter.response.defer()
         embed = discord.Embed(
             title=inter.guild.name, colour=inter.guild.owner.colour, description=inter.guild.description

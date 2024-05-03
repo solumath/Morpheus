@@ -1,9 +1,10 @@
 import discord
 
 
-def get_emoji_count(guild: discord.Guild) -> int:
+def get_emoji_count(guild: discord.Guild) -> tuple[int, int]:
     """Get count of all emojis from Guild"""
-    emojis, animated_emojis = 0
+    emojis = 0
+    animated_emojis = 0
     for emoji in guild.emojis:
         if emoji.animated:
             animated_emojis += 1
