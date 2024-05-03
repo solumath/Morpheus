@@ -10,6 +10,7 @@ from cogs.base import Base
 from custom import custom_errors
 from custom.enums import DiscordTimestamps
 from utils import utils
+from utils.interaction import custom_send
 
 from .messages import ErrorMess
 
@@ -115,10 +116,7 @@ class Error(Base, commands.Cog):
         if channel is None:
             return
 
-        if inter.response.is_done():
-            await inter.followup.send(ErrorMess.error_happened)
-        else:
-            await inter.response.send_message(ErrorMess.error_happened)
+        await custom_send(inter, ErrorMess.error_happened, edit=False)
 
         url = f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}"
 
