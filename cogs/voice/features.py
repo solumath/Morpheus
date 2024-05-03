@@ -34,7 +34,7 @@ class VoiceFeatures:
 
         if not player:
             try:
-                player: WavelinkPlayer = await inter.user.voice.channel.connect(cls=WavelinkPlayer)
+                player: WavelinkPlayer = await inter.user.voice.channel.connect(cls=WavelinkPlayer, self_deaf=True)
             except AttributeError:
                 await inter.response.send_message(VoiceMess.join_channel, ephemeral=True)
                 return
