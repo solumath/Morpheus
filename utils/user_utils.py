@@ -1,9 +1,8 @@
-from typing import Optional
-
 import discord
+from discord.ext import commands
 
 
-async def get_or_fetch_user(bot, user_id: int) -> Optional[discord.User]:
+async def get_or_fetch_user(bot: commands.Bot, user_id: int) -> discord.User | None:
     """
     Tries to get the user from the cache. If fails, it tries to
     fetch the user from the API.
@@ -16,13 +15,15 @@ async def get_or_fetch_user(bot, user_id: int) -> Optional[discord.User]:
     Returns
     -------
     Optional[:class:`~discord.User`]
-        The user with the given ID, or ``None`` if not found and ``strict`` is set to ``False``.
+        The user with the given ID, or ``None`` if not found.
     """
     user = bot.get_user(user_id)
-    if user is not None:
+    if user:
         return user
+
     try:
         user = await bot.fetch_user(user_id)
     except Exception:
         return None
+
     return user
