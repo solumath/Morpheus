@@ -60,3 +60,4 @@ class VoiceMess(GlobalMessages):
     use_autocomplete = "Please use autocomplete to select the playlist."
     playlist_removed = "Playlist `{name}` has been removed\n- {url}"
     node_connected = "Wavelink Node connected: {node} | Resumed: {resumed}"
+    is_global_param = "Make playlist visible for you everywhere."

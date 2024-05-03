@@ -9,3 +9,4 @@ class AdminMess(GlobalMessages):
 
     purge_brief = "Delete all messages to the specified message(included)"
     purged_messages = "Deleted {count} messages in channel {channel}"
+    last_message_param = "URL to the last message to delete"

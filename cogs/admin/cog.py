@@ -14,16 +14,17 @@ class Admin(Base, commands.Cog):
 
     @commands.has_permissions(manage_messages=True)
     @app_commands.command(name="purge", description=AdminMess.purge_brief)
-    async def purge(self, inter: discord.Interaction, last_message: str):
+    @app_commands.describe(last_message_url=AdminMess.last_message_param)
+    async def purge(self, inter: discord.Interaction, last_message_url: str):
         await inter.response.defer(ephemeral=True)
         ctx = await commands.Context.from_interaction(inter)
-        last_message: discord.Message = await commands.MessageConverter().convert(ctx, last_message)
+        last_message_url: discord.Message = await commands.MessageConverter().convert(ctx, last_message_url)
 
-        channel = last_message.channel
+        channel = last_message_url.channel
         counter = 0
         async for message in channel.history(limit=None):
             counter += 1
-            if message.id == last_message.id:
+            if message.id == last_message_url.id:
                 break
 
         deleted = await channel.purge(limit=counter)

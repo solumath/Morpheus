@@ -216,6 +216,7 @@ class Voice(Base, commands.Cog):
         await VoiceFeatures.play(inter, playlist_url)
 
     @playlist_group.command(name="add", description=VoiceMess.add_playlist_brief)
+    @app_commands.describe(is_global=VoiceMess.is_global_param)
     async def playlist_add(
         self, inter: discord.Interaction, name: app_commands.Range[str, 1, 100], url: str, is_global: bool
     ) -> None:
