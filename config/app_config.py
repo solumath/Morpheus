@@ -1,5 +1,3 @@
-from typing import List
-
 import toml
 
 
@@ -35,11 +33,11 @@ class Config:
     key: str = get_attr(toml_dict, "base", "key")
 
     # Base information
-    admin_ids: List[int] = get_attr(toml_dict, "base", "admin_ids")
+    admin_ids: list[int] = get_attr(toml_dict, "base", "admin_ids")
     guild_id: int = get_attr(toml_dict, "base", "guild_id")
     default_prefix: str = get_attr(toml_dict, "base", "default_prefix")
 
-    extensions: List[str] = get_attr(toml_dict, "extensions", "extensions")
+    extensions: list[str] = get_attr(toml_dict, "extensions", "extensions")
 
     # database
     db_string: str = get_attr(toml_dict, "database", "db_string")
@@ -47,14 +45,14 @@ class Config:
     # Special channel IDs
     bot_dev_channel: int = get_attr(toml_dict, "channels", "bot_dev_channel")
     bot_channel: int = get_attr(toml_dict, "channels", "bot_channel")
-    thread_channels: List[int] = get_attr(toml_dict, "channels", "thread_channels")
-    threads_with_reaction: List[int] = get_attr(toml_dict, "channels", "threads_with_reaction")
+    thread_channels: list[int] = get_attr(toml_dict, "channels", "thread_channels")
+    threads_with_reaction: list[int] = get_attr(toml_dict, "channels", "threads_with_reaction")
     name_day_channels: int = get_attr(toml_dict, "channels", "name_day_channels")
     nasa_channels: list[int] = get_attr(toml_dict, "channels", "nasa_channels")
     gay_channel: int = get_attr(toml_dict, "channels", "gay_channel")
     webhook: int = get_attr(toml_dict, "channels", "webhook")
 
-    allowed_channels: List[int] = eval_channels(toml_dict, get_attr(toml_dict, "channels", "allowed_channels"))
+    allowed_channels: list[int] = eval_channels(toml_dict, get_attr(toml_dict, "channels", "allowed_channels"))
 
     # Memes
     jany: int = get_attr(toml_dict, "memes", "jany")
