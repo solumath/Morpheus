@@ -260,7 +260,7 @@ class Autocomplete:
             tracks: wavelink.Search = await wavelink.Playable.search(user_input)
 
         tracks_found = [
-            app_commands.Choice(name=VoiceFeatures.truncate_string(f"{track.title} - {track.author}"), value=track.uri)
+            app_commands.Choice(name=cls.truncate_string(f"{track.title} - {track.author}"), value=track.uri)
             for track in tracks[:10]
         ]
 
