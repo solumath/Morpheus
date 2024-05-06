@@ -41,12 +41,16 @@ class Nasa(Base, commands.Cog):
     async def nasa_image(self, inter: discord.Interaction):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         response = await self.nasa_daily_image()
-        embed = create_nasa_embed(response)
+        embed, video = create_nasa_embed(response)
         await inter.edit_original_response(embed=embed)
+        if video:
+            await inter.followup.send(video)
 
     @tasks.loop(time=time(7, 0, tzinfo=utils.get_local_zone()))
     async def send_nasa_image(self):
         response = await self.nasa_daily_image()
-        embed = create_nasa_embed(response)
+        embed, video = create_nasa_embed(response)
         for channel in self.nasa_channels:
             await channel.send(embed=embed)
+            if video:
+                await channel.followup.send(video)
