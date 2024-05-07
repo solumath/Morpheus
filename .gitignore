@@ -13,3 +13,4 @@ emojis.zip
 application.yml
 *.log
 plugins/*
+database/backup/backup.sql
