@@ -53,4 +53,4 @@ class Nasa(Base, commands.Cog):
         for channel in self.nasa_channels:
             await channel.send(embed=embed)
             if video:
-                await channel.followup.send(video)
+                await channel.send(video)
