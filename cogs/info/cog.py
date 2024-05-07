@@ -20,6 +20,8 @@ class Info(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         info_channel_id = GuildDB.get_info_channel(member.guild.id)
+        if not info_channel_id:
+            return
         channel = self.bot.get_channel(int(info_channel_id))
         await channel.send(InfoMess.welcome_user(member.mention))
 
