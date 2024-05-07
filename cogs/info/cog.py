@@ -78,11 +78,14 @@ class Info(Base, commands.Cog):
         )
         embed.add_field(name="Members", value=inter.guild.member_count, inline=True)
         embed.add_field(name="Bots", value=len([member for member in inter.guild.members if member.bot]), inline=True)
-        embed.add_field(
-            name="Banned users",
-            value=len([entry async for entry in inter.guild.bans(limit=None)]),
-            inline=False,
-        )
+        try:
+            embed.add_field(
+                name="Banned users",
+                value=len([entry async for entry in inter.guild.bans(limit=None)]),
+                inline=False,
+            )
+        except discord.Forbidden:
+            embed.add_field(name="Banned users", value=InfoMess.missing_permission, inline=False)
 
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(name="Categories", value=len(inter.guild.categories), inline=True)
@@ -90,7 +93,11 @@ class Info(Base, commands.Cog):
         embed.add_field(name="Threads", value=len(inter.guild.threads), inline=True)
         embed.add_field(name="Voice channels", value=len(inter.guild.voice_channels), inline=True)
         embed.add_field(name="Roles", value=len(inter.guild.roles), inline=True)
-        embed.add_field(name="Active invites", value=len(await inter.guild.invites()), inline=True)
+        try:
+            embed.add_field(name="Active invites", value=len(await inter.guild.invites()), inline=True)
+        except discord.Forbidden:
+            embed.add_field(name="Active invites", value=InfoMess.missing_permission, inline=True)
+
         embed.add_field(name="Guild level", value=inter.guild.premium_tier, inline=True)
         embed.add_field(name="Boosters", value=inter.guild.premium_subscription_count, inline=True)
 
