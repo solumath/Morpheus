@@ -243,7 +243,7 @@ class Autocomplete:
         playlists_found = [
             app_commands.Choice(
                 name=await Autocomplete.playlist_name(cls.bot, playlist),
-                value=f"{playlist.guild_id},{playlist.author_id},{playlist.name}",
+                value=f"{playlist.id}",
             )
             for playlist in playlists
             if user_input in playlist.name.lower()

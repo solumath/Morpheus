@@ -196,24 +196,17 @@ class Voice(Base, commands.Cog):
         await inter.edit_original_response(content="", embed=embeds[0], view=view)
         view.message = await inter.original_response()
 
-    @playlist_group.command(name="play", description=VoiceMess.play_brief)
-    @app_commands.autocomplete(name=Autocomplete.autocomp_playlists)
-    async def playlist_play(self, inter: discord.Interaction, name: str) -> None:
-        """Get playlist from db
-
-        Parameters
-        ----------
-        name : str
-            Guild ID, Author ID, Playlist Name
-        """
-        guild_id, author_id, playlist_name = name.split(",")
-        playlist_url = PlaylistDB.get_playlist(guild_id, author_id, playlist_name)
-        if not playlist_url:
-            await inter.response.send_message(content=VoiceMess.playlist_not_found(name=playlist_name), ephemeral=True)
+    @playlist_group.command(name="play", description=VoiceMess.playlist_play)
+    @app_commands.autocomplete(playlist=Autocomplete.autocomp_playlists)
+    async def playlist_play(self, inter: discord.Interaction, playlist: str) -> None:
+        """Get playlist from db and play it"""
+        playlist_db = PlaylistDB.get(playlist)
+        if not playlist_db:
+            await inter.response.send_message(content=VoiceMess.playlist_not_found, ephemeral=True)
             return
 
         await inter.response.defer()
-        await VoiceFeatures.play(inter, playlist_url)
+        await VoiceFeatures.play(inter, playlist_db.url)
 
     @playlist_group.command(name="add", description=VoiceMess.add_playlist_brief)
     @app_commands.describe(is_global=VoiceMess.is_global_param)
@@ -249,7 +242,7 @@ class Voice(Base, commands.Cog):
 
         removed = PlaylistDB.remove_playlist(str(inter.user.id), guild_id, author_id, playlist_name)
         if removed is None:
-            await inter.edit_original_response(content=VoiceMess.playlist_not_found(name=playlist_name))
+            await inter.edit_original_response(content=VoiceMess.playlist_not_found)
             return
         await inter.edit_original_response(content=VoiceMess.playlist_removed(name=removed.name, url=removed.url))
 
