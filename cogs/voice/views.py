@@ -21,11 +21,11 @@ class VoiceView(discord.ui.View):
         if not await VoiceFeatures.default_checks(inter, player, check_interact):
             return False
 
-        # history is empty
-        if player.queue.history.is_empty and player.auto_queue.history.is_empty:
-            self.back_button.disabled = True
-        else:
-            self.back_button.disabled = False
+        # # history is empty
+        # if player.queue.history.is_empty and player.auto_queue.history.is_empty:
+        #     self.back_button.disabled = True
+        # else:
+        #     self.back_button.disabled = False
 
         return True
 
@@ -45,7 +45,6 @@ class VoiceView(discord.ui.View):
     async def back_button(self, inter: discord.Interaction, button: discord.ui.Button):
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
 
-        print(player.queue.history)
         await player.skip(force=True)
 
         description = VoiceMess.back(user=inter.user.mention)
