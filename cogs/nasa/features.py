@@ -16,4 +16,5 @@ def create_nasa_embed(response: dict) -> tuple[discord.Embed, str | None]:
     url = response["hdurl"] if response.get("hdurl", None) else response["url"]
     if response.get("media_type", None) != "video":
         embed.set_image(url=url)
+        return embed, None
     return embed, url
