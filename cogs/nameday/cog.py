@@ -57,14 +57,14 @@ class NameDay(Base, commands.Cog):
     async def name_day_cz(self, inter: discord.Interaction):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         name_day_cz = await self._name_day_cz()
-        await inter.edit_original_response(name_day_cz)
+        await inter.edit_original_response(content=name_day_cz)
 
     @default_cooldown()
     @app_commands.command(name="meniny", description=NameDayMess.name_day_sk_brief)
     async def name_day_sk(self, inter: discord.Interaction):
         await inter.response.defer(ephemeral=self.check.botroom_check(inter))
         name_day_sk = await self._name_day_sk()
-        await inter.edit_original_response(name_day_sk)
+        await inter.edit_original_response(content=name_day_sk)
 
     @tasks.loop(time=time(7, 0, tzinfo=utils.get_local_zone()))
     async def send_names(self):
