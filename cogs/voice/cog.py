@@ -246,6 +246,17 @@ class Voice(Base, commands.Cog):
             return
         await inter.edit_original_response(content=VoiceMess.playlist_removed(name=removed.name, url=removed.url))
 
+    @playlist_group.command(name="list", description=VoiceMess.playlist_list_brief)
+    async def playlist_list(self, inter: discord.Interaction) -> None:
+        """List all user's playlists"""
+        await inter.response.defer()
+        playlists = PlaylistDB.get_author_playlists(str(inter.user.id))
+        if not playlists:
+            await inter.edit_original_response(content=VoiceMess.no_playlist_found)
+            return
+        embeds, view = VoiceFeatures.get_user_playlists(playlists, inter.user, self.bot)
+        await inter.edit_original_response(embed=embeds[0], view=view)
+
     @commands.Cog.listener()
     async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload) -> None:
         logging.info(VoiceMess.node_connected(node=f"{payload.node!r}", resumed=payload.resumed))

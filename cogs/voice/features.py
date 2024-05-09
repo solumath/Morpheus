@@ -151,6 +151,27 @@ class VoiceFeatures:
         return embeds, view
 
     @classmethod
+    def get_user_playlists(
+        cls, playlists: list[PlaylistDB], user: discord.User, bot: commands.Bot
+    ) -> tuple[discord.Embed, PaginationView] | tuple[None, None]:
+        embeds = []
+        for i in range(0, len(playlists), 10):
+            embed = discord.Embed(title="Your playlists")
+            for playlist in playlists[i : i + 5]:
+                if playlist.guild_id:
+                    guild = bot.get_guild(int(playlist.guild_id))
+                    guild_name = guild.name if guild else "Unknown"
+                    name = f"{playlist.name} - {guild_name}"
+                else:
+                    name = playlist.name
+
+                embed.add_field(name=name, value=f"`ID: {playlist.id}`\n{playlist.url}", inline=False)
+            embeds.append(embed)
+
+        view = PaginationView(user, embeds, show_page=True)
+        return embeds, view
+
+    @classmethod
     def create_embed(
         cls, title: str = None, description: str = None, color: discord.Color = discord.Color.dark_blue()
     ) -> discord.Embed:

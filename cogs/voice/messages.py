@@ -13,6 +13,7 @@ class VoiceMess(GlobalMessages):
     autoplay_brief = "Toggle autoplay"
     add_playlist_brief = "Add a playlist to the database"
     remove_playlist_brief = "Remove a playlist from database"
+    playlist_list_brief = "List all your playlists"
     queue_brief = "Show the current queue"
     remove_brief = "Remove a song from the queue"
     shuffle_brief = "Shuffle the queue"
