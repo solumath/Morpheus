@@ -16,7 +16,9 @@ class VoiceView(discord.ui.View):
 
     async def interaction_check(self, inter: discord.Interaction) -> bool:
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
+        check_interact = False if inter.data["custom_id"] == "voice:queue" else True
+
+        if not await VoiceFeatures.default_checks(inter, player, check_interact):
             return False
 
         # history is empty

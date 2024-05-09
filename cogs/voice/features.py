@@ -189,16 +189,19 @@ class VoiceFeatures:
         return embed
 
     @classmethod
-    async def default_checks(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
+    async def default_checks(
+        cls, inter: discord.Interaction, player: WavelinkPlayer, check_interact: bool = True
+    ) -> bool:
         """Check if the bot is connected and the user can interact."""
-        if not await cls.is_connected(inter, player):
+        if not await cls.bot_is_connected(inter, player):
             return False
-        if not await cls.can_interact(inter, player):
-            return False
+        if check_interact:
+            if not await cls.user_can_interact(inter, player):
+                return False
         return True
 
     @classmethod
-    async def is_connected(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
+    async def bot_is_connected(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
         """Check if the bot is connected to a voice channel.
 
         This should not happen if so update message and return False.
@@ -211,7 +214,7 @@ class VoiceFeatures:
         return True
 
     @classmethod
-    async def can_interact(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
+    async def user_can_interact(cls, inter: discord.Interaction, player: WavelinkPlayer) -> bool:
         """Check if the user can interact with the bot.
 
         Must be in the voice channel with bot.

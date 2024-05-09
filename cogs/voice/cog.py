@@ -184,7 +184,7 @@ class Voice(Base, commands.Cog):
     async def queue(self, inter: discord.Interaction) -> None:
         """Show the current queue."""
         player: WavelinkPlayer = cast(WavelinkPlayer, inter.guild.voice_client)
-        if not await VoiceFeatures.default_checks(inter, player):
+        if not await VoiceFeatures.default_checks(inter, player, check_interact=False):
             return
 
         await inter.response.send_message(content=VoiceMess.fetching_queue)
