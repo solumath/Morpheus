@@ -18,7 +18,7 @@ class PlaylistDB(database.base):
     url: Mapped[str] = mapped_column(nullable=False)
 
     @classmethod
-    def get(cls, playlist_id: str) -> PlaylistDB | None:
+    def get(cls, playlist_id: int) -> PlaylistDB | None:
         return session.query(cls).get(playlist_id)
 
     @classmethod
@@ -32,11 +32,10 @@ class PlaylistDB(database.base):
         return playlist
 
     @classmethod
-    def remove_playlist(cls, inter_author_id: str, playlist_id: str) -> PlaylistDB | None:
-        if inter_author_id != cls.author_id:
-            return None
-
+    def remove_playlist(cls, inter_author_id: str, playlist_id: int) -> PlaylistDB | None:
         playlist = session.query(cls).get(playlist_id)
+        if inter_author_id != playlist.author_id:
+            return None
 
         session.delete(playlist)
         session.commit()

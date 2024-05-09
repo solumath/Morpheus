@@ -198,8 +198,15 @@ class Voice(Base, commands.Cog):
 
     @playlist_group.command(name="play", description=VoiceMess.playlist_play)
     @app_commands.autocomplete(playlist=Autocomplete.autocomp_playlists)
+    @app_commands.describe(playlist=VoiceMess.playlist_param)
     async def playlist_play(self, inter: discord.Interaction, playlist: str) -> None:
         """Get playlist from db and play it"""
+        try:
+            playlist = int(playlist)
+        except ValueError:
+            await inter.response.send_message(content=VoiceMess.playlist_param, ephemeral=True)
+            return
+
         playlist_db = PlaylistDB.get(playlist)
         if not playlist_db:
             await inter.response.send_message(content=VoiceMess.playlist_not_found, ephemeral=True)
@@ -224,26 +231,22 @@ class Voice(Base, commands.Cog):
         await inter.edit_original_response(content=VoiceMess.playlist_added(name=add.name, url=add.url))
 
     @playlist_group.command(name="remove", description=VoiceMess.remove_playlist_brief)
-    @app_commands.autocomplete(name=Autocomplete.autocomp_remove_playlists)
-    async def playlist_remove(self, inter: discord.Interaction, name: str) -> None:
-        """Remove playlist from db
-
-        Parameters
-        ----------
-        name : str
-            Guild ID, Author ID, Playlist Name
-        """
+    @app_commands.autocomplete(playlist=Autocomplete.autocomp_remove_playlists)
+    async def playlist_remove(self, inter: discord.Interaction, playlist: str) -> None:
+        """Remove playlist from db"""
         await inter.response.defer(ephemeral=True)
+
         try:
-            guild_id, author_id, playlist_name = name.split(",")
+            playlist_id = int(playlist)
         except ValueError:
-            await inter.edit_original_response(content=VoiceMess.use_autocomplete)
+            await inter.edit_original_response(content=VoiceMess.playlist_param)
             return
 
-        removed = PlaylistDB.remove_playlist(str(inter.user.id), guild_id, author_id, playlist_name)
+        removed = PlaylistDB.remove_playlist(str(inter.user.id), playlist_id)
         if removed is None:
             await inter.edit_original_response(content=VoiceMess.playlist_not_found)
             return
+
         await inter.edit_original_response(content=VoiceMess.playlist_removed(name=removed.name, url=removed.url))
 
     @playlist_group.command(name="list", description=VoiceMess.playlist_list_brief)
