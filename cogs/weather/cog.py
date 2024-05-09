@@ -21,25 +21,20 @@ class Weather(Base, commands.Cog):
     async def get_weather(self, place: str) -> dict:
         token = Base.config.weather_token
 
+        session: aiohttp.ClientSession = self.bot.morpheus_session
         url = f"http://api.openweathermap.org/data/2.5/weather?q={place}&units=metric&lang=en&appid={token}"
-        headers = {
-            "Accept": "application/json",
-            "User-Agent": f"https://github.com/solumath/Morpheus#bot:{self.bot.user.id}",
-        }
-
-        async with aiohttp.ClientSession(headers=headers, timeout=aiohttp.ClientTimeout(total=10)) as session:
-            try:
-                async with session.get(url) as resp:
-                    if resp.status == 200:
-                        return await resp.json()
-                    if resp.status == 404:
-                        return WeatherMess.place_not_found(place=place)
-                    elif resp.status == 401:
-                        return WeatherMess.token_error
-                    else:
-                        raise ApiError(resp.get("message"))
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                raise ApiError(WeatherMess.website_unreachable)
+        try:
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    return await resp.json()
+                if resp.status == 404:
+                    return WeatherMess.place_not_found(place=place)
+                elif resp.status == 401:
+                    return WeatherMess.token_error
+                else:
+                    raise ApiError(resp.get("message"))
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
+            raise ApiError(WeatherMess.website_unreachable)
 
     @default_cooldown()
     @app_commands.command(name="weather", description=WeatherMess.weather_brief)

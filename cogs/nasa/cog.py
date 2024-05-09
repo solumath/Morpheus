@@ -27,14 +27,14 @@ class Nasa(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
 
     async def nasa_daily_image(self):
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
-            try:
-                url = f"https://api.nasa.gov/planetary/apod?api_key={self.config.nasa_key}&concept_tags=True"
-                async with session.get(url) as resp:
-                    response = await resp.json()
-                return response
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                return "Website unreachable"
+        session = self.bot.morpheus_session
+        try:
+            url = f"https://api.nasa.gov/planetary/apod?api_key={self.config.nasa_key}&concept_tags=True"
+            async with session.get(url) as resp:
+                response = await resp.json()
+            return response
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
+            return "Website unreachable"
 
     @default_cooldown()
     @app_commands.command(name="nasa_daily_image", description=NasaMess.nasa_image_brief)

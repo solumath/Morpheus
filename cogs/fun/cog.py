@@ -9,7 +9,6 @@ from datetime import datetime
 from io import BytesIO
 from typing import Dict, List, Optional, Tuple
 
-import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -30,35 +29,35 @@ class Fun(Base, commands.Cog):
         return f"📩 {author} | {url} • {datetime.now().strftime('%d.%m.%Y %H:%M')}"
 
     async def get_image(self, inter, url) -> Optional[Tuple[BytesIO, str]]:
-        async with aiohttp.ClientSession() as session:
-            # get random image url
-            async with session.get(url) as response:
-                if response.status != 200:
-                    raise ApiError(response.status)
-                image = await response.json()
+        session = self.bot.morpheus_session
+        # get random image url
+        async with session.get(url) as response:
+            if response.status != 200:
+                raise ApiError(response.status)
+            image = await response.json()
 
-            # get image url
-            if isinstance(image, list):
-                url = image[0]["url"]
-            else:
-                url = image.get("url")
-                if not url:
-                    url = image.get("image")
+        # get image url
+        if isinstance(image, list):
+            url = image[0]["url"]
+        else:
+            url = image.get("url")
+            if not url:
+                url = image.get("image")
 
-            # get image bytes
-            async with session.get(url) as response:
-                if response.status != 200:
-                    raise ApiError(response.status)
-                file_name = url.split("/")[-1]
-                return BytesIO(await response.read()), file_name
+        # get image bytes
+        async with session.get(url) as response:
+            if response.status != 200:
+                raise ApiError(response.status)
+            file_name = url.split("/")[-1]
+            return BytesIO(await response.read()), file_name
 
     async def get_fact(self, url, key) -> str:
-        async with aiohttp.ClientSession() as session:
-            with contextlib.suppress(OSError):
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        fact_response_ = await response.json()
-                        fact_response = fact_response_[key][0]
+        session = self.bot.morpheus_session
+        with contextlib.suppress(OSError):
+            async with session.get(url) as response:
+                if response.status == 200:
+                    fact_response_ = await response.json()
+                    fact_response = fact_response_[key][0]
         return fact_response
 
     @default_cooldown()
@@ -160,11 +159,11 @@ class Fun(Base, commands.Cog):
             url += "/search"
         headers: Dict[str, str] = {"Accept": "application/json"}
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, params=params) as response:
-                if response.status != 200:
-                    raise ApiError(response.status)
-                fetched = await response.json()
+        session = self.bot.morpheus_session
+        async with session.get(url, headers=headers, params=params) as response:
+            if response.status != 200:
+                raise ApiError(response.status)
+            fetched = await response.json()
 
         if keyword is not None:
             res = fetched["results"]
@@ -195,11 +194,11 @@ class Fun(Base, commands.Cog):
     @app_commands.command(name="yo_mamajoke", description=FunMess.yo_mamajoke_brief)
     async def yo_mamajoke(self, inter: discord.Interaction):
         """Get random Yo momma joke"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.yomomma.info/") as response:
-                if response.status != 200:
-                    raise ApiError(response.status)
-                result = await response.json()
+        session = self.bot.morpheus_session
+        async with session.get("https://api.yomomma.info/") as response:
+            if response.status != 200:
+                raise ApiError(response.status)
+            result = await response.json()
 
         embed = discord.Embed(
             title="Yo mamajoke",

@@ -2,6 +2,7 @@ import logging
 import os
 import platform
 
+import aiohttp
 import discord
 import git
 import wavelink
@@ -41,7 +42,12 @@ class Morpheus(commands.Bot):
         init_views(self)
 
         # get bot data
-        await self.application_info()
+        app_info = await self.application_info()
+        self.owner_id = app_info.owner.id
+
+        # create aiohttp session
+        headers = {"User-Agent": f"https://github.com/solumath/Morpheus?bot_owner={self.owner_id}"}
+        self.morpheus_session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers)
 
     async def on_ready(self) -> None:
         synced = await self.tree.sync()

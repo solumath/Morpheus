@@ -27,30 +27,30 @@ class NameDay(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
 
     async def _name_day_cz(self):
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
-            try:
-                url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
-                async with session.get(url) as resp:
-                    res = await resp.json()
-                names = []
-                for i in res:
-                    names.append(i["name"])
-                return NameDayMess.name_day_cz(name=", ".join(names))
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                return "Website unreachable"
+        session = self.bot.morpheus_session
+        try:
+            url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
+            async with session.get(url) as resp:
+                res = await resp.json()
+            names = []
+            for i in res:
+                names.append(i["name"])
+            return NameDayMess.name_day_cz(name=", ".join(names))
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
+            return "Website unreachable"
 
     async def _name_day_sk(self):
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
-            try:
-                url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
-                async with session.get(url) as resp:
-                    res = await resp.json()
-                names = []
-                for i in res:
-                    names.append(i["name"])
-                return NameDayMess.name_day_sk(name=", ".join(names))
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                return "Website unreachable"
+        session = self.bot.morpheus_session
+        try:
+            url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
+            async with session.get(url) as resp:
+                res = await resp.json()
+            names = []
+            for i in res:
+                names.append(i["name"])
+            return NameDayMess.name_day_sk(name=", ".join(names))
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
+            return "Website unreachable"
 
     @default_cooldown()
     @app_commands.command(name="svatek", description=NameDayMess.name_day_cz_brief)
