@@ -295,7 +295,7 @@ class Autocomplete:
 
     @classmethod
     async def autocomp_playlists(cls, inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
-        playlists = PlaylistDB.get_available_playlists(str(inter.guild.id), str(inter.user.id))
+        playlists = await PlaylistDB.get_available_playlists(str(inter.guild.id), str(inter.user.id))
         playlists_found = await cls.create_choices(playlists, user_input.lower())
 
         if not playlists_found:
@@ -307,7 +307,7 @@ class Autocomplete:
     async def autocomp_remove_playlists(
         cls, inter: discord.Interaction, user_input: str
     ) -> list[app_commands.Choice[str]]:
-        playlists = PlaylistDB.get_author_playlists(str(inter.user.id))
+        playlists = await PlaylistDB.get_author_playlists(str(inter.user.id))
         playlists_found = await cls.create_choices(playlists, user_input.lower())
 
         if not playlists_found:

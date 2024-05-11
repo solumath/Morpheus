@@ -13,8 +13,8 @@ PostgreSQL prompt will open and you can now run any SQL (or Postgre-specific) co
 Add `echo=True` to `database/__init__.py`:
 
 ```python
-12      self.db = create_engine(self.config.db_string, echo=True)
-                                                       ^
+8   self.engine = create_async_engine(config.db_string, echo=False)
+                                                        ^
 ```
 
 ## Database backup/restore

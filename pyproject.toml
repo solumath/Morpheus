@@ -16,4 +16,5 @@ line-ending = "auto"
 
 [tool.codespell]
 write-changes = false
+ignore-words-list = "selectin"
 skip = '*./logs,*./venv,*./vscode,*./github,*./__pycache__,*./ruff_cache'

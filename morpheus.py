@@ -26,7 +26,7 @@ class Morpheus(commands.Bot):
 
     async def setup_hook(self) -> None:
         # initialize database
-        database_init.init_db()
+        await database_init.init_db()
         logging.info("Database initialized")
 
         # connect to lavalink

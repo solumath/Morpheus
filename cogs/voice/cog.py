@@ -207,7 +207,7 @@ class Voice(Base, commands.Cog):
             await inter.response.send_message(content=VoiceMess.playlist_param, ephemeral=True)
             return
 
-        playlist_db = PlaylistDB.get(playlist)
+        playlist_db = await PlaylistDB.get(playlist)
         if not playlist_db:
             await inter.response.send_message(content=VoiceMess.playlist_not_found, ephemeral=True)
             return
@@ -223,7 +223,8 @@ class Voice(Base, commands.Cog):
         """Add playlist to db"""
         await inter.response.defer(ephemeral=True)
         guild_id = str(inter.guild.id) if not is_global else None
-        add = PlaylistDB.add_playlist(guild_id, str(inter.user.id), name, url)
+        add = await PlaylistDB.add_playlist(guild_id, str(inter.user.id), name, url)
+
         if add is None:
             await inter.edit_original_response(content=VoiceMess.playlist_exists(name=name))
             return
@@ -242,7 +243,7 @@ class Voice(Base, commands.Cog):
             await inter.edit_original_response(content=VoiceMess.playlist_param)
             return
 
-        removed = PlaylistDB.remove_playlist(str(inter.user.id), playlist_id)
+        removed = await PlaylistDB.remove_playlist(str(inter.user.id), playlist_id)
         if removed is None:
             await inter.edit_original_response(content=VoiceMess.playlist_not_found)
             return
@@ -253,7 +254,7 @@ class Voice(Base, commands.Cog):
     async def playlist_list(self, inter: discord.Interaction) -> None:
         """List all user's playlists"""
         await inter.response.defer()
-        playlists = PlaylistDB.get_author_playlists(str(inter.user.id))
+        playlists = await PlaylistDB.get_author_playlists(str(inter.user.id))
         if not playlists:
             await inter.edit_original_response(content=VoiceMess.no_playlist_found)
             return

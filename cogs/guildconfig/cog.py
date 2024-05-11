@@ -14,7 +14,7 @@ from .messages import GuildConfigMess
 
 async def autocomp_replies(inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
     user_input = user_input.lower()
-    phrases = GuildDB.get_guild(inter.guild.id).phrases_dict
+    phrases = await GuildDB.get_phrases(str(inter.guild.id))
     return [
         app_commands.Choice(name=phrase, value=phrase) for phrase in phrases.keys() if user_input in phrase.lower()
     ][:10]
@@ -36,7 +36,10 @@ class GuildConfig(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         for guild in self.bot.guilds:
-            self.phrases[guild.id] = GuildDB.get_guild(guild.id).phrases_dict
+            guild_db = await GuildDB.get_guild(str(guild.id))
+            if not guild_db:
+                guild_db = await GuildDB.add_guild(str(guild.id))
+            self.phrases[guild.id] = guild_db.phrases_dict
 
     reply_group = ReplyGroup(name="reply", description="Autoreply commands")
 
@@ -46,8 +49,8 @@ class GuildConfig(Base, commands.Cog):
     @app_commands.command(name="edit_config", description=GuildConfigMess.edit_config_brief)
     async def edit_config(self, inter: discord.Interaction, info_channel: discord.TextChannel):
         """for now only info channel in future all attributes guild config can have"""
-        guild_db = GuildDB.get_guild(inter.guild.id)
-        guild_db.set_info_channel(info_channel.id)
+        guild_db = await GuildDB.get_guild(str(inter.guild.id))
+        await guild_db.set_info_channel(info_channel.id)
         await inter.response.send_message(GuildConfigMess.info_channel_set(info_channel=info_channel.mention))
 
     @commands.Cog.listener("on_message")
@@ -72,28 +75,28 @@ class GuildConfig(Base, commands.Cog):
 
     @reply_group.command(name="add", description=GuildConfigMess.add_reply_brief)
     async def add_reply(self, inter: discord.Interaction, key: str, reply: str):
-        phrase = GuildPhraseDB.add_phrase(inter.guild.id, key, reply)
+        phrase = await GuildPhraseDB.add_phrase(str(inter.guild.id), key, reply)
         if not phrase:
             await inter.response.send_message(GuildConfigMess.reply_exists(key=key))
             return
 
-        self.phrases[inter.guild.id] = GuildDB.get_guild(inter.guild.id).phrases_dict
+        self.phrases[inter.guild.id] = await GuildDB.get_phrases(str(inter.guild.id))
         await inter.response.send_message(GuildConfigMess.reply_added(key=key))
 
     @reply_group.command(name="remove", description=GuildConfigMess.rem_reply_brief)
     @app_commands.autocomplete(key=autocomp_replies)
     async def remove_reply(self, inter: discord.Interaction, key: str):
-        phrase = GuildPhraseDB.remove_phrase(inter.guild.id, key)
+        phrase = await GuildPhraseDB.remove_phrase(str(inter.guild.id), key)
         if not phrase:
             await inter.response.send_message(GuildConfigMess.reply_not_found(key=key))
             return
 
-        self.phrases[inter.guild.id] = GuildDB.get_guild(inter.guild.id).phrases_dict
+        self.phrases[inter.guild.id] = await GuildDB.get_phrases(str(inter.guild.id))
         await inter.response.send_message(GuildConfigMess.reply_removed(key=key))
 
     @reply_group.command(name="list", description=GuildConfigMess.list_reply_brief)
     async def list_reply(self, inter: discord.Interaction):
-        phrases = GuildDB.get_guild(inter.guild.id).phrases_dict
+        phrases = await GuildDB.get_phrases(str(inter.guild.id))
         if not phrases:
             await inter.response.send_message(GuildConfigMess.no_replies)
             return
