@@ -98,6 +98,10 @@ class Error(Base, commands.Cog):
             await inter.response.send_message(ErrorMess.not_enough_perms, ephemeral=True)
             return
 
+        if isinstance(error, commands.UserNotFound):
+            await inter.response.send_message(ErrorMess.user_not_found, ephemeral=True)
+            return
+
         if isinstance(error, commands.CommandOnCooldown):
             time = datetime.now() + timedelta(seconds=error.retry_after)
             retry_after = discord.utils.format_dt(time, style=DiscordTimestamps.RelativeTime.value)

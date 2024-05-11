@@ -19,8 +19,7 @@ class Pet(Base, commands.Cog):
     @default_cooldown()
     @app_commands.command(name="pet", description=PetMess.pet_brief)
     async def pet(self, inter: discord.Interaction, user: discord.User = None):
-        if user is None:
-            user = inter.user
+        user = user or inter.user
         if not user.avatar:
             await inter.response.send_message(PetMess.pet_unsupported_avatar)
             return
@@ -63,9 +62,3 @@ class Pet(Base, commands.Cog):
             )
             image_binary.seek(0)
             await inter.response.send_message(file=discord.File(fp=image_binary, filename="pet.gif"))
-
-    @pet.error
-    async def pet_error(self, inter: discord.Interaction, error):
-        if isinstance(error, commands.MemberNotFound):
-            await inter.response.send_message(PetMess.member_not_found(user=inter.user.id))
-            return True

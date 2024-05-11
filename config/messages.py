@@ -27,7 +27,7 @@ class GlobalMessages(metaclass=Formatable):
 
     not_enough_perms = "You do not have permissions to use this."
     command_on_cooldown = "This command is on cooldown. Please try again in {time}."
-    member_not_found = "{user} could not be found."
+    user_not_found = "User could not be found."
     error_happened = "`Errors happen Mr. Anderson`"
     embed_not_author = "You can't interact with this embed, because you are not author."
 
