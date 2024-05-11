@@ -27,10 +27,9 @@ class Nasa(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
 
     async def nasa_daily_image(self):
-        session = self.bot.morpheus_session
         try:
             url = f"https://api.nasa.gov/planetary/apod?api_key={self.config.nasa_key}&concept_tags=True"
-            async with session.get(url) as resp:
+            async with self.bot.morpheus_session.get(url) as resp:
                 response = await resp.json()
             return response
         except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):

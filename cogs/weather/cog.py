@@ -21,10 +21,9 @@ class Weather(Base, commands.Cog):
     async def get_weather(self, place: str) -> dict:
         token = Base.config.weather_token
 
-        session: aiohttp.ClientSession = self.bot.morpheus_session
         url = f"http://api.openweathermap.org/data/2.5/weather?q={place}&units=metric&lang=en&appid={token}"
         try:
-            async with session.get(url) as resp:
+            async with self.bot.morpheus_session.get(url) as resp:
                 if resp.status == 200:
                     return await resp.json()
                 if resp.status == 404:

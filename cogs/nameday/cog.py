@@ -27,10 +27,9 @@ class NameDay(Base, commands.Cog):
         self.check = room_check.RoomCheck(bot)
 
     async def _name_day_cz(self):
-        session = self.bot.morpheus_session
         try:
             url = f"http://svatky.adresa.info/json?date={date.today().strftime('%d%m')}"
-            async with session.get(url) as resp:
+            async with self.bot.morpheus_session.get(url) as resp:
                 res = await resp.json()
             names = []
             for i in res:
@@ -40,10 +39,9 @@ class NameDay(Base, commands.Cog):
             return "Website unreachable"
 
     async def _name_day_sk(self):
-        session = self.bot.morpheus_session
         try:
             url = f"http://svatky.adresa.info/json?lang=sk&date={date.today().strftime('%d%m')}"
-            async with session.get(url) as resp:
+            async with self.bot.morpheus_session.get(url) as resp:
                 res = await resp.json()
             names = []
             for i in res:

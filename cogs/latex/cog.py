@@ -25,9 +25,8 @@ class Latex(Base, commands.Cog):
             eq = urllib.parse.quote(equation)
             imgURL = f"http://www.sciweavers.org/tex2img.php?eq={eq}&fc=White&im=png&fs=25&edit=0"
 
-            session = self.bot.morpheus_session
             try:
-                async with session.get(imgURL) as resp:
+                async with self.bot.morpheus_session.get(imgURL) as resp:
                     if resp.status != 200:
                         return await ctx.send("Could not get image.")
                     data = await resp.read()
