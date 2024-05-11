@@ -1,7 +1,6 @@
 from io import BytesIO
 
 import discord
-import requests
 from discord import app_commands
 from discord.ext import commands
 from PIL import Image, ImageDraw
@@ -25,9 +24,9 @@ class Pet(Base, commands.Cog):
         if not user.avatar:
             await inter.response.send_message(PetMess.pet_unsupported_avatar)
             return
-        url = user.display_avatar.with_format("jpg")
-        response = requests.get(url, timeout=10)
-        avatarFull = Image.open(BytesIO(response.content))
+
+        avatar = await user.display_avatar.read()
+        avatarFull = Image.open(BytesIO(avatar))
 
         frames = []
         deformWidth = [-1, -2, 1, 2, 1]
