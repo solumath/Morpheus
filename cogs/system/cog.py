@@ -55,7 +55,7 @@ class System(Base, commands.Cog):
         await message.edit(content=f"```{pull_parts[0]}```")
 
         for part in pull_parts[1:]:
-            await inter.followup.send(inter, f"```{part}```")
+            await inter.followup.send(f"```{part}```")
 
     @app_commands.check(is_bot_admin)
     @app_commands.command(name="shutdown", description=SystemMess.shutdown_brief)
