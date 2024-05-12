@@ -2,12 +2,14 @@
 Cog containing commands that call random APIs for fun things.
 """
 
+from __future__ import annotations
+
 import contextlib
 import random
 import re
 from datetime import datetime
 from io import BytesIO
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import discord
 from discord import app_commands
@@ -19,9 +21,12 @@ from custom.custom_errors import ApiError
 
 from .messages import FunMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Fun(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

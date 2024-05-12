@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
@@ -10,9 +13,12 @@ from custom.cooldowns import default_cooldown
 
 from .messages import PetMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Pet(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

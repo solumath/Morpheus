@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 import git
 from discord import app_commands
@@ -13,6 +17,9 @@ from . import features
 from .buttons import SystemView
 from .messages import SystemMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Git:
     def __init__(self):
@@ -27,7 +34,7 @@ class Git:
 
 
 class System(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
         self.git = Git()

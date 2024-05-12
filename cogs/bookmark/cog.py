@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -7,9 +11,12 @@ from cogs.base import Base
 from .buttons import BookmarkModal, BookmarkView
 from .features import BookmarkContext, BookmarkFeatures
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Bookmark(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
         self.ctx_menu = app_commands.ContextMenu(name="Bookmark", callback=self.bookmark)

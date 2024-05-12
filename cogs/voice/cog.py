@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 import logging
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import discord
 import wavelink
@@ -13,6 +15,9 @@ from database.voice import PlaylistDB
 from .features import Autocomplete, VoiceFeatures, WavelinkPlayer
 from .messages import VoiceMess
 from .views import VoiceView
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 
 @app_commands.guild_only()
@@ -28,7 +33,7 @@ class PlaylistGroup(app_commands.Group):
 
 
 class Voice(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
         Autocomplete.bot = bot

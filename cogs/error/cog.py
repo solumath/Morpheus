@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import traceback
 from datetime import datetime, timedelta
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import discord
 from discord import app_commands
@@ -14,9 +16,12 @@ from utils.interaction import custom_send
 
 from .messages import ErrorMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Error(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

@@ -2,8 +2,11 @@
 Cog for sending name days and birthdays.
 """
 
+from __future__ import annotations
+
 import asyncio
 from datetime import time
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
@@ -18,9 +21,12 @@ from custom.cooldowns import default_cooldown
 from .features import create_nasa_embed
 from .messages import NasaMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Nasa(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
         self.tasks = [self.send_nasa_image.start()]

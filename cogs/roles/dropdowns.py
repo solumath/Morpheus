@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
-from discord.ext import commands
 from discord.utils import get
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 
 class RolesSelectView(discord.ui.View):
@@ -8,7 +14,7 @@ class RolesSelectView(discord.ui.View):
 
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Morpheus,
         roles: list = None,
         placeholder: str = "Select role(s)",
         min_roles: int = 0,
@@ -22,7 +28,7 @@ class RolesSelectView(discord.ui.View):
 class RoleSelect(discord.ui.Select):
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Morpheus,
         roles: list = None,
         placeholder: str = "Select role(s)",
         min_roles: int = 0,
@@ -90,7 +96,7 @@ class ChannelsSelectView(discord.ui.View):
 
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Morpheus,
         category: discord.CategoryChannel = None,
         placeholder: str = "Select channel(s)",
         min_channels: int = 0,
@@ -104,7 +110,7 @@ class ChannelsSelectView(discord.ui.View):
 class ChannelsSelect(discord.ui.Select):
     def __init__(
         self,
-        bot: commands.Bot,
+        bot: Morpheus,
         category: discord.CategoryChannel = None,
         placeholder: str = "Select channel(s)",
         min_channels: int = 0,

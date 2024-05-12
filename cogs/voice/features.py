@@ -7,19 +7,18 @@ from typing import TYPE_CHECKING, cast
 import discord
 import wavelink
 from discord import app_commands
-from discord.ext import commands
 
 from database.voice import PlaylistDB
+from utils.embed_utils import PaginationView
 from utils.interaction import custom_send
 from utils.user_utils import get_or_fetch_user
 
-if TYPE_CHECKING:
-    # prevent circular import
-    from . import views
-
-from utils.embed_utils import PaginationView
-
 from .messages import VoiceMess
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
+    from . import views
 
 
 class Home:
@@ -152,7 +151,7 @@ class VoiceFeatures:
 
     @classmethod
     def get_user_playlists(
-        cls, playlists: list[PlaylistDB], user: discord.User, bot: commands.Bot
+        cls, playlists: list[PlaylistDB], user: discord.User, bot: Morpheus
     ) -> tuple[discord.Embed, PaginationView] | tuple[None, None]:
         embeds = []
         for i in range(0, len(playlists), 10):
@@ -247,14 +246,14 @@ class VoiceFeatures:
 
 
 class Autocomplete:
-    bot: commands.Bot
+    bot: Morpheus
 
     @classmethod
     def truncate_string(cls, string: str, limit: int = 100) -> str:
         return textwrap.shorten(string, width=limit, placeholder="...")
 
     @classmethod
-    async def playlist_name(cls, bot: commands.Bot, playlist: PlaylistDB) -> str:
+    async def playlist_name(cls, bot: Morpheus, playlist: PlaylistDB) -> str:
         guild = bot.get_guild(int(playlist.guild_id)) if playlist.guild_id else None
         author = await get_or_fetch_user(bot, int(playlist.author_id))
         if not guild:

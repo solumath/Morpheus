@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -11,9 +15,12 @@ from utils.embed_utils import add_author_footer
 from . import features as info_features
 from .messages import InfoMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Info(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

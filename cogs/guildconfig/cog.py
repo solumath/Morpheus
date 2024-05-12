@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import random
+from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
@@ -10,6 +13,9 @@ from database.guild import GuildDB, GuildPhraseDB
 from utils import utils
 
 from .messages import GuildConfigMess
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 
 async def autocomp_replies(inter: discord.Interaction, user_input: str) -> list[app_commands.Choice[str]]:
@@ -28,7 +34,7 @@ class ReplyGroup(app_commands.Group):
 
 
 class GuildConfig(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
         self.phrases = {}

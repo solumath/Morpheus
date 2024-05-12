@@ -1,16 +1,20 @@
-from typing import cast
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, cast
 
 import discord
 import wavelink
-from discord.ext import commands
 
 from .features import VoiceFeatures, WavelinkPlayer
 from .messages import VoiceMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 # TODO guild config in db?
 class VoiceView(discord.ui.View):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__(timeout=None)
         self.bot = bot
 

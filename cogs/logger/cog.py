@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 from discord.ext import commands
 
@@ -6,9 +10,12 @@ from cogs.base import Base
 from .levels import LoggerLeveles
 from .top_logger import top_logger
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Logger(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

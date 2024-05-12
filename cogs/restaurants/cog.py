@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import io
+from typing import TYPE_CHECKING
 
 import discord
 import unidecode
@@ -11,6 +14,9 @@ from custom.cooldowns import custom_cooldown, default_cooldown
 
 from .features import RestaurantsScraper
 from .messages import RestaurantsMess
+
+if TYPE_CHECKING:
+    pass
 
 restaurants = []
 days = ["pondeli", "utery", "streda", "ctvrtek", "patek", "sobota", "nedele", "dnes"]

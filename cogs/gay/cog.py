@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -5,6 +9,9 @@ from discord.ext import commands
 from cogs.base import Base
 
 from .messages import GayMess
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 mention_count = {}
 mention_author_count = {}
@@ -42,7 +49,7 @@ async def iterate_messages(channel):
 
 
 class Gay(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

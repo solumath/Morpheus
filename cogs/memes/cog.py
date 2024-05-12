@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 from functools import cached_property
+from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
@@ -11,9 +14,12 @@ from utils.user_utils import get_or_fetch_user
 
 from .messages import MemesMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Memes(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

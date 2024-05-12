@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import asyncio
 import io
 import urllib
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
@@ -10,11 +13,14 @@ from cogs.base import Base
 from custom.cooldowns import default_cooldown
 from custom.custom_errors import ApiError
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 PNG_HEADER = b"\x89PNG\r\n\x1a\n"
 
 
 class Latex(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

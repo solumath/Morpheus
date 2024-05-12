@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 
 from custom.constants import MAX_FILE_SIZE
 from utils.utils import split_to_parts
 
 from .messages import BookmarkMess
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 
 class BookmarkFeatures:
@@ -89,7 +92,7 @@ class BookmarkContext:
 
     Parameters
     ----------
-    bot : commands.Bot
+    bot : Morpheus
         The instance of the bot.
     payload : discord.RawReactionActionEvent
         The payload of the reaction event.
@@ -109,7 +112,7 @@ class BookmarkContext:
         The guild where the bookmarked message is located.
     """
 
-    def __init__(self, bot: commands.Bot, payload: discord.RawReactionActionEvent):
+    def __init__(self, bot: Morpheus, payload: discord.RawReactionActionEvent):
         self.bot = bot
         self.channel_id = payload.channel_id
         self.message_id = payload.message_id

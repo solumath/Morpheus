@@ -1,14 +1,20 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
-from discord.ext import commands
 
 from custom.permission_check import is_bot_admin
 
 from . import features
 from .messages import SystemMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class SystemView(discord.ui.View):
-    def __init__(self, bot: commands.Bot, cog_chunks: list):
+    def __init__(self, bot: Morpheus, cog_chunks: list):
         super().__init__()
         self.bot = bot
         self.cogs = cog_chunks
@@ -44,7 +50,7 @@ class SystemView(discord.ui.View):
 
 
 class CogSelect(discord.ui.Select):
-    def __init__(self, bot: commands.Bot, view: SystemView, cogs: list):
+    def __init__(self, bot: Morpheus, view: SystemView, cogs: list):
         self.bot = bot
         self._view = view
         self.cogs = cogs

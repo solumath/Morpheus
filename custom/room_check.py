@@ -1,11 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
-from discord.ext import commands
 
 from config.app_config import config
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class RoomCheck:
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         self.bot = bot
 
     def botroom_check(self, inter: discord.Interaction) -> bool:

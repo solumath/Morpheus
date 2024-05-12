@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 import os
 from os.path import isdir, isfile
+from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 
 from config.app_config import config
 from utils import utils
 
 from .messages import SystemMess
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 
 def get_all_cogs() -> list[tuple[str, str]]:
@@ -51,7 +56,7 @@ async def split_cogs() -> list[tuple[str, str]]:
     return all_cogs
 
 
-def create_embed(bot: commands.Bot) -> discord.Embed:
+def create_embed(bot: Morpheus) -> discord.Embed:
     embed = discord.Embed(title=SystemMess.embed_title, colour=discord.Color.yellow())
     bot_cogs = [cog.lower() for cog in bot.cogs]
     cogs = get_all_cogs()

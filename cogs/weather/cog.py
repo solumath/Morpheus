@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import asyncio
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
@@ -12,9 +15,12 @@ from custom.custom_errors import ApiError
 
 from .messages import WeatherMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Weather(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

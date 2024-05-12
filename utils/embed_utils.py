@@ -1,16 +1,20 @@
+from __future__ import annotations
+
 import platform
 from datetime import datetime, timezone
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 import discord
-from discord.ext import commands
 
 from config.messages import GlobalMessages
 
 from .utils import get_commands_count
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
-def info_embed(bot: commands.Bot) -> discord.Embed:
+
+def info_embed(bot: Morpheus) -> discord.Embed:
     embed = discord.Embed(title="Morpheus", url=GlobalMessages.morpheus_url, color=discord.Colour.yellow())
     embed.add_field(name="ID", value=bot.user.id, inline=False)
     embed.add_field(name="Python", value=platform.python_version())

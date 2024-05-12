@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from discord.ext import commands
 
 from cogs.base import Base
 from config.app_config import config
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Threads(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

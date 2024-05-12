@@ -1,7 +1,12 @@
-from discord.ext import commands
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .cog import Restaurants
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
-async def setup(bot: commands.Bot):
+
+async def setup(bot: Morpheus):
     await bot.add_cog(Restaurants(bot))

@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import random
 import shlex
+from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
@@ -8,9 +11,12 @@ from discord.ext import commands
 from cogs.base import Base
 from custom.cooldowns import default_cooldown
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Random(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
 

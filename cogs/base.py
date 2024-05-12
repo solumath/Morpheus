@@ -2,14 +2,21 @@
 Base cog class. All cogs should inherit from this class.
 """
 
+from __future__ import annotations
+
 from functools import cached_property
+from typing import TYPE_CHECKING
 
 import discord
 
 from config.app_config import config, load_config
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class Base:
+    bot: Morpheus
     config = config
 
     def __init__(self):

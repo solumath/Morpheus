@@ -2,10 +2,13 @@
 Cog for managing server emojis. Download emojis and stickers. Get full size of emoji.
 """
 
+from __future__ import annotations
+
 import io
 import os
 import zipfile
 from datetime import time
+from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
@@ -18,6 +21,9 @@ from custom.cooldowns import default_cooldown
 
 from .messages import EmojiMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 @default_cooldown()
 class EmojiGroup(app_commands.Group):
@@ -26,7 +32,7 @@ class EmojiGroup(app_commands.Group):
 
 
 class Emoji(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
         self.tasks = [self.download_emojis_task.start()]

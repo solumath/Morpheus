@@ -2,8 +2,11 @@
 Cog for sending name days and birthdays.
 """
 
+from __future__ import annotations
+
 import asyncio
 from datetime import date, time
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
@@ -17,9 +20,12 @@ from custom.cooldowns import default_cooldown
 
 from .messages import NameDayMess
 
+if TYPE_CHECKING:
+    from morpheus import Morpheus
+
 
 class NameDay(Base, commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: Morpheus):
         super().__init__()
         self.bot = bot
         self.tasks = [self.send_names.start()]

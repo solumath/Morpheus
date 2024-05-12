@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
-from discord.ext import commands
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 
-async def get_or_fetch_user(bot: commands.Bot, user_id: int) -> discord.User | None:
+async def get_or_fetch_user(bot: Morpheus, user_id: int) -> discord.User | None:
     """
     Tries to get the user from the cache. If fails, it tries to
     fetch the user from the API.

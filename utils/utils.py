@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import math
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import discord
 from discord import AppCommandType
-from discord.ext import commands
+
+if TYPE_CHECKING:
+    from morpheus import Morpheus
 
 
 def cut_string(string: str, part_len: int):
@@ -70,7 +75,7 @@ async def get_or_fetch_channel(bot, channel_id) -> discord.TextChannel:
     return channel
 
 
-def get_commands_count(bot: commands.Bot) -> dict[str, int]:
+def get_commands_count(bot: Morpheus) -> dict[str, int]:
     context_commands = len(bot.commands)
     slash_commands = len(bot.tree.get_commands(type=AppCommandType.chat_input))
     message_commands = len(bot.tree.get_commands(type=AppCommandType.message))
