@@ -62,9 +62,12 @@ class Memes(Base, commands.Cog):
             await inter.response.send_message(MemesMess.nickname_success)
 
     @custom_cooldown(rate=1, per=100.0)
-    @commands.command()
+    @commands.command(hidden=True)
     async def tagrage(self, ctx: commands.Context, user: discord.Member, *text):
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except Exception:
+            pass
         for x in range(5):
             await ctx.send(f"{user.mention} {' '.join(text)}")
             await asyncio.sleep(5)

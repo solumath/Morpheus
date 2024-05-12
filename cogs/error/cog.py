@@ -35,7 +35,7 @@ class Error(Base, commands.Cog):
         tree.on_error = self._old_tree_error
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, app_commands.CommandInvokeError):
             error = error.original
 
