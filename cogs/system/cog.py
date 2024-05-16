@@ -61,7 +61,8 @@ class System(Base, commands.Cog):
     @app_commands.command(name="shutdown", description=SystemMess.shutdown_brief)
     async def shutdown(self, inter: discord.Interaction):
         await inter.response.send_message("`Shutting down...`")
-        exit(1)
+        await self.bot.morpheus_session.close()
+        await self.bot.close()
 
     @app_commands.check(is_bot_admin)
     @app_commands.command(name="cogs", description=SystemMess.cogs_brief)
