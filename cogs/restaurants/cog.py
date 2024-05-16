@@ -35,7 +35,7 @@ class Restaurants(Base, commands.Cog):
         super().__init__()
         global restaurants
         self.bot = bot
-        self.scraper = RestaurantsScraper()
+        self.scraper = RestaurantsScraper(self.bot.morpheus_session)
         restaurants = self.scraper.get_restaurants()
 
     @default_cooldown()
@@ -53,16 +53,17 @@ class Restaurants(Base, commands.Cog):
         for restaurant in restaurants:
             await self.print_menu(inter, restaurant)
 
-    async def print_menu(self, inter, restaurant):
+    async def print_menu(self, inter: discord.Interaction, restaurant):
         if restaurant in restaurants:
-            menu, type = self.scraper.get_menu(restaurant)
+            menu, type = await self.scraper.get_menu(restaurant)
             if type == "file":
                 await inter.followup.send(
                     f"Menu z **{restaurant.upper()}**.",
                     file=discord.File(io.BytesIO(menu), filename=f"{restaurant}.jpg"),
                 )
             else:
-                await inter.followup.send(f"Menu z **{restaurant.upper()}**.")
+                url = self.scraper.urls[restaurant]
+                await inter.followup.send(f"Menu z [**{restaurant.upper()}**]({url}).")
 
                 # split text to lines to find days and highlight them with markdown
                 menu = menu.splitlines()
@@ -70,13 +71,13 @@ class Restaurants(Base, commands.Cog):
                 for line in menu:
                     if any(day in unidecode.unidecode(line.strip().lower()) for day in days):
                         line = line.lstrip(" ")
-                        aligned_menu.append(f"# {line}")
+                        aligned_menu.append(f"\n# {line.title()}")
                     else:
                         aligned_menu.append(line.strip())
 
                 # make list to string again and cut it for sending
                 aligned_menu = "\n".join(aligned_menu)
-                output = utils.cut_string(aligned_menu, 1950)
+                output = utils.cut_string_by_words(aligned_menu, 1950, " ")
                 for menu in output:
                     await inter.channel.send(f"```md\n{menu}```")
         else:
