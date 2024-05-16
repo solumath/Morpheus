@@ -22,6 +22,11 @@ class Bookmark(Base, commands.Cog):
         self.ctx_menu = app_commands.ContextMenu(name="Bookmark", callback=self.bookmark)
         self.bot.tree.add_command(self.ctx_menu)
 
+    @commands.Cog.listener("on_ready")
+    async def init_views(self):
+        """Add permanent views to the bot"""
+        self.bot.add_view(BookmarkView())
+
     @app_commands.guild_only()
     async def bookmark(self, inter: discord.Interaction, message: discord.Message):
         """Send modal with input for bookmark name and then send to user"""

@@ -10,7 +10,6 @@ from discord.ext import commands
 
 from config.app_config import config
 from config.messages import GlobalMessages
-from custom.views import init_views
 from database import database_init
 from utils import embed_utils
 from utils.utils import get_commands_count
@@ -37,9 +36,6 @@ class Morpheus(commands.Bot):
 
         # load cogs
         await self.init_cogs()
-
-        # add views
-        init_views(self)
 
         # get bot data
         app_info = await self.application_info()

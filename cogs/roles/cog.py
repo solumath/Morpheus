@@ -21,6 +21,12 @@ class Roles(Base, commands.Cog):
         super().__init__()
         self.bot = bot
 
+    @commands.Cog.listener("on_ready")
+    async def init_views(self):
+        """Add permanent views to the bot"""
+        self.bot.add_view(RolesSelectView(self.bot))
+        self.bot.add_view(ChannelsSelectView(self.bot))
+
     @app_commands.check(is_bot_admin)
     @app_commands.command(name="roles_select", description=RolesMess.role_select_brief)
     async def roles_select(
