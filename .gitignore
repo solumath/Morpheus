@@ -1,16 +1,36 @@
-keys.py
-__pycache__
-servers
-.vscode
-discord.log
-config/config.toml
-*.db
-venv
-logs
-.ruff_cache
-.devcontainer
-emojis.zip
-application.yml
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# logs and data
 *.log
-plugins/*
+logs/
+servers/
+emojis.zip
+*.db
 database/backup/backup.sql
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# settings
+.vscode/
+.ruff_cache/
+.devcontainer/
+
+# config
+config/config.toml
+application.yml
+plugins/*
