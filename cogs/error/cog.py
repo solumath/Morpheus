@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import traceback
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
@@ -75,7 +76,7 @@ class Error(Base, commands.Cog):
         message = await ctx.reply(ErrorMess.error_happened)
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        print(output)
+        logging.error(output)
 
         embed = discord.Embed(title=f"Ignoring exception on command {ctx.command}", color=0xFF0000)
         embed.add_field(name="Author", value=str(ctx.author))
@@ -126,7 +127,7 @@ class Error(Base, commands.Cog):
         url = f"https://discord.com/channels/{inter.guild_id}/{inter.channel_id}/{inter.id}"
 
         output = "".join(traceback.format_exception(type(error), error, error.__traceback__))
-        print(output)
+        logging.error(output)
 
         embed = discord.Embed(title=f"Ignoring exception on command `/{inter.command.name}`", color=0xFF0000)
         embed.add_field(name="Author", value=str(inter.user))
@@ -150,7 +151,7 @@ class Error(Base, commands.Cog):
     @commands.Cog.listener()
     async def on_error(self, event: str, /, *args: Any, **kwargs: Any) -> None:
         output = traceback.format_exc()
-        print(output)
+        logging.error(output)
 
         channel = self.bot_dev_channel
         if channel is None:
