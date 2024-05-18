@@ -36,7 +36,7 @@ class Error(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error):
-        if isinstance(error, app_commands.CommandInvokeError):
+        if isinstance(error, commands.CommandInvokeError):
             error = error.original
 
         if isinstance(error, custom_errors.NotAdminError):
@@ -61,7 +61,7 @@ class Error(Base, commands.Cog):
             return
 
         if isinstance(error, custom_errors.ApiError):
-            await ctx.reply(error.message)
+            await ctx.reply(embed=error.embed)
             return
 
         if isinstance(error, custom_errors.InvalidTime):
@@ -96,29 +96,25 @@ class Error(Base, commands.Cog):
             error = error.original
 
         if isinstance(error, custom_errors.NotAdminError):
-            await inter.response.send_message(error.message, ephemeral=True)
-            return
-
-        if isinstance(error, commands.MissingPermissions):
-            await inter.response.send_message(ErrorMess.not_enough_perms, ephemeral=True)
-            return
-
-        if isinstance(error, commands.UserNotFound):
-            await inter.response.send_message(ErrorMess.user_not_found, ephemeral=True)
-            return
-
-        if isinstance(error, commands.CommandOnCooldown):
-            time = datetime.now() + timedelta(seconds=error.retry_after)
-            retry_after = discord.utils.format_dt(time, style=DiscordTimestamps.RelativeTime.value)
-            await inter.response.send_message(ErrorMess.command_on_cooldown(time=retry_after))
+            await custom_send(inter, error.message, ephemeral=True)
             return
 
         if isinstance(error, custom_errors.ApiError):
-            await inter.response.send_message(error.message)
+            await custom_send(inter, embed=error.embed)
             return
 
         if isinstance(error, custom_errors.InvalidTime):
-            await inter.response.send_message(error.message, ephemeral=True)
+            await custom_send(inter, error.message, ephemeral=True)
+            return
+
+        if isinstance(error, app_commands.MissingPermissions):
+            await custom_send(inter, ErrorMess.not_enough_perms, ephemeral=True)
+            return
+
+        if isinstance(error, app_commands.CommandOnCooldown):
+            time = datetime.now() + timedelta(seconds=error.retry_after)
+            retry_after = discord.utils.format_dt(time, style=DiscordTimestamps.RelativeTime.value)
+            await custom_send(inter, ErrorMess.command_on_cooldown(time=retry_after), ephemeral=True)
             return
 
         channel = self.bot_dev_channel
