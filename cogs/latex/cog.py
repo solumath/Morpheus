@@ -41,5 +41,5 @@ class Latex(Base, commands.Cog):
 
                     datastream = io.BytesIO(data)
                     await ctx.send(file=discord.File(datastream, "latex.png"))
-            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-                raise ApiError("Website is not responding")
+            except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as error:
+                raise ApiError(error=str(error))

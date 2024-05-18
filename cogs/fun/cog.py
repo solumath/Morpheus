@@ -4,6 +4,7 @@ Cog containing commands that call random APIs for fun things.
 
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import random
 import re
@@ -11,6 +12,7 @@ from datetime import datetime
 from io import BytesIO
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
+import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -35,10 +37,13 @@ class Fun(Base, commands.Cog):
 
     async def get_image(self, inter, url) -> Optional[Tuple[BytesIO, str]]:
         # get random image url
-        async with self.bot.morpheus_session.get(url) as response:
-            if response.status != 200:
-                raise ApiError(response.status)
-            image = await response.json()
+        try:
+            async with self.bot.morpheus_session.get(url) as response:
+                if response.status != 200:
+                    raise ApiError(response.status)
+                image = await response.json()
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as error:
+            raise ApiError(error=str(error))
 
         # get image url
         if isinstance(image, list):
@@ -49,11 +54,14 @@ class Fun(Base, commands.Cog):
                 url = image.get("image")
 
         # get image bytes
-        async with self.bot.morpheus_session.get(url) as response:
-            if response.status != 200:
-                raise ApiError(response.status)
-            file_name = url.split("/")[-1]
-            return BytesIO(await response.read()), file_name
+        try:
+            async with self.bot.morpheus_session.get(url) as response:
+                if response.status != 200:
+                    raise ApiError(error=f"{response.status} - {response.text()}")
+                file_name = url.split("/")[-1]
+                return BytesIO(await response.read()), file_name
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as error:
+            raise ApiError(error=str(error))
 
     async def get_fact(self, url, key) -> str:
         with contextlib.suppress(OSError):
@@ -162,10 +170,13 @@ class Fun(Base, commands.Cog):
             url += "/search"
         headers: Dict[str, str] = {"Accept": "application/json"}
 
-        async with self.bot.morpheus_session.get(url, headers=headers, params=params) as response:
-            if response.status != 200:
-                raise ApiError(response.status)
-            fetched = await response.json()
+        try:
+            async with self.bot.morpheus_session.get(url, headers=headers, params=params) as response:
+                if response.status != 200:
+                    raise ApiError(f"{response.status} - {response.text()}")
+                fetched = await response.json()
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as error:
+            raise ApiError(error=str(error))
 
         if keyword is not None:
             res = fetched["results"]
@@ -196,10 +207,13 @@ class Fun(Base, commands.Cog):
     @app_commands.command(name="yo_mamajoke", description=FunMess.yo_mamajoke_brief)
     async def yo_mamajoke(self, inter: discord.Interaction):
         """Get random Yo momma joke"""
-        async with self.bot.morpheus_session.get("https://api.yomomma.info/") as response:
-            if response.status != 200:
-                raise ApiError(response.status)
-            result = await response.json()
+        try:
+            async with self.bot.morpheus_session.get("https://api.yomomma.info/") as response:
+                if response.status != 200:
+                    raise ApiError(f"{response.status} - {response.text()}")
+                result = await response.json()
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as error:
+            raise ApiError(error=str(error))
 
         embed = discord.Embed(
             title="Yo mamajoke",

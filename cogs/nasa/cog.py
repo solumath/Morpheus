@@ -17,6 +17,7 @@ import utils.utils as utils
 from cogs.base import Base
 from custom import room_check
 from custom.cooldowns import default_cooldown
+from custom.custom_errors import ApiError
 
 from .features import create_nasa_embed
 from .messages import NasaMess
@@ -32,14 +33,14 @@ class Nasa(Base, commands.Cog):
         self.tasks = [self.send_nasa_image.start()]
         self.check = room_check.RoomCheck(bot)
 
-    async def nasa_daily_image(self):
+    async def nasa_daily_image(self) -> dict:
         try:
             url = f"https://api.nasa.gov/planetary/apod?api_key={self.config.nasa_key}&concept_tags=True"
             async with self.bot.morpheus_session.get(url) as resp:
                 response = await resp.json()
             return response
-        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError):
-            return "Website unreachable"
+        except (asyncio.exceptions.TimeoutError, aiohttp.client_exceptions.ClientConnectorError) as error:
+            raise ApiError(error=str(error))
 
     @default_cooldown()
     @app_commands.command(name="nasa_daily_image", description=NasaMess.nasa_image_brief)
