@@ -38,4 +38,4 @@ class Random(Base, commands.Cog):
         args = shlex.split(args)
 
         option = discord.utils.escape_mentions(random.choice(args))
-        await inter.response.send_message(f"{option[:1900]} {inter.author.mention}")
+        await inter.response.send_message(f"{option[:1900]}")

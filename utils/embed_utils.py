@@ -204,7 +204,7 @@ class PaginationView(discord.ui.View):
         ids = ["embed:start_page", "embed:prev_page", "embed:next_page", "embed:end_page"]
         if inter.data["custom_id"] not in ids or self.max_page <= 1:
             return False
-        if (self.perma_lock or self.locked) and inter.author.id != self.author.id:
+        if (self.perma_lock or self.locked) and inter.user.id != self.author.id:
             await inter.response.send(GlobalMessages.embed_not_author, ephemeral=True)
             return False
         self.page = self.pagination_next(inter.data["custom_id"], self.page, self.max_page, self.roll_arroud)

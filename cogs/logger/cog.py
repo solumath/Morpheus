@@ -128,7 +128,7 @@ class Logger(Base, commands.Cog):
 
     @commands.Cog.listener()
     async def on_command(self, inter: discord.Interaction):
-        prefix = self.log_prefix(inter.channel, inter.message.jump_url, inter.author)
+        prefix = self.log_prefix(inter.channel, inter.message.jump_url, inter.user)
         logger = top_logger.get_guild_logger(inter.guild.id)
         logger.command_logger.log(
             LoggerLeveles.Command,
