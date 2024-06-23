@@ -1,17 +1,19 @@
-name: Lint
+name: Main
 
 on:
   push:
     branches: [ master ]
   pull_request:
     types: [ opened, reopened, synchronize ]
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: [ "3.12" ]
 
     steps:
     - uses: actions/checkout@v4
